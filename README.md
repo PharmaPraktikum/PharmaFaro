@@ -1,1 +1,1 @@
-# pharmaziepraktikum
+# PharmaFaro
