@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaFaro – Demnächst verfügbar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #b83228;
+            --dark: #2a1210;
+            --mid: #6b4f4a;
+            --bg: #fdf8f5;
+            --accent: #e8c4b8;
+            --border: rgba(42,18,16,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Hintergrund-Dekoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -30%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(184,50,40,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            left: -15%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(232,196,184,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeUp 0.8s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-family: 'Fraunces', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.03em;
+            margin-bottom: 0.25rem;
+        }
+
+        .logo em {
+            color: var(--red);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .tagline {
+            font-size: 0.85rem;
+            color: var(--mid);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 3.5rem;
+        }
+
+        .divider {
+            width: 48px;
+            height: 2px;
+            background: var(--red);
+            margin: 0 auto 3.5rem;
+            opacity: 0.4;
+        }
+
+        .headline {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            color: var(--dark);
+            margin-bottom: 1.25rem;
+        }
+
+        .headline em {
+            font-style: italic;
+            font-weight: 300;
+            color: var(--red);
+        }
+
+        .description {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: var(--mid);
+            font-weight: 300;
+            max-width: 420px;
+            margin: 0 auto 3rem;
+        }
+
+
+
+        .footer-note {
+            margin-top: 3rem;
+            font-size: 0.75rem;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Pharma<em>Faro</em></div>
+        <div class="tagline">Bewertungsplattform für Pharmaziepraktika</div>
+        <div class="divider"></div>
+
+        <h1 class="headline">Wir sind bald<br><em>für euch da.</em></h1>
+        <p class="description">
+            PharmaFaro hilft Pharmaziestudierenden dabei, den richtigen Praktikumsbetrieb zu finden — durch echte Bewertungen von echten Praktikanten.
+        </p>
+
+        <p class="footer-note">© 2026 PharmaFaro</p>
+    </div>
+
+
+</body>
+</html>
