@@ -142,14 +142,7 @@
 		padding: 0.5rem;
 		z-index: 1001;
 	}
-	.hamburger span {
-		display: block;
-		width: 24px;
-		height: 2px;
-		background: var(--dark);
-		border-radius: 2px;
-		transition: all 0.3s;
-	}
+	.hamburger span { display: block; width: 24px; height: 2px; background: var(--dark); border-radius: 2px; transition: all 0.3s; }
 	.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 	.hamburger.open span:nth-child(2) { opacity: 0; }
 	.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -1384,13 +1377,12 @@
 	/* ── MOBILE (≤ 600px) ── */
 	@media (max-width: 600px) {
 
-		/* ── NAVIGATION ── */
+		/* ── HAMBURGER ── */
 		.hamburger { display: flex; }
 		.nav-tabs {
 			display: none;
 			position: absolute;
-			top: 66px;
-			left: 0; right: 0;
+			top: 66px; left: 0; right: 0;
 			background: white;
 			border-bottom: 1px solid var(--border);
 			flex-direction: column;
@@ -1403,17 +1395,12 @@
 		.nav-tab { width: 100%; text-align: left; padding: 0.85rem 1.25rem; font-size: 0.95rem; border-radius: 0; white-space: normal; }
 		.nav-dropdown { width: 100%; }
 		.nav-dropdown .dropdown-content {
-			position: static;
-			box-shadow: none;
-			border: none;
-			border-top: 1px solid var(--border);
-			border-radius: 0;
-			padding: 0;
-			display: none;
+			position: static; box-shadow: none; border: none;
+			border-top: 1px solid var(--border); border-radius: 0;
+			padding: 0; display: none;
 		}
 		.nav-dropdown.mobile-sub-open .dropdown-content { display: block; }
-		.nav-dropdown .dropdown-content a { padding: 0.75rem 1.25rem 0.75rem 2rem; display: block; font-size: 0.9rem; color: var(--mid); border-bottom: none; }
-		.header { position: sticky; top: 0; z-index: 1000; }
+		.nav-dropdown .dropdown-content a { padding: 0.75rem 1.25rem 0.75rem 2rem; display: block; font-size: 0.9rem; color: var(--mid); }
 
 		/* ── HERO ── */
 		.hero { padding: 2rem 0 1.5rem; }
@@ -1427,11 +1414,10 @@
 		* { box-sizing: border-box; }
 		input, textarea, select { max-width: 100% !important; width: 100% !important; box-sizing: border-box !important; }
 
-		/* ── FILTER ── */
+		/* ── FILTER BUTTONS ── */
 		.filter-row { grid-template-columns: 1fr !important; gap: 0.75rem; }
 		.sort-controls { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-		.filter-buttons { flex-direction: column !important; gap: 0.5rem !important; }
-		.filter-buttons button, .filter-buttons .btn { width: 100% !important; }
+		.search-filters .btn { display: block; width: 100% !important; margin-left: 0 !important; margin-top: 0.5rem !important; }
 
 		/* ── CARDS ── */
 		#reviews-container, #jobs-container { grid-template-columns: 1fr; }
@@ -1441,25 +1427,23 @@
 		.overall-rating .rating-number { font-size: 1.5rem; }
 		.rating-grid { grid-template-columns: repeat(2, 1fr) !important; }
 		.rating-item .label { font-size: 0.75rem; }
+		.rating-item-stars .star { font-size: 0.75rem !important; }
 
-		/* ── FORMULARE ── */
-		.rating-form-group { grid-template-columns: 1fr 1fr; }
+		/* ── FORMULARE: CHECKBOXEN ── */
 		.form-section { padding: 1rem; }
 		.form-section [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
-		.form-section .checkbox-grid, [class*="checkbox"] { grid-template-columns: 1fr !important; }
+		label { max-width: 100% !important; width: 100% !important; display: flex !important; align-items: flex-start !important; gap: 0.5rem !important; flex-wrap: nowrap !important; }
+		label input[type="checkbox"] { flex-shrink: 0; margin-top: 2px; }
+		input[type="checkbox"] { accent-color: var(--red) !important; }
 
-		/* ── UNTERNEHMENSSEITE ── */
-		.company-section-header { flex-direction: column !important; align-items: center !important; gap: 1rem; text-align: center; }
-		.company-section-header img { width: 100px !important; height: 100px !important; }
-		.company-section-header h1 { font-size: 1.6rem !important; }
-		[style*="grid-template-columns: repeat(auto-fit, minmax(450px"] { grid-template-columns: 1fr !important; }
-		[style*="display: flex; gap: 3rem; align-items: center"] { flex-direction: column !important; gap: 1rem !important; }
-		.rating-item { cursor: pointer; -webkit-tap-highlight-color: rgba(184,50,40,0.1); }
-		.rating-item::after { content: ''; }
+		/* ── ARBEITSZEITEN ── */
+		.working-hours-row, [style*="HH:MM"] { max-width: 100% !important; }
 
-		/* ── LANDING STATS ── */
-		.landing-stats { grid-template-columns: 1fr !important; }
-		.landing-stat-number { font-size: 2.4rem; }
+		/* ── LANDING STATS: alle untereinander mit Abstand ── */
+		.landing-stats { grid-template-columns: 1fr !important; gap: 1rem; padding: 0 1rem; margin-top: 1.5rem; }
+		.landing-stat-card { margin: 0; }
+
+		/* ── LANDING FEATURES ── */
 		.landing-features-grid { grid-template-columns: 1fr; }
 		.landing-highlight-card { padding: 1.25rem; }
 
@@ -1467,16 +1451,32 @@
 		.modal-content { width: 95%; margin: 1rem auto; }
 		.modal-content [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
 
-		/* ── UNTERNEHMEN SUCHEN FILTER ── */
-		#company-search-section [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
-		#company-search-section [style*="display: flex"] { flex-wrap: wrap !important; }
-		#company-search-section label { width: 100%; }
+		/* ── UNTERNEHMENSSEITE ── */
+		.company-section-header { padding: 1rem !important; }
+		.company-section-header > div[style*="display: flex"] { flex-direction: column !important; align-items: center !important; text-align: center; gap: 1rem !important; }
+		.company-section-header img { width: 90px !important; height: 90px !important; }
+		.company-section-header h1 { font-size: 1.4rem !important; }
+		[style*="grid-template-columns: repeat(auto-fit, minmax(450px"] { grid-template-columns: 1fr !important; }
+		[style*="display: flex; gap: 3rem; align-items: center"] { flex-direction: column !important; gap: 1rem !important; }
 
-		/* ── STELLENANGEBOTE ERSTELLEN BUTTON ── */
-		[style*="position: absolute"][style*="top"][style*="right"] { position: static !important; margin-bottom: 1rem; width: 100%; text-align: center; }
+		/* ── SUCHVORSCHLÄGE: max 3 ── */
+		#search-suggestions { max-height: 180px; overflow-y: auto; }
 
-		/* ── SUCHVORSCHLÄGE ── */
-		#search-suggestions { max-height: 180px; }
+		/* ── STELLENANGEBOT ERSTELLEN BUTTON ── */
+		#jobs-section [style*="display: flex; justify-content: space-between"] { flex-direction: column !important; gap: 0.75rem !important; }
+		#jobs-section [style*="display: flex; justify-content: space-between"] .btn { width: 100% !important; }
+
+		/* ── PDF BUTTON ── */
+		#internship-guide-section [style*="display: flex; justify-content: space-between"] { flex-direction: column !important; gap: 0.75rem !important; align-items: flex-start !important; }
+
+		/* ── UNTERNEHMEN SUCHEN: FILTER ── */
+		#company-search-section .filter-row { grid-template-columns: 1fr !important; }
+		#company-search-section [style*="grid-column: span 2"] { grid-column: span 1 !important; }
+		#company-search-section [style*="display: flex; gap: 2rem"] { flex-direction: column !important; gap: 0.75rem !important; }
+		#company-search-section .btn { display: block; width: 100% !important; margin-left: 0 !important; margin-top: 0.5rem !important; }
+
+		/* ── BPHD AWARDS: STERNE UNTER BADGE ── */
+		.awarded-company-card [style*="display: flex; gap: 0.5rem; margin-top: 0.5rem"] { flex-wrap: wrap !important; }
 	}
 
     @media (max-width: 380px) {
@@ -1501,10 +1501,10 @@
 				<div class="nav-dropdown">
 					<button class="nav-tab" id="wissenswert-tab" onclick="toggleWissenswertMobile()">Wissenswert ▾</button>
 					<div class="dropdown-content" id="wissenswert-dropdown">
-						<a href="#" onclick="event.preventDefault(); const dd = document.querySelector('.nav-dropdown'); dd.classList.add('clicked'); setTimeout(() => dd.classList.remove('clicked'), 100); showSection('company-search'); closeMobileMenu(); return false;">Unternehmen suchen</a>
-						<a href="#" onclick="event.preventDefault(); const dd = document.querySelector('.nav-dropdown'); dd.classList.add('clicked'); setTimeout(() => dd.classList.remove('clicked'), 100); showSection('awarded-companies'); closeMobileMenu(); return false;">Ausgezeichnete Unternehmen</a>
-						<a href="#" onclick="event.preventDefault(); const dd = document.querySelector('.nav-dropdown'); dd.classList.add('clicked'); setTimeout(() => dd.classList.remove('clicked'), 100); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsleitfaden</a>
-						<a href="#" onclick="event.preventDefault(); const dd = document.querySelector('.nav-dropdown'); dd.classList.add('clicked'); setTimeout(() => dd.classList.remove('clicked'), 100); showSection('internship-tips'); closeMobileMenu(); return false;">Tipps zur Praktikumssuche</a>
+						<a href="#" onclick="event.preventDefault(); showSection('company-search'); closeMobileMenu(); return false;">Unternehmen suchen</a>
+						<a href="#" onclick="event.preventDefault(); showSection('awarded-companies'); closeMobileMenu(); return false;">Ausgezeichnete Unternehmen</a>
+						<a href="#" onclick="event.preventDefault(); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsleitfaden</a>
+						<a href="#" onclick="event.preventDefault(); showSection('internship-tips'); closeMobileMenu(); return false;">Tipps zur Praktikumssuche</a>
 					</div>
 				</div>
 			</div>
@@ -8781,8 +8781,15 @@
 		function toggleMobileMenu() {
 			const btn = document.getElementById('hamburger-btn');
 			const tabs = document.getElementById('nav-tabs');
+			if (!btn || !tabs) return;
 			btn.classList.toggle('open');
 			tabs.classList.toggle('mobile-open');
+			// Wissenswert-Untermenü beim Schließen einklappen
+			if (!tabs.classList.contains('mobile-open')) {
+				document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
+				const wt = document.getElementById('wissenswert-tab');
+				if (wt) wt.textContent = 'Wissenswert ▾';
+			}
 		}
 		function closeMobileMenu() {
 			const btn = document.getElementById('hamburger-btn');
@@ -8790,10 +8797,15 @@
 			if (btn) btn.classList.remove('open');
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
+			const wt = document.getElementById('wissenswert-tab');
+			if (wt) wt.textContent = 'Wissenswert ▾';
 		}
 		function toggleWissenswertMobile() {
 			if (window.innerWidth <= 600) {
-				document.querySelector('.nav-dropdown').classList.toggle('mobile-sub-open');
+				const dd = document.querySelector('.nav-dropdown');
+				const wt = document.getElementById('wissenswert-tab');
+				dd.classList.toggle('mobile-sub-open');
+				if (wt) wt.textContent = dd.classList.contains('mobile-sub-open') ? 'Wissenswert ▴' : 'Wissenswert ▾';
 			} else {
 				showSection('wissenswert');
 			}
