@@ -1401,6 +1401,7 @@
 		}
 		.nav-dropdown.mobile-sub-open .dropdown-content { display: block; }
 		.nav-dropdown .dropdown-content a { padding: 0.75rem 1.25rem 0.75rem 2rem; display: block; font-size: 0.9rem; color: var(--mid); }
+		.nav-dropdown .dropdown-content a.active { background: var(--red); color: white !important; }
 
 		/* ── HERO ── */
 		.hero { padding: 2rem 0 1.5rem; }
@@ -1419,6 +1420,9 @@
 		.sort-controls { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 		.search-filters .btn { display: block; width: 100% !important; margin-left: 0 !important; margin-top: 0.5rem !important; }
 
+		.job-create-btn { display: none !important; }
+		.job-create-btn-mobile { display: block !important; width: 100% !important; margin-top: 0.5rem !important; }
+
 		/* ── CARDS ── */
 		#reviews-container, #jobs-container { grid-template-columns: 1fr; }
 		.review-header { flex-direction: row !important; gap: 0.75rem; align-items: flex-start; }
@@ -1432,9 +1436,11 @@
 		/* ── FORMULARE: CHECKBOXEN ── */
 		.form-section { padding: 1rem; }
 		.form-section [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
-		label { max-width: 100% !important; width: 100% !important; display: flex !important; align-items: flex-start !important; gap: 0.5rem !important; flex-wrap: nowrap !important; }
-		label input[type="checkbox"] { flex-shrink: 0; margin-top: 2px; }
-		input[type="checkbox"] { accent-color: var(--red) !important; }
+		label { max-width: 100% !important; box-sizing: border-box !important; }
+		label input[type="checkbox"] { flex-shrink: 0 !important; }
+		input[type="checkbox"] { accent-color: var(--red) !important; width: auto !important; max-width: none !important; }
+		[style*="grid-template-columns: 1fr 1fr"] label { width: 100% !important; }
+		.form-section label { display: flex !important; align-items: flex-start !important; gap: 0.5rem !important; flex-wrap: nowrap !important; width: 100% !important; }
 
 		/* ── ARBEITSZEITEN ── */
 		.working-hours-row, [style*="HH:MM"] { max-width: 100% !important; }
@@ -1453,18 +1459,27 @@
 
 		/* ── UNTERNEHMENSSEITE ── */
 		.company-section-header { padding: 1rem !important; }
-		.company-section-header > div[style*="display: flex"] { flex-direction: column !important; align-items: center !important; text-align: center; gap: 1rem !important; }
+		.company-section-header > div[style*="display: flex"] { flex-direction: column !important; align-items: center !important; text-align: center; gap: 0.75rem !important; }
+		.company-section-header img { width: 90px !important; height: 90px !important; margin: 0 auto !important; }
+		.company-section-header h1 { font-size: 1.4rem !important; }
+		.company-section-header [style*="display: flex; align-items: center; gap: 1rem"] { justify-content: center !important; flex-wrap: wrap !important; }
+		.company-section-header .stars { justify-content: center !important; margin: 0 !important; }
+		.company-section-header [style*="margin-top: 0.75rem; display: flex"] { justify-content: center !important; }
 		.company-section-header img { width: 90px !important; height: 90px !important; }
 		.company-section-header h1 { font-size: 1.4rem !important; }
-		[style*="grid-template-columns: repeat(auto-fit, minmax(450px"] { grid-template-columns: 1fr !important; }
+		#company-section [style*="padding: 2rem; background: white; border-radius: 10px"] { padding: 1rem !important; }
+		#company-section [style*="grid-template-columns: repeat(auto-fit, minmax(450px"] { grid-template-columns: 1fr !important; gap: 1rem !important; }
 		[style*="display: flex; gap: 3rem; align-items: center"] { flex-direction: column !important; gap: 1rem !important; }
 
 		/* ── SUCHVORSCHLÄGE: max 3 ── */
-		#search-suggestions { max-height: 180px; overflow-y: auto; }
+		#search-suggestions { max-height: 180px !important; overflow-y: auto !important; }
 
 		/* ── STELLENANGEBOT ERSTELLEN BUTTON ── */
 		#jobs-section [style*="display: flex; justify-content: space-between"] { flex-direction: column !important; gap: 0.75rem !important; }
 		#jobs-section [style*="display: flex; justify-content: space-between"] .btn { width: 100% !important; }
+		#jobs-section .search-filters > div:first-child { flex-wrap: wrap !important; }
+		#jobs-section .search-filters > div:first-child .btn { order: 3; width: 100% !important; margin-top: 0.5rem !important; }
+		#jobs-section .search-filters > div:first-child h2 { order: 1; }
 
 		/* ── PDF BUTTON ── */
 		#internship-guide-section [style*="display: flex; justify-content: space-between"] { flex-direction: column !important; gap: 0.75rem !important; align-items: flex-start !important; }
@@ -1476,7 +1491,8 @@
 		#company-search-section .btn { display: block; width: 100% !important; margin-left: 0 !important; margin-top: 0.5rem !important; }
 
 		/* ── BPHD AWARDS: STERNE UNTER BADGE ── */
-		.awarded-company-card [style*="display: flex; gap: 0.5rem; margin-top: 0.5rem"] { flex-wrap: wrap !important; }
+		#all-companies-container [style*="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap"] { flex-direction: column !important; align-items: flex-start !important; gap: 0.25rem !important; }
+		.awarded-company-card [style*="display: flex; gap: 0.5rem; margin-top: 0.5rem"] { flex-direction: column !important; align-items: flex-start !important; gap: 0.25rem !important; }
 	}
 
     @media (max-width: 380px) {
@@ -8791,6 +8807,7 @@
 				if (wt) wt.textContent = 'Wissenswert ▾';
 			}
 		}
+		
 		function closeMobileMenu() {
 			const btn = document.getElementById('hamburger-btn');
 			const tabs = document.getElementById('nav-tabs');
@@ -8800,12 +8817,15 @@
 			const wt = document.getElementById('wissenswert-tab');
 			if (wt) wt.textContent = 'Wissenswert ▾';
 		}
+		
 		function toggleWissenswertMobile() {
-			if (window.innerWidth <= 600) {
+			const navTabs = document.getElementById('nav-tabs');
+			const isMobile = navTabs && navTabs.classList.contains('mobile-open');
+			if (isMobile) {
 				const dd = document.querySelector('.nav-dropdown');
 				const wt = document.getElementById('wissenswert-tab');
 				dd.classList.toggle('mobile-sub-open');
-				if (wt) wt.textContent = dd.classList.contains('mobile-sub-open') ? 'Wissenswert ▴' : 'Wissenswert ▾';
+				if (wt) wt.innerHTML = dd.classList.contains('mobile-sub-open') ? 'Wissenswert ▴' : 'Wissenswert ▾';
 			} else {
 				showSection('wissenswert');
 			}
