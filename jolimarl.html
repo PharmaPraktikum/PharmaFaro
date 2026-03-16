@@ -130,6 +130,8 @@
 		.nav-tab { width: 100%; text-align: left; padding: 0.75rem 1rem; }
 		.nav-dropdown { width: 100%; }
 		.dropdown-content { position: static; box-shadow: none; border: none; padding-left: 1rem; }
+		.nav-dropdown .dropdown-content { display: none; }
+		.nav-dropdown.mobile-sub-open .dropdown-content { display: block; }		
 	}
 
 	.hamburger {
@@ -1555,7 +1557,7 @@
 		
 		.job-create-btn-mobile { display: block !important; width: 100% !important; margin: 0.75rem 0 !important; }
 
-		#company-section [style*="position: absolute; top: -20px; right: -20px"] { top: 0.5rem !important; right: 0.5rem !important; transform: none !important; }
+		#company-section [style*="position: absolute; top: -20px; right: -20px"] { top: -15px !important; right: -15px !important; transform: none !important; z-index: 10 !important; }
 
 		#company-section [style*="position: absolute; top: -15px; right: -15px"] { top: -10px !important; right: 10px !important; }
 
