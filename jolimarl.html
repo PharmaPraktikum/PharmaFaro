@@ -769,6 +769,7 @@
     .checkbox-group label:hover { border-color: var(--red); background: var(--red-light); }
     .checkbox-group input[type="checkbox"] { width: auto; margin: 0; accent-color: var(--red); }
     .checkbox-group input[type="checkbox"]:checked + span { color: var(--red); font-weight: 600; }
+	.job-create-btn-mobile { display: none; }
 	input[type="checkbox"] { accent-color: var(--red); }
     input[type="radio"] { accent-color: var(--red); }
 
@@ -1461,6 +1462,12 @@
 		/* ── UNTERNEHMENSSEITE ── */
 		.company-section-header { padding: 1rem !important; }
 		.company-section-header > div[style*="display: flex"] { flex-direction: column !important; align-items: center !important; text-align: center; gap: 0.75rem !important; }
+		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { flex-direction: column !important; align-items: center !important; text-align: center !important; }
+		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] img { width: 100px !important; height: 100px !important; margin: 0 auto !important; flex-shrink: 0 !important; }
+		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] > div { width: 100% !important; }
+		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] h1 { font-size: 1.4rem !important; text-align: center !important; }
+		#company-section [style*="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem"] { justify-content: center !important; flex-wrap: wrap !important; }
+		#company-section [style*="margin-top: 0.75rem; display: flex; align-items: center"] { justify-content: center !important; }
 		.company-section-header img { width: 90px !important; height: 90px !important; margin: 0 auto !important; }
 		.company-section-header h1 { font-size: 1.4rem !important; }
 		.company-section-header [style*="display: flex; align-items: center; gap: 1rem"] { justify-content: center !important; flex-wrap: wrap !important; }
@@ -1527,11 +1534,21 @@
 		.job-create-btn-mobile { display: block !important; }
 
 		#all-companies-container [style*="display: flex; align-items: center; gap: 0.5rem"] { flex-wrap: wrap !important; align-items: baseline !important; }
-		#all-companies-container h4 { display: inline !important; }
+		#all-companies-container h4 { display: inline !important; font-size: 1.05rem !important; }
+		#all-companies-container [style*="display: flex; align-items: center; gap: 0.5rem"] { display: inline !important; }
 		#all-companies-container .verified-badge { display: inline-flex !important; vertical-align: middle !important; }
 		#all-companies-container [style*="margin-top: 0.4rem"] { gap: 0 !important; }
 		#all-companies-container .category-badge { margin-bottom: 0.5rem !important; }
-		#all-companies-container [style*="display: flex; align-items: center; gap: 0.25rem"] { margin-top: 0.35rem !important; }
+		#all-companies-container [style*="display: flex; align-items: center; gap: 0.25rem"] { margin-top: 0.35rem !important; margin-bottom: 0.35rem !important; }
+
+		.job-create-btn-mobile { display: none; }
+
+		.hero > .container > div[style*="position: relative"] { background: transparent !important; border-radius: 0 !important; overflow: visible !important; }
+		#search-suggestions { z-index: 9999 !important; position: absolute !important; }
+
+		.checkbox-group { grid-template-columns: 1fr !important; }
+		#jobs-section .search-filters > div:first-child { display: block !important; }
+		.overall-rating[style*="transform: scale(1.2)"] { transform: scale(1) !important; }
 	}
 
     @media (max-width: 380px) {
@@ -2404,9 +2421,9 @@
                     </div>
                     <button class="btn btn-primary" onclick="applyJobFilters()">Filter anwenden</button>
                     <button class="btn btn-secondary" onclick="showJobAdvancedFilters()" style="margin-left: 1rem;">Weitere Filtermöglichkeiten</button>
-                    <button class="btn btn-secondary" onclick="resetAllJobFilters()" id="job-reset-filters-btn" style="margin-left: 1rem; display: none;">Filter zurücksetzen</button>
-					<button class="btn btn-primary job-create-btn-mobile" onclick="showJobModal()">Stellenangebot erstellen</button>
+					<button class="btn btn-secondary" onclick="resetAllJobFilters()" id="job-reset-filters-btn" style="margin-left: 1rem; display: none;">Filter zurücksetzen</button>
                 </div>
+                <button class="btn btn-primary job-create-btn-mobile" onclick="showJobModal()">Stellenangebot erstellen</button>
 
 				<div class="sort-controls">
 					<span class="sort-label">Sortierung:</span>
@@ -8372,11 +8389,18 @@
 				fileDisplay.textContent = this.files[0].name;
 				if (window.innerWidth <= 600) {
 					const removeBtn = document.getElementById('remove-file-btn');
+					const wrapper = document.getElementById('verification-file').parentElement;
+					fileDisplay.style.display = 'inline';
+					fileDisplay.style.width = 'auto';
+					fileDisplay.style.marginTop = '0.5rem';
 					fileDisplay.style.display = 'block';
-					fileDisplay.style.width = '100%';
-					fileDisplay.style.marginTop = '0.25rem';
-					if (removeBtn) { removeBtn.style.marginLeft = '0'; removeBtn.style.marginTop = '0.25rem'; }
-				}				
+					if (removeBtn) { 
+						removeBtn.style.display = 'inline-block';
+						removeBtn.style.marginLeft = '0.5rem';
+						removeBtn.style.verticalAlign = 'middle';
+						removeBtn.style.marginTop = '0';
+					}
+				}
 				removeBtn.style.display = 'inline-block';
 			} else {
 				fileDisplay.textContent = 'Keine Datei ausgewählt.';
@@ -8847,11 +8871,15 @@
 			if (!btn || !tabs) return;
 			btn.classList.toggle('open');
 			tabs.classList.toggle('mobile-open');
-			// Wissenswert-Untermenü beim Schließen einklappen
+			const wt = document.getElementById('wissenswert-tab');
+			const dd = document.querySelector('.nav-dropdown');
 			if (!tabs.classList.contains('mobile-open')) {
-				document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
-				const wt = document.getElementById('wissenswert-tab');
+				dd?.classList.remove('mobile-sub-open');
 				if (wt) wt.innerHTML = 'Wissenswert &#9660;';
+			} else {
+				// Beim Öffnen: Pfeil entsprechend aktuellem Untermenü-Status setzen
+				const isSubOpen = dd?.classList.contains('mobile-sub-open');
+				if (wt) wt.innerHTML = isSubOpen ? 'Wissenswert <span style="display:inline-block;transform:scaleY(-1);">&#9660;</span>' : 'Wissenswert &#9660;';
 			}
 		}
 		
@@ -8873,7 +8901,7 @@
 				const wt = document.getElementById('wissenswert-tab');
 				const isOpen = dd.classList.contains('mobile-sub-open');
 				dd.classList.toggle('mobile-sub-open');
-				if (wt) wt.innerHTML = isOpen ? 'Wissenswert &#9660;' : 'Wissenswert &#9650;';
+				if (wt) wt.innerHTML = isOpen ? 'Wissenswert &#9660;' : 'Wissenswert <span style="display:inline-block;transform:scaleY(-1);">&#9660;</span>';
 			} else {
 				showSection('wissenswert');
 			}
