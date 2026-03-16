@@ -9437,22 +9437,26 @@
 		let closeTimeout;
 
 		dropdown.addEventListener('mouseenter', function() {
+			if (window.matchMedia('(max-width: 768px)').matches) return;
 			clearTimeout(closeTimeout);
 			dropdown.classList.add('open');
 		});
 
 		dropdown.addEventListener('mouseleave', function() {
+			if (window.matchMedia('(max-width: 768px)').matches) return;
 			closeTimeout = setTimeout(() => {
 				dropdown.classList.remove('open');
 			}, 250);
 		});
 
 		dropdownContent.addEventListener('mouseenter', function() {
+			if (window.matchMedia('(max-width: 768px)').matches) return;
 			clearTimeout(closeTimeout);
 			dropdown.classList.add('open');
 		});
 
 		dropdownContent.addEventListener('mouseleave', function() {
+			if (window.matchMedia('(max-width: 768px)').matches) return;
 			closeTimeout = setTimeout(() => {
 				dropdown.classList.remove('open');
 			}, 250);
