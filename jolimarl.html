@@ -1555,12 +1555,13 @@
 		
 		.job-create-btn-mobile { display: block !important; width: 100% !important; margin: 0.75rem 0 !important; }
 
-		#company-section [style*="position: absolute; top: -20px; right: -20px"] { position: fixed !important; top: auto !important; right: 1rem !important; transform: none !important; margin-top: 1rem !important; }
+		#company-section [style*="position: absolute; top: -20px; right: -20px"] { top: 0.5rem !important; right: 0.5rem !important; transform: none !important; }
 
 		#company-section [style*="position: absolute; top: -15px; right: -15px"] { top: -10px !important; right: 10px !important; }
 
 		#company-section [style*="padding: 1rem 2rem; background: #f8f9fa"] span { display: block; margin-bottom: 0.75rem !important; }
 		#company-section [style*="padding: 1rem 2rem; background: #f8f9fa"] .btn { margin-left: 0 !important; width: 100% !important; }
+		#company-section [style*="position: absolute; top: -20px; right: -20px"] { right: 0.5rem !important; top: 0.5rem !important; }
 	}
 
     @media (max-width: 380px) {
@@ -8917,7 +8918,7 @@
 		
 		function toggleWissenswertMobile() {
 			const navTabs = document.getElementById('nav-tabs');
-			const isMobile = navTabs && navTabs.classList.contains('mobile-open');
+			const isMobile = window.innerWidth <= 600;
 			if (isMobile) {
 				const dd = document.querySelector('.nav-dropdown');
 				const wt = document.getElementById('wissenswert-tab');
