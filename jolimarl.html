@@ -384,6 +384,7 @@
 
     /* ── CARDS ── */
 	.review-card, .job-card {
+		overflow: hidden;
 		background: white;
 		border: 1px solid var(--border);
 		border-radius: 12px;
@@ -977,7 +978,7 @@
     .comments-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
     .comment-item { margin-bottom: 1rem; }
     .comment-label { font-weight: 600; color: var(--dark); margin-bottom: 0.25rem; font-size: 0.85rem; }
-    .comment-text { color: var(--mid); font-family: 'DM Sans', sans-serif; font-style: normal; font-size: 0.9rem; line-height: 1.65; }
+    .comment-text { color: var(--mid); font-family: 'DM Sans', sans-serif; font-style: normal; font-size: 0.9rem; line-height: 1.65; word-break: break-word; overflow-wrap: break-word; }
 
     .job-description { background: var(--bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin: 1rem 0; }
     .job-posted-date { font-size: 0.8rem; color: var(--mid); margin-top: 1rem; }
@@ -1262,13 +1263,13 @@
 
     /* ── HIGHLIGHT REVIEWS ── */
 	.landing-reviews-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-		gap: 1.5rem;
-		margin-top: 2.5rem;
-		min-height: 280px;
-		align-items: start;
-	}
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2.5rem;
+        align-items: stretch;
+        grid-auto-rows: 1fr;
+    }
 
 	.landing-highlight-card {
 		background: var(--bg-card);
@@ -1493,6 +1494,44 @@
 		/* ── BPHD AWARDS: STERNE UNTER BADGE ── */
 		#all-companies-container [style*="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap"] { flex-direction: column !important; align-items: flex-start !important; gap: 0.25rem !important; }
 		.awarded-company-card [style*="display: flex; gap: 0.5rem; margin-top: 0.5rem"] { flex-direction: column !important; align-items: flex-start !important; gap: 0.25rem !important; }
+
+		#verification-file + button ~ span#file-name-display { display: block; margin-top: 0.5rem; }
+		[style*="position: relative; display: inline-block; width: 100%"] { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 0.5rem !important; }
+
+		.success-modal-overlay > div { width: 88% !important; padding: 1.75rem !important; box-sizing: border-box !important; }
+
+		.landing-highlight-card { overflow: hidden !important; }
+		.landing-highlight-card * { word-break: break-word !important; overflow-wrap: break-word !important; }
+		.review-card { overflow: visible !important; }
+		.review-card > * { max-width: 100% !important; overflow: hidden !important; }		
+		.comment-text { word-break: break-word !important; overflow-wrap: break-word !important; max-width: 100% !important; }
+		.review-card * { max-width: 100% !important; }
+
+		.hero [style*="position: relative; max-width: 600px"] { overflow: visible !important; background: transparent !important; border-radius: 0 !important; }
+
+		#benefits-field, #job-benefits-field, [id*="benefits"] .checkbox-grid { grid-template-columns: 1fr !important; }
+		.checkbox-item, [class*="checkbox-item"] { grid-template-columns: 1fr !important; }
+		.form-section label { align-items: center !important; }
+		.form-section label input[type="checkbox"] { margin-top: 0 !important; flex-shrink: 0 !important; }		
+
+		[style*="background: #f8f9fa"] { background: var(--bg) !important; }
+		
+		#jobs-section .search-filters { display: flex !important; flex-direction: column !important; }
+		#jobs-section .search-filters > div:first-child { order: 1 !important; }
+		#jobs-section .search-filters > div:first-child .job-create-btn { display: none !important; }
+		#jobs-section .search-filters .filter-row { order: 2 !important; }
+		#jobs-section .search-filters > .btn:first-of-type { order: 3 !important; }
+		#jobs-section .search-filters > .btn { order: 3 !important; width: 100% !important; margin-left: 0 !important; }		
+
+		.job-create-btn { display: none !important; }
+		.job-create-btn-mobile { display: block !important; }
+
+		#all-companies-container [style*="display: flex; align-items: center; gap: 0.5rem"] { flex-wrap: wrap !important; align-items: baseline !important; }
+		#all-companies-container h4 { display: inline !important; }
+		#all-companies-container .verified-badge { display: inline-flex !important; vertical-align: middle !important; }
+		#all-companies-container [style*="margin-top: 0.4rem"] { gap: 0 !important; }
+		#all-companies-container .category-badge { margin-bottom: 0.5rem !important; }
+		#all-companies-container [style*="display: flex; align-items: center; gap: 0.25rem"] { margin-top: 0.35rem !important; }
 	}
 
     @media (max-width: 380px) {
@@ -2300,7 +2339,7 @@
                 <div class="search-filters">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h2 class="search-title">Stellenangebote für Praktikumsplätze</h2>
-                        <button class="btn btn-primary" onclick="showJobModal()">Stellenangebot erstellen</button>
+                        <button class="btn btn-primary job-create-btn" onclick="showJobModal()">Stellenangebot erstellen</button>
                     </div>
                     <div class="filter-row">
                         <div class="filter-group">
@@ -2366,6 +2405,7 @@
                     <button class="btn btn-primary" onclick="applyJobFilters()">Filter anwenden</button>
                     <button class="btn btn-secondary" onclick="showJobAdvancedFilters()" style="margin-left: 1rem;">Weitere Filtermöglichkeiten</button>
                     <button class="btn btn-secondary" onclick="resetAllJobFilters()" id="job-reset-filters-btn" style="margin-left: 1rem; display: none;">Filter zurücksetzen</button>
+					<button class="btn btn-primary job-create-btn-mobile" onclick="showJobModal()">Stellenangebot erstellen</button>
                 </div>
 
 				<div class="sort-controls">
@@ -8330,6 +8370,13 @@
 			
 			if (this.files.length > 0) {
 				fileDisplay.textContent = this.files[0].name;
+				if (window.innerWidth <= 600) {
+					const removeBtn = document.getElementById('remove-file-btn');
+					fileDisplay.style.display = 'block';
+					fileDisplay.style.width = '100%';
+					fileDisplay.style.marginTop = '0.25rem';
+					if (removeBtn) { removeBtn.style.marginLeft = '0'; removeBtn.style.marginTop = '0.25rem'; }
+				}				
 				removeBtn.style.display = 'inline-block';
 			} else {
 				fileDisplay.textContent = 'Keine Datei ausgewählt.';
@@ -8737,9 +8784,9 @@
 									if (t.length === 0) return '';
 									const trunc = t.length > MAX_CHARS;
 									const disp = trunc ? t.substring(0, MAX_CHARS).trimEnd() + '…' : t;
-									return `<div style="flex:1; padding-top:0.6rem; border-top:1px solid var(--border);">
+									return `<div style="flex:1; padding-top:0.6rem; min-width:0; border-top:1px solid var(--border);">
 										<div style="font-weight:600; color:var(--dark); margin-bottom:0.25rem; font-size:0.85rem;">${label}</div>
-										<div style="color:var(--mid); font-family:'DM Sans',sans-serif; font-size:0.9rem; line-height:1.65;">${esc(disp)}${trunc ? `<span style="color:var(--red);font-weight:600;"> Mehr anzeigen…</span>` : ''}</div>
+										<div style="color:var(--mid); font-family:'DM Sans',sans-serif; font-size:0.9rem; line-height:1.65; word-break:break-word; overflow-wrap:anywhere; min-width:0;">${esc(disp)}${trunc ? `<span style="color:var(--red);font-weight:600;"> Mehr anzeigen…</span>` : ''}</div>
 									</div>`;
 								})()}
 							</div>`;
@@ -8804,7 +8851,7 @@
 			if (!tabs.classList.contains('mobile-open')) {
 				document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 				const wt = document.getElementById('wissenswert-tab');
-				if (wt) wt.textContent = 'Wissenswert ▾';
+				if (wt) wt.innerHTML = 'Wissenswert &#9660;';
 			}
 		}
 		
@@ -8815,7 +8862,7 @@
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 			const wt = document.getElementById('wissenswert-tab');
-			if (wt) wt.textContent = 'Wissenswert ▾';
+			if (wt) wt.innerHTML = 'Wissenswert &#9660;';
 		}
 		
 		function toggleWissenswertMobile() {
@@ -8824,8 +8871,9 @@
 			if (isMobile) {
 				const dd = document.querySelector('.nav-dropdown');
 				const wt = document.getElementById('wissenswert-tab');
+				const isOpen = dd.classList.contains('mobile-sub-open');
 				dd.classList.toggle('mobile-sub-open');
-				if (wt) wt.innerHTML = dd.classList.contains('mobile-sub-open') ? 'Wissenswert ▴' : 'Wissenswert ▾';
+				if (wt) wt.innerHTML = isOpen ? 'Wissenswert &#9660;' : 'Wissenswert &#9650;';
 			} else {
 				showSection('wissenswert');
 			}
