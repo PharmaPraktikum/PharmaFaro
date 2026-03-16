@@ -1562,7 +1562,6 @@
 
 		#company-section [style*="padding: 1rem 2rem; background: #f8f9fa"] span { display: block; margin-bottom: 0.75rem !important; }
 		#company-section [style*="padding: 1rem 2rem; background: #f8f9fa"] .btn { margin-left: 0 !important; width: 100% !important; }
-		#company-section [style*="position: absolute; top: -20px; right: -20px"] { right: 0.5rem !important; top: 0.5rem !important; }
 	}
 
     @media (max-width: 380px) {
@@ -3998,7 +3997,7 @@
 				<!-- Header -->
 				<div style="position: relative; display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06); overflow: visible;">
 					${company.bphdAwards && company.bphdAwards.length > 0 ? `
-					<div class="bphd-badge-container" style="position: absolute; top: -20px; right: -20px; cursor: pointer; z-index: 5;"
+					<div class="bphd-badge-container" style="position: absolute; top: -20px; right: -20px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${company.name.replace(/'/g, "\\'")}')">
 						<svg width="90" height="100" viewBox="0 0 90 100">
 							<!-- Ribbon -->
 							<path d="M25 0 L35 0 L35 50 L30 45 L25 50 Z" fill="#8B0000"/>
@@ -5226,7 +5225,7 @@
 				<!-- Header -->
 				<div style="position: relative; display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06); overflow: visible;">
 					${company.bphdAwards && company.bphdAwards.length > 0 ? `
-					<div class="bphd-badge-container" style="position: absolute; top: -20px; right: -20px; cursor: pointer; z-index: 5;"
+					<div class="bphd-badge-container" style="position: absolute; top: -20px; right: -20px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${company.name.replace(/'/g, "\\'")}')">
 						<svg width="90" height="100" viewBox="0 0 90 100">
 							<!-- Ribbon -->
 							<path d="M25 0 L35 0 L35 50 L30 45 L25 50 Z" fill="#8B0000"/>
@@ -8900,10 +8899,10 @@
 			const dd = document.querySelector('.nav-dropdown');
 			if (!tabs.classList.contains('mobile-open')) {
 				dd?.classList.remove('mobile-sub-open');
-				if (wt) wt.textContent = 'Wissenswert ▾';
+				if (wt) { wt.textContent = 'Wissenswert ▾'; wt.setAttribute('data-open', 'false'); }
 			} else {
 				const isSubOpen = dd?.classList.contains('mobile-sub-open');
-				if (wt) wt.textContent = isSubOpen ? 'Wissenswert ▴' : 'Wissenswert ▾';
+				if (wt) { wt.textContent = isSubOpen ? 'Wissenswert ▴' : 'Wissenswert ▾'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
 			}
 		}
 		
@@ -8914,13 +8913,13 @@
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 			const wt = document.getElementById('wissenswert-tab');
-			if (wt) wt.textContent = 'Wissenswert ▾';
+			if (wt) { wt.textContent = 'Wissenswert ▾'; wt.setAttribute('data-open', 'false'); }
 		}
 		
 		function toggleWissenswertMobile() {
 			const dd = document.querySelector('.nav-dropdown');
 			const wt = document.getElementById('wissenswert-tab');
-			if (window.innerWidth > 600) { showSection('wissenswert'); return; }
+			if (!window.matchMedia('(max-width: 600px)').matches) { showSection('wissenswert'); return; }
 			const isOpen = wt.getAttribute('data-open') === 'true';
 			dd.classList.toggle('mobile-sub-open');
 			wt.setAttribute('data-open', !isOpen);
