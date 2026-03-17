@@ -1424,7 +1424,6 @@
 		.search-filters .btn { display: block; width: 100% !important; margin-left: 0 !important; margin-top: 0.5rem !important; }
 
 		.job-create-btn { display: none !important; }
-		.job-create-btn-mobile { display: block !important; width: 100% !important; margin-top: 0.5rem !important; }
 
 		/* ── CARDS ── */
 		#reviews-container, #jobs-container { grid-template-columns: 1fr; }
@@ -1463,7 +1462,7 @@
 		/* ── UNTERNEHMENSSEITE ── */
 		.company-section-header { padding: 1rem !important; }
 		.company-section-header > div[style*="display: flex"] { flex-direction: column !important; align-items: center !important; text-align: center; gap: 0.75rem !important; }
-		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { flex-direction: column !important; align-items: center !important; text-align: center !important; width: 100% !important; }
+		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { flex-direction: column !important; align-items: center !important; text-align: center !important; width: 100% !important; overflow: visible !important; }
 		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] img { width: 100px !important; height: 100px !important; margin: 0 auto !important; flex-shrink: 0 !important; }
 		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] > div { width: 100% !important; }
 		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] h1 { font-size: 1.4rem !important; text-align: center !important; }
@@ -1532,7 +1531,6 @@
 		#jobs-section .search-filters > .btn { order: 3 !important; width: 100% !important; margin-left: 0 !important; }		
 
 		.job-create-btn { display: none !important; }
-		.job-create-btn-mobile { display: block !important; }
 
 		#all-companies-container [style*="display: flex; align-items: center; gap: 0.5rem"] { flex-wrap: wrap !important; align-items: baseline !important; }
 		#all-companies-container h4 { display: inline !important; font-size: 1.05rem !important; }
@@ -1543,8 +1541,6 @@
 		#all-companies-container [style*="display: flex; align-items: center; gap: 0.25rem"] { margin-top: 0.35rem !important; margin-bottom: 0.35rem !important; }
 		#all-companies-container [style*="background: #d4edda"] { margin-top: 0.35rem !important; }
 
-		.job-create-btn-mobile { display: none; }
-
 		.hero > .container > div[style*="position: relative"] { background: transparent !important; border-radius: 0 !important; overflow: visible !important; }
 		#search-suggestions { z-index: 9999 !important; position: absolute !important; }
 
@@ -1553,10 +1549,8 @@
 		#jobs-section .search-filters > div:first-child h2 { margin-bottom: 0 !important; }
 		.job-create-btn { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
 		.overall-rating[style*="transform: scale(1.2)"] { transform: scale(1) !important; }
-		
-		.job-create-btn-mobile { display: block !important; width: 100% !important; margin: 0.75rem 0 !important; }
 
-		.bphd-badge-container { position: absolute !important; top: -15px !important; right: 0px !important; z-index: 10 !important; }
+		.bphd-badge-container { position: absolute !important; top: -15px !important; right: -20px !important; z-index: 10 !important; }
 
 		#company-section [style*="position: absolute; top: -15px; right: -15px"] { top: -10px !important; right: 10px !important; }
 
@@ -1566,6 +1560,8 @@
 		.nav-dropdown { position: relative !important; }
 		.nav-dropdown .nav-tab { text-align: left !important; }
 		.nav-dropdown { display: block !important; }
+		
+		.job-create-btn-mobile { display: block !important; width: 100% !important; margin-bottom: 1rem !important; padding: 1rem !important; }
 	}
 
     @media (max-width: 380px) {
@@ -2370,6 +2366,7 @@
 
             <!-- Stellenangebote -->
             <div id="jobs-section" class="content-section">
+				<button class="btn btn-primary job-create-btn-mobile" onclick="showJobModal()" style="display:none;">Stellenangebot erstellen</button>
                 <div class="search-filters">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h2 class="search-title">Stellenangebote für Praktikumsplätze</h2>
@@ -2440,7 +2437,6 @@
                     <button class="btn btn-secondary" onclick="showJobAdvancedFilters()" style="margin-left: 1rem;">Weitere Filtermöglichkeiten</button>
 					<button class="btn btn-secondary" onclick="resetAllJobFilters()" id="job-reset-filters-btn" style="margin-left: 1rem; display: none;">Filter zurücksetzen</button>
                 </div>
-                <button class="btn btn-primary job-create-btn-mobile" onclick="showJobModal()">Stellenangebot erstellen</button>
 
 				<div class="sort-controls">
 					<span class="sort-label">Sortierung:</span>
@@ -4080,7 +4076,7 @@
 							${Object.keys(ratingDistribution).reverse().map(star => `
 								<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; cursor: pointer;" 
 									 onclick="alert('Filter ${star} Sterne')">
-									<span style="min-width: 40px; display: inline-flex; align-items: center; gap: 2px;">${star} <span style="color: var(--red); line-height: 1;">★</span></span>
+									<span style="width: 40px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex-shrink: 0;"><span style="min-width: 12px; text-align: right;">${star}</span><span style="color: var(--red); line-height: 1; flex-shrink: 0;">★</span></span>
 									<div style="flex: 1; height: 25px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
 										<div style="height: 100%; background: var(--red); width: ${company.reviews.length > 0 ? (ratingDistribution[star] / company.reviews.length) * 100 : 0}%;"></div>
 									</div>
@@ -5318,7 +5314,7 @@
 							${Object.keys(ratingDistribution).reverse().map(star => `
 								<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; cursor: pointer;" 
 									 onclick="showRatingFilterModal('${company.name}', ${star})">
-									<span style="min-width: 40px; display: inline-flex; align-items: center; gap: 2px;">${star} <span style="color: var(--red); line-height: 1;">★</span></span>
+									<span style="width: 40px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex-shrink: 0;"><span style="min-width: 12px; text-align: right;">${star}</span><span style="color: var(--red); line-height: 1; flex-shrink: 0;">★</span></span>
 									<div style="flex: 1; height: 25px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
 										<div style="height: 100%; background: var(--red); width: ${company.reviews.length > 0 ? (ratingDistribution[star] / company.reviews.length) * 100 : 0}%;"></div>
 									</div>
@@ -7286,10 +7282,7 @@
                     <button class="report-btn" onclick="showReportModal('${reviewData.adminId || reviewData.id}')" title="Bewertung melden">!</button>
                     <div class="review-header">
                         <div class="company-info">
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <h3 onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0;">${reviewData.companyName}</h3>
-                                ${getCompanyVerifiedBadge(reviewData.companyName)}
-                            </div>
+							<p onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark);">${reviewData.companyName} ${getCompanyVerifiedBadge(reviewData.companyName)}</p>
                             <p>${reviewData.address}</p>
 							<div class="company-badges" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
                                 <div class="category-badge" style="padding: 0.35rem 1.25rem;">${reviewData.category}</div>
@@ -7297,7 +7290,7 @@
 							${reviewData.specializations ? `<p>Spezialisierungen: ${reviewData.specializations}</p>` : ''}
 							${reviewData.area ? `<p>Bereich: ${reviewData.area}</p>` : ''}
                         </div>
-                        <div style="text-align: center; padding-top: 1rem;">
+						<div style="text-align: center; padding-top: 0;">
                             <div class="overall-rating" style="transform: scale(1.2); margin-top: 0;">
                                 <div class="rating-number">${overallRating.toFixed(1)}</div>
                                 <div class="stars">${generateStarHTML(Math.round(overallRating))}</div>
@@ -8903,10 +8896,10 @@
 			const dd = document.querySelector('.nav-dropdown');
 			if (!tabs.classList.contains('mobile-open')) {
 				dd?.classList.remove('mobile-sub-open');
-				if (wt) { wt.textContent = 'Wissenswert ▾'; wt.setAttribute('data-open', 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span>'; wt.setAttribute('data-open', 'false'); }
 			} else {
 				const isSubOpen = dd?.classList.contains('mobile-sub-open');
-				if (wt) { wt.textContent = isSubOpen ? 'Wissenswert ▴' : 'Wissenswert ▾'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">' + (isSubOpen ? '▴' : '▾') + '</span>'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
 			}
 		}
 		
@@ -8917,7 +8910,7 @@
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 			const wt = document.getElementById('wissenswert-tab');
-			if (wt) { wt.textContent = 'Wissenswert ▾'; wt.setAttribute('data-open', 'false'); }
+			if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span>'; wt.setAttribute('data-open', 'false'); }
 		}
 
 		document.addEventListener('click', function(e) {
@@ -8937,7 +8930,7 @@
 			const isOpen = wt.getAttribute('data-open') === 'true';
 			dd.classList.toggle('mobile-sub-open');
 			wt.setAttribute('data-open', isOpen ? 'false' : 'true');
-			wt.textContent = isOpen ? 'Wissenswert ▾' : 'Wissenswert ▴';
+			wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">' + (isOpen ? '▾' : '▴') + '</span>';
 		}
 
 		function renderLandingFallback() {
@@ -9027,9 +9020,7 @@
 					<div style="display: flex; align-items: center; gap: 1.25rem;">
 						<img src="${company.profileImage}" style="width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0; object-fit: cover;">
 						<div style="flex: 1;">
-							<div style="display: flex; align-items: baseline; gap: 0; flex-wrap: wrap;">
-								<h4 style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; display: inline;">${company.name} ${company.verified ? '<span class="verified-badge" data-tooltip="Verifiziertes Unternehmen" style="display:inline-flex;vertical-align:middle;"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>' : ''}</h4>
-							</div>
+							<p style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; line-height: 1.4;">${company.name}${company.verified ? ' <span class="verified-badge" data-tooltip="Verifiziertes Unternehmen" style="display:inline-flex;vertical-align:middle;position:relative;top:-1px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>' : ''}</p>
 							<p style="margin: 0.5rem 0; color: #666;">${company.address}, ${company.state}</p>
 							<div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-top: 0.4rem;">
 								<div class="category-badge" style="margin-top:0;margin-bottom:0;">${getCategoryLabel(company.category)}</div>
