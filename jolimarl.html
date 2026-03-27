@@ -8899,10 +8899,10 @@
 			const dd = document.querySelector('.nav-dropdown');
 			if (!tabs.classList.contains('mobile-open')) {
 				dd?.classList.remove('mobile-sub-open');
-				if (wt) { wt.innerHTML = 'Wissenswert '<span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span>'; wt.setAttribute('data-open', 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span>'; wt.setAttribute('data-open', 'false'); }
 			} else {
 				const isSubOpen = dd?.classList.contains('mobile-sub-open');
-				if (wt) { wt.innerHTML = 'Wissenswert '<span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span>'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">' + (isSubOpen ? '▴' : '▾') + '</span>'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
 			}
 		}
 		
@@ -8913,7 +8913,7 @@
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 			const wt = document.getElementById('wissenswert-tab');
-			if (wt) { wt.innerHTML = 'Wissenswert '<span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span>'; wt.setAttribute('data-open', 'false'); }
+			if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span>'; wt.setAttribute('data-open', 'false'); }
 		}
 
 		document.addEventListener('click', function(e) {
