@@ -7282,9 +7282,7 @@
                     <button class="report-btn" onclick="showReportModal('${reviewData.adminId || reviewData.id}')" title="Bewertung melden">!</button>
                     <div class="review-header">
                         <div class="company-info">
-							<div style="display: flex; align-items: center; gap: 0.5rem;">
-								<h3 onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark);">${reviewData.companyName} ${getCompanyVerifiedBadge(reviewData.companyName)}</h3>
-							</div>
+							<p onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark);">${reviewData.companyName} ${getCompanyVerifiedBadge(reviewData.companyName)}</p>
                             <p>${reviewData.address}</p>
 							<div class="company-badges" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
                                 <div class="category-badge" style="padding: 0.35rem 1.25rem;">${reviewData.category}</div>
