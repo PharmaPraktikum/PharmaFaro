@@ -869,7 +869,7 @@
 	.review-header, .job-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
+        align-items: center;
         margin-bottom: 1rem;
         position: relative;
     }
@@ -1562,6 +1562,9 @@
 		.nav-dropdown { display: block !important; }
 		
 		.job-create-btn-mobile { display: block !important; width: 100% !important; margin-bottom: 1rem !important; padding: 1rem !important; }
+
+		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { isolation: isolate; }
+		.bphd-badge-container { position: absolute !important; top: 0.5rem !important; right: 0.5rem !important; z-index: 10 !important; }
 	}
 
     @media (max-width: 380px) {
@@ -1584,7 +1587,7 @@
 				<button class="nav-tab" onclick="showSection('write');closeMobileMenu()">Bewertung schreiben</button>
 				<button class="nav-tab" onclick="showSection('jobs');closeMobileMenu()">Stellenangebote</button>
 				<div class="nav-dropdown">
-					<button class="nav-tab" id="wissenswert-tab" data-open="false" onclick="toggleWissenswertMobile()">Wissenswert ▾</button>
+					<button class="nav-tab" id="wissenswert-tab" data-open="false" onclick="toggleWissenswertMobile()">Wissenswert '<span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span>'</button>
 					<div class="dropdown-content" id="wissenswert-dropdown">
 						<a href="#" onclick="event.preventDefault(); showSection('company-search'); closeMobileMenu(); return false;">Unternehmen suchen</a>
 						<a href="#" onclick="event.preventDefault(); showSection('awarded-companies'); closeMobileMenu(); return false;">Ausgezeichnete Unternehmen</a>
@@ -2623,78 +2626,80 @@
 								</div>
 							</div>	
 						</div>
-						
-						<!-- Spezialisierungen für Offizin -->
-						<div class="form-group" id="job-specializations-field" style="display: none;">
-							<label>Spezialisierungen</label>
-							<div class="checkbox-group">
-								<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
-								<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
-								<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
-								<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
-								<label><input type="checkbox" value="klinikversorgung"> Klinikversorgung</label>
-								<label><input type="checkbox" value="homoeopathie"> Homöopathie</label>
-								<label><input type="checkbox" value="ernaehrungsberatung"> Ernährungsberatung</label>
-								<label><input type="checkbox" value="sonstige" id="job-spec-sonstige"> Sonstige</label>
-							</div>
-							<div class="form-group" id="job-spec-sonstige-field" style="display: none; margin-top: 1rem;">
-								<input type="text" id="job-spec-sonstige-input" placeholder="Bitte andere Spezialisierungen angeben">
-							</div>
+					</div>
+
+					<!-- Spezialisierungen für Offizin -->
+					<div class="form-group" id="job-specializations-field" style="display: none;">
+						<label>Spezialisierungen</label>
+						<div class="checkbox-group">
+							<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
+							<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
+							<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
+							<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
+							<label><input type="checkbox" value="klinikversorgung"> Klinikversorgung</label>
+							<label><input type="checkbox" value="homoeopathie"> Homöopathie</label>
+							<label><input type="checkbox" value="ernaehrungsberatung"> Ernährungsberatung</label>
+							<label><input type="checkbox" value="sonstige" id="job-spec-sonstige"> Sonstige</label>
 						</div>
-	
-						<div class="form-group" id="job-customer-type-field" style="display: none;">
-							<label style="font-weight: 600;">Kundschaft</label>
-							<div class="slider-container">
-								<div id="job-customer-type-buttons" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1rem;">
-									<button type="button" class="job-customer-btn" data-value="0" style="padding: 1rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: center; transition: all 0.2s;">
-										<div>Überwiegend</div>
-										<div>Stammkundschaft</div>
-									</button>
-									<button type="button" class="job-customer-btn active" data-value="1" style="padding: 1rem; border: 2px solid var(--red); border-radius: 8px; background: white; cursor: pointer; text-align: center; color: var(--red); font-weight: 600; transition: all 0.2s;">
-										<div>Gemischte</div>
-										<div>Kundschaft</div>
-									</button>
-									<button type="button" class="job-customer-btn" data-value="2" style="padding: 1rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: center; transition: all 0.2s;">
-										<div>Überwiegend</div>
-										<div>Laufkundschaft</div>
-									</button>
-								</div>
-								<input type="hidden" id="job-customer-type-value" value="1">
+						<div class="form-group" id="job-spec-sonstige-field" style="display: none; margin-top: 1rem;">
+							<input type="text" id="job-spec-sonstige-input" placeholder="Bitte andere Spezialisierungen angeben">
+						</div>
+					</div>
+
+					<div class="form-group" id="job-customer-type-field" style="display: none;">
+						<label style="font-weight: 600;">Kundschaft</label>
+						<div class="slider-container">
+							<div id="job-customer-type-buttons" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1rem;">
+								<button type="button" class="job-customer-btn" data-value="0" style="padding: 1rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: center; transition: all 0.2s;">
+									<div>Überwiegend</div>
+									<div>Stammkundschaft</div>
+								</button>
+								<button type="button" class="job-customer-btn active" data-value="1" style="padding: 1rem; border: 2px solid var(--red); border-radius: 8px; background: white; cursor: pointer; text-align: center; color: var(--red); font-weight: 600; transition: all 0.2s;">
+									<div>Gemischte</div>
+									<div>Kundschaft</div>
+								</button>
+								<button type="button" class="job-customer-btn" data-value="2" style="padding: 1rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: center; transition: all 0.2s;">
+									<div>Überwiegend</div>
+									<div>Laufkundschaft</div>
+								</button>
 							</div>
+							<input type="hidden" id="job-customer-type-value" value="1">
 						</div>
-	
-						<!-- Bereich für Industrie -->
-						<div class="form-group" id="job-industry-field" style="display: none;">
-							<label>Bereich *</label>
-							<select id="job-industry-area">
-								<option value="">Bitte wählen</option>
-								<option value="qualitaetskontrolle">Qualitätskontrolle</option>
-								<option value="qualitaetssicherung">Qualitätssicherung</option>
-								<option value="produktion">Produktion</option>
-								<option value="zulassung">Zulassung</option>
-								<option value="forschung">Forschung</option>
-								<option value="sonstige">Sonstige</option>
-							</select>
-							<div class="form-group" id="job-industry-sonstige-field" style="display: none; margin-top: 1rem;">
-								<input type="text" id="job-industry-sonstige-input" placeholder="Bitte anderen Bereich angeben">
-							</div>
+					</div>
+
+					<!-- Bereich für Industrie -->
+					<div class="form-group" id="job-industry-field" style="display: none;">
+						<label>Bereich *</label>
+						<select id="job-industry-area">
+							<option value="">Bitte wählen</option>
+							<option value="qualitaetskontrolle">Qualitätskontrolle</option>
+							<option value="qualitaetssicherung">Qualitätssicherung</option>
+							<option value="produktion">Produktion</option>
+							<option value="zulassung">Zulassung</option>
+							<option value="forschung">Forschung</option>
+							<option value="sonstige">Sonstige</option>
+						</select>
+						<div class="form-group" id="job-industry-sonstige-field" style="display: none; margin-top: 1rem;">
+							<input type="text" id="job-industry-sonstige-input" placeholder="Bitte anderen Bereich angeben">
 						</div>
-	
-						<!-- Bereich für Universität -->
-						<div class="form-group" id="job-university-field" style="display: none;">
-							<label>Bereich *</label>
-							<select id="job-university-area">
-								<option value="">Bitte wählen</option>
-								<option value="pharmazeutische-technologie">Pharmazeutische Technologie</option>
-								<option value="medizinische-pharmazeutische-chemie">Medizinische und pharmazeutische Chemie</option>
-								<option value="pharmazeutische-biologie">Pharmazeutische Biologie</option>
-								<option value="pharmakologie-klinische-pharmazie">Pharmakologie/Klinische Pharmazie</option>
-								<option value="pharmaziegeschichte">Pharmaziegeschichte</option>
-							</select>
-						</div>
-								
+					</div>
+
+					<!-- Bereich für Universität -->
+					<div class="form-group" id="job-university-field" style="display: none;">
+						<label>Bereich *</label>
+						<select id="job-university-area">
+							<option value="">Bitte wählen</option>
+							<option value="pharmazeutische-technologie">Pharmazeutische Technologie</option>
+							<option value="medizinische-pharmazeutische-chemie">Medizinische und pharmazeutische Chemie</option>
+							<option value="pharmazeutische-biologie">Pharmazeutische Biologie</option>
+							<option value="pharmakologie-klinische-pharmazie">Pharmakologie/Klinische Pharmazie</option>
+							<option value="pharmaziegeschichte">Pharmaziegeschichte</option>
+						</select>
+					</div>
+							
+					<div class="form-section">
+						<label>Benefits</label>
 						<div class="form-group">
-							<label>Benefits</label>
 							<div class="checkbox-group">
 								<label><input type="checkbox" value="wohnung"> Wohnung</label>
 								<label><input type="checkbox" value="sonderzahlungen"> Sonderzahlungen</label>
@@ -2707,7 +2712,7 @@
 							<div class="form-group" id="job-benefits-sonstige-field" style="display: none; margin-top: 1rem;">
 								<textarea id="job-benefits-sonstige-input" placeholder="Bitte andere Benefits angeben"></textarea>
 							</div>
-						</div>					
+						</div>
 					</div>
 
 					<hr style="border: none; border-top: 1px solid #ddd; margin: 2.5rem 0;">
@@ -3100,20 +3105,22 @@
 	<div class="footer">
 		<div class="footer-content">
 			<h3>Impressum</h3>
-			<p><strong>Angaben gemäß § 5 TMG</strong></p>
-			<p>Marlon Krompholz</p>
-			<p>Otto-Himmel-Weg 1</p>
-			<p>38104 Braunschweig</p>
+			<p><strong>PharmaFaro</strong></p>
+			<p>Musterstraße 123</p>
+			<p>12345 Musterstadt</p>
 			<p>Deutschland</p>
 			<br>
-			<p><strong>Kontakt</strong></p>
-			<p>E-Mail: Kontakt@pharmafaro.de</p>
+			<p><strong>Geschäftsführer:</strong> Max Mustermann</p>
+			<p><strong>Registergericht:</strong> Amtsgericht Musterstadt</p>
+			<p><strong>Handelsregisternummer:</strong> HRB 12345</p>
+			<p><strong>Umsatzsteuer-ID:</strong> DE123456789</p>
 			<br>
-			<p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</strong></p>
-			<p>Marlon Krompholz</p>
-			<p>Otto-Himmel-Weg 1</p>
-			<p>38104 Braunschweig</p>
-			<p>Deutschland</p>
+			<p><strong>Kontakt:</strong></p>
+			<p>E-Mail: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="21484f474e61514940534c405b48445153404a55484a544c0f4544">[email&#160;protected]</a></p>
+			<p>Telefon: +49 (0) 123 456789</p>
+			<br>
+			<p><strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong></p>
+			<p>Max Mustermann, Musterstraße 123, 12345 Musterstadt</p>
 			<br>
 			<p>
 				<span style="text-decoration: underline; cursor: pointer; color: #ccc;" onclick="showPrivacyModal()">Datenschutzerklärung</span>
@@ -4072,11 +4079,11 @@
 							${Object.keys(ratingDistribution).reverse().map(star => `
 								<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; cursor: pointer;" 
 									 onclick="alert('Filter ${star} Sterne')">
-									<span style="width: 40px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex-shrink: 0;"><span style="min-width: 12px; text-align: right;">${star}</span><span style="color: var(--red); line-height: 1; flex-shrink: 0;">★</span></span>
+									<span style="width: 36px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex-shrink: 0;"><span style="width: 10px; text-align: center; font-variant-numeric: tabular-nums;">${star}</span><span style="color: var(--red); line-height: 1; flex-shrink: 0; width: 14px; text-align: center;">★</span></span>
 									<div style="flex: 1; height: 25px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
 										<div style="height: 100%; background: var(--red); width: ${company.reviews.length > 0 ? (ratingDistribution[star] / company.reviews.length) * 100 : 0}%;"></div>
 									</div>
-									<span style="min-width: 40px; text-align: right; display: inline-flex; justify-content: flex-end; align-items: center;">${ratingDistribution[star]}</span>
+									<span style="width: 30px; text-align: center; font-variant-numeric: tabular-nums; flex-shrink: 0;">${ratingDistribution[star]}</span>
 								</div>
 							`).join('')}
 						</div>
@@ -5310,11 +5317,11 @@
 							${Object.keys(ratingDistribution).reverse().map(star => `
 								<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; cursor: pointer;" 
 									 onclick="showRatingFilterModal('${company.name}', ${star})">
-									<span style="width: 40px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex-shrink: 0;"><span style="min-width: 12px; text-align: right;">${star}</span><span style="color: var(--red); line-height: 1; flex-shrink: 0;">★</span></span>
+									<span style="width: 36px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex-shrink: 0;"><span style="width: 10px; text-align: center; font-variant-numeric: tabular-nums;">${star}</span><span style="color: var(--red); line-height: 1; flex-shrink: 0; width: 14px; text-align: center;">★</span></span>
 									<div style="flex: 1; height: 25px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
 										<div style="height: 100%; background: var(--red); width: ${company.reviews.length > 0 ? (ratingDistribution[star] / company.reviews.length) * 100 : 0}%;"></div>
 									</div>
-									<span style="min-width: 40px; text-align: right; display: inline-flex; justify-content: flex-end; align-items: center;">${ratingDistribution[star]}</span>
+									<span style="width: 30px; text-align: center; font-variant-numeric: tabular-nums; flex-shrink: 0;">${ratingDistribution[star]}</span>
 								</div>
 							`).join('')}
 						</div>
@@ -7286,7 +7293,7 @@
 							${reviewData.specializations ? `<p>Spezialisierungen: ${reviewData.specializations}</p>` : ''}
 							${reviewData.area ? `<p>Bereich: ${reviewData.area}</p>` : ''}
                         </div>
-						<div style="text-align: center; padding-top: 1rem;">
+						<div style="text-align: center; padding-top: 0;">
                             <div class="overall-rating" style="transform: scale(1.2); margin-top: 0;">
                                 <div class="rating-number">${overallRating.toFixed(1)}</div>
                                 <div class="stars">${generateStarHTML(Math.round(overallRating))}</div>
@@ -8892,10 +8899,10 @@
 			const dd = document.querySelector('.nav-dropdown');
 			if (!tabs.classList.contains('mobile-open')) {
 				dd?.classList.remove('mobile-sub-open');
-				if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span>'; wt.setAttribute('data-open', 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert '<span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span>'; wt.setAttribute('data-open', 'false'); }
 			} else {
 				const isSubOpen = dd?.classList.contains('mobile-sub-open');
-				if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">' + (isSubOpen ? '▴' : '▾') + '</span>'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert '<span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span>'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
 			}
 		}
 		
@@ -8906,7 +8913,7 @@
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 			const wt = document.getElementById('wissenswert-tab');
-			if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span>'; wt.setAttribute('data-open', 'false'); }
+			if (wt) { wt.innerHTML = 'Wissenswert '<span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span>'; wt.setAttribute('data-open', 'false'); }
 		}
 
 		document.addEventListener('click', function(e) {
@@ -8926,7 +8933,7 @@
 			const isOpen = wt.getAttribute('data-open') === 'true';
 			dd.classList.toggle('mobile-sub-open');
 			wt.setAttribute('data-open', isOpen ? 'false' : 'true');
-			wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">' + (isOpen ? '▾' : '▴') + '</span>';
+			wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>';
 		}
 
 		function renderLandingFallback() {
@@ -9016,7 +9023,7 @@
 					<div style="display: flex; align-items: center; gap: 1.25rem;">
 						<img src="${company.profileImage}" style="width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0; object-fit: cover;">
 						<div style="flex: 1;">
-							<p style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; line-height: 1.4;">${company.name}${company.verified ? ' <span class="verified-badge" data-tooltip="Verifiziertes Unternehmen" style="display:inline-flex;vertical-align:middle;position:relative;top:-1px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>' : ''}</p>
+							<h4 style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; line-height: 1.4;">${company.name}${company.verified ? '&nbsp;<span class="verified-badge" data-tooltip="Verifiziertes Unternehmen" style="display:inline-flex;vertical-align:middle;position:relative;top:-1px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>' : ''}</h4>
 							<p style="margin: 0.5rem 0; color: #666;">${company.address}, ${company.state}</p>
 							<div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-top: 0.4rem;">
 								<div class="category-badge" style="margin-top:0;margin-bottom:0;">${getCategoryLabel(company.category)}</div>
