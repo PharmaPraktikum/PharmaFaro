@@ -1465,7 +1465,8 @@
 		.company-section-header > div[style*="display: flex"] { flex-direction: column !important; align-items: center !important; text-align: center; gap: 0.75rem !important; }
 		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { flex-direction: column !important; align-items: center !important; text-align: center !important; width: 100% !important; overflow: visible !important; }
 		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] img { width: 100px !important; height: 100px !important; margin: 0 auto !important; flex-shrink: 0 !important; }
-		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] > div:not([style*="position: relative; flex-shrink"]) { width: 100% !important; }
+		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] > div { width: 100% !important; }
+		#company-section [style*="position: relative; flex-shrink: 0; width: 140px"] { width: 140px !important; flex-shrink: 0 !important; }		
 		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] h1 { font-size: 1.4rem !important; text-align: center !important; }
 		#company-section [style*="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem"] { justify-content: center !important; flex-wrap: wrap !important; }
 		#company-section [style*="margin-top: 0.75rem; display: flex; align-items: center"] { justify-content: center !important; }
@@ -1551,7 +1552,8 @@
 		.job-create-btn { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
 		.overall-rating[style*="transform: scale(1.2)"] { transform: scale(1) !important; }
 
-		.bphd-badge-container { position: absolute !important; top: -20px !important; right: 0px !important; z-index: 10 !important; }
+		.bphd-badge-container { position: absolute !important; top: -20px !important; right: -20px !important; z-index: 10 !important; }
+		#company-section [style*="position: relative; flex-shrink: 0; width: 140px"] { overflow: visible !important; }
 		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { overflow: visible !important; }
 		#company-section [style*="position: absolute; top: -15px; right: -15px"] { top: -10px !important; right: 10px !important; }
 
@@ -3096,7 +3098,7 @@
 				<button class="close-btn" onclick="closeModal('contact-company-modal')">&times;</button>
 			</div>
 			<div class="modal-body">
-				<div id="contact-info-display" style="padding: 1rem;">
+				<div id="contact-info-display" style="padding: 1rem; overflow: visible;">
 					<!-- Wird dynamisch gefüllt -->
 				</div>
 				<div style="text-align: center; margin-top: 2rem;">
@@ -5233,26 +5235,19 @@
 			container.innerHTML = `
 				<!-- Header -->
 				<div style="position: relative; display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06); overflow: visible;">
-					${company.bphdAwards && company.bphdAwards.length > 0 ? `
-					<div class="bphd-badge-container" style="position: absolute; top: -20px; right: -20px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${company.name.replace(/'/g, "\\'")}')">
-						<svg width="90" height="100" viewBox="0 0 90 100">
-							<!-- Ribbon -->
-							<path d="M25 0 L35 0 L35 50 L30 45 L25 50 Z" fill="#8B0000"/>
-							<path d="M55 0 L65 0 L65 50 L60 45 L55 50 Z" fill="#8B0000"/>
-							
-							<!-- Medal circle -->
-							<circle cx="45" cy="65" r="30" fill="#DAA520" stroke="#B8860B" stroke-width="2"/>
-							
-							<!-- Inner circle -->
-							<circle cx="45" cy="65" r="24" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
-							
-							<!-- BPhD Text -->
-							<text x="45" y="70" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#8B4513" text-anchor="middle">BPhD</text>
-						</svg>
-					</div>
-					` : ''}					
-					<div style="position: relative; flex-shrink: 0; width: 140px; height: 140px;">
+					<div style="position: relative; flex-shrink: 0; width: 140px; height: 140px; overflow: visible;">
 						<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;" alt="Profilbild">
+						${company.bphdAwards && company.bphdAwards.length > 0 ? `
+						<div class="bphd-badge-container" style="position: absolute; top: -20px; right: -20px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${company.name.replace(/'/g, "\\'")}')">
+							<svg width="90" height="100" viewBox="0 0 90 100">
+								<path d="M25 0 L35 0 L35 50 L30 45 L25 50 Z" fill="#8B0000"/>
+								<path d="M55 0 L65 0 L65 50 L60 45 L55 50 Z" fill="#8B0000"/>
+								<circle cx="45" cy="65" r="30" fill="#DAA520" stroke="#B8860B" stroke-width="2"/>
+								<circle cx="45" cy="65" r="24" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
+								<text x="45" y="70" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#8B4513" text-anchor="middle">BPhD</text>
+							</svg>
+						</div>
+						` : ''}
 					</div>
 					<div style="flex: 1;">
 						<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
@@ -5382,34 +5377,34 @@
 			
 			if (company.contactPerson) {
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
-				contactHTML += '<svg width="20" height="20" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">';
+				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-				contactHTML += '<div><strong>Ansprechperson:</strong><br>' + company.contactPerson + '</div>';
+				contactHTML += '<div style="min-width:0;"><strong>Ansprechperson:</strong><br>' + company.contactPerson + '</div>';
 				contactHTML += '</div>';
 			}
 			
 			if (company.contactEmail) {
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
-				contactHTML += '<svg width="20" height="20" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">';
+				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
-				contactHTML += '<div><strong>E-Mail:</strong><br><a href="mailto:' + company.contactEmail + '" style="color:var(--red);">' + company.contactEmail + '</a></div>';
+				contactHTML += '<div style="min-width:0;"><strong>E-Mail:</strong><br><a href="mailto:' + company.contactEmail + '" style="color:var(--red);">' + company.contactEmail + '</a></div>';
 				contactHTML += '</div>';
 			}
 			
 			if (company.phone) {
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
-				contactHTML += '<svg width="20" height="20" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
-				contactHTML += '<div><strong>Telefon:</strong><br><a href="tel:' + company.phone.replace(/\s/g, '') + '" style="color:var(--red);">' + company.phone + '</a></div>';
+				contactHTML += '<div style="min-width:0;"><strong>Telefon:</strong><br><a href="tel:' + company.phone.replace(/\s/g, '') + '" style="color:var(--red);">' + company.phone + '</a></div>';
 				contactHTML += '</div>';
 			}
 			
 			if (company.website) {
 				const websiteUrl = company.website.startsWith('http') ? company.website : 'https://' + company.website;
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
-				contactHTML += '<svg width="20" height="20" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
-				contactHTML += '<div><strong>Website:</strong><br><a href="' + websiteUrl + '" target="_blank" style="color:var(--red);">' + company.website + '</a></div>';
+				contactHTML += '<div style="min-width:0;"><strong>Website:</strong><br><a href="' + websiteUrl + '" target="_blank" style="color:var(--red);">' + company.website + '</a></div>';
 				contactHTML += '</div>';
 			}
 			
@@ -7285,9 +7280,9 @@
         function formatNameWithBadge(name, badge) {
             if (!badge) return name;
             const words = name.split(' ');
-            const firstWord = words.shift();
-            const rest = words.length > 0 ? ' ' + words.join(' ') : '';
-            return '<span style="display:inline-flex;align-items:center;gap:0.25rem;vertical-align:baseline;">' + firstWord + '<span style="display:inline-flex;align-items:center;vertical-align:middle;">' + badge + '</span></span>' + rest;
+            const lastWord = words.pop();
+            const prefix = words.length > 0 ? words.join(' ') + ' ' : '';
+            return prefix + '<span style="display:inline-flex;align-items:center;gap:0.25rem;vertical-align:baseline;">' + lastWord + '<span style="display:inline-flex;align-items:center;vertical-align:middle;">' + badge + '</span></span>';
         }
 
         function createReviewCard(reviewData) {
