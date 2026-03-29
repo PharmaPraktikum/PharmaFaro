@@ -1591,12 +1591,12 @@
 				<button class="nav-tab" onclick="showSection('write');closeMobileMenu()">Bewertung schreiben</button>
 				<button class="nav-tab" onclick="showSection('jobs');closeMobileMenu()">Stellenangebote</button>
 				<div class="nav-dropdown">
-					<button class="nav-tab" id="wissenswert-tab" data-open="false" onclick="toggleWissenswertMobile()">Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span></button>
+					<button class="nav-tab" id="wissenswert-tab" data-open="false" onclick="toggleWissenswertMobile()">Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span></button>
 					<div class="dropdown-content" id="wissenswert-dropdown">
-						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('company-search'); closeMobileMenu(); return false;">Unternehmen suchen</a>
-						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('awarded-companies'); closeMobileMenu(); return false;">Ausgezeichnete Unternehmen</a>
-						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsleitfaden</a>
-						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-tips'); closeMobileMenu(); return false;">Tipps zur Praktikumssuche</a>
+						<a href="#" onclick="event.preventDefault(); showSection('company-search'); closeMobileMenu(); return false;">Unternehmen suchen</a>
+						<a href="#" onclick="event.preventDefault(); showSection('awarded-companies'); closeMobileMenu(); return false;">Ausgezeichnete Unternehmen</a>
+						<a href="#" onclick="event.preventDefault(); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsleitfaden</a>
+						<a href="#" onclick="event.preventDefault(); showSection('internship-tips'); closeMobileMenu(); return false;">Tipps zur Praktikumssuche</a>
 					</div>
 				</div>
 			</div>
@@ -7378,7 +7378,7 @@
 							${jobData.customerType ? `<p>Kundschaft: ${jobData.customerType}</p>` : ''}
                             ${jobData.benefits ? `<p>Benefits: ${jobData.benefits}</p>` : ''}							
                         </div>
-						<div style="text-align: center; padding-top: 0;">
+						<div style="text-align: center;">
 							<div class="salary-badge ${salaryBadge.class}" title="${salaryBadge.text}" style="font-size: 1rem; font-weight: 500; padding: 0.5rem 1rem;">${jobData.salary}€</div>
                         </div>
                     </div>
