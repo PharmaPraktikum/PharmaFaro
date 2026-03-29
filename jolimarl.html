@@ -276,8 +276,6 @@
         background: var(--bg);
         min-height: calc(100vh - 300px);
     }
-    #write-section { background: white; }
-    #write-section .form-section, #write-section .form-group { background: var(--bg); }
 
 
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
@@ -7368,7 +7366,9 @@
                 <div class="job-card">		
                     <div class="job-header">
                         <div class="job-info">
-							<h3 onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600;">${reviewData.companyName}${getCompanyVerifiedBadge(reviewData.companyName) ? ' ' + getCompanyVerifiedBadge(reviewData.companyName) : ''}</h3>
+							<div style="display: flex; align-items: center; gap: 0.5rem;">
+								<h3 onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600;">${reviewData.companyName}${getCompanyVerifiedBadge(reviewData.companyName) ? ' ' + getCompanyVerifiedBadge(reviewData.companyName) : ''}</h3>
+							</div>
                             <p>${jobData.address}</p>
 							<div class="company-badges" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
 								<div class="category-badge" style="padding: 0.35rem 1.25rem; margin-top: 0; margin-bottom: 0;">${jobData.category}</div>								
@@ -8902,10 +8902,10 @@
 			const dd = document.querySelector('.nav-dropdown');
 			if (!tabs.classList.contains('mobile-open')) {
 				dd?.classList.remove('mobile-sub-open');
-				if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span>'; wt.setAttribute('data-open', 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>'; wt.setAttribute('data-open', 'false'); }
 			} else {
 				const isSubOpen = dd?.classList.contains('mobile-sub-open');
-				if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">' + (isSubOpen ? '▴' : '▾') + '</span>'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
 			}
 		}
 		
@@ -8916,7 +8916,7 @@
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 			const wt = document.getElementById('wissenswert-tab');
-			if (wt) { wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">▾</span>'; wt.setAttribute('data-open', 'false'); }
+			if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>'; wt.setAttribute('data-open', 'false'); }
 		}
 
 		document.addEventListener('click', function(e) {
@@ -8936,7 +8936,7 @@
 			const isOpen = wt.getAttribute('data-open') === 'true';
 			dd.classList.toggle('mobile-sub-open');
 			wt.setAttribute('data-open', isOpen ? 'false' : 'true');
-			wt.innerHTML = 'Wissenswert <span style="font-size:0.7em;vertical-align:middle;">' + (isOpen ? '▾' : '▴') + '</span>';
+			wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>';
 		}
 
 		function renderLandingFallback() {
