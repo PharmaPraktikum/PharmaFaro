@@ -1551,7 +1551,8 @@
 		.job-create-btn { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
 		.overall-rating[style*="transform: scale(1.2)"] { transform: scale(1) !important; }
 
-		.bphd-badge-container { position: absolute !important; top: -20px !important; right: -10px !important; z-index: 10 !important; }
+		.bphd-badge-container { position: absolute !important; top: -20px !important; right: -20px !important; z-index: 10 !important; }
+		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { overflow: visible !important; }
 		#company-section [style*="position: absolute; top: -15px; right: -15px"] { top: -10px !important; right: 10px !important; }
 
 		#company-section [style*="padding: 1rem 2rem; background: #f8f9fa"] span { display: block; margin-bottom: 0.75rem !important; }
@@ -4020,9 +4021,10 @@
 							<text x="45" y="70" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#8B4513" text-anchor="middle">BPhD</text>
 						</svg>
 					</div>
-					` : ''}
-					
-					<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="Profilbild">
+					` : ''}					
+					<div style="position: relative; flex-shrink: 0; width: 140px; height: 140px;">
+						<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;" alt="Profilbild">
+					</div>
 					<div style="flex: 1;">
 						<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
 							<h1 style="margin: 0; font-size: 2.5rem;">${company.name}</h1>
@@ -5248,9 +5250,10 @@
 							<text x="45" y="70" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#8B4513" text-anchor="middle">BPhD</text>
 						</svg>
 					</div>
-					` : ''}
-					
-					<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="Profilbild">
+					` : ''}					
+					<div style="position: relative; flex-shrink: 0; width: 140px; height: 140px;">
+						<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;" alt="Profilbild">
+					</div>
 					<div style="flex: 1;">
 						<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
 							<h1 style="margin: 0; font-size: 2.5rem;">${company.name}</h1>
@@ -8910,10 +8913,10 @@
 			const dd = document.querySelector('.nav-dropdown');
 			if (!tabs.classList.contains('mobile-open')) {
 				dd?.classList.remove('mobile-sub-open');
-				if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>'; wt.setAttribute('data-open', 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;border-top:5px solid currentColor;"></span>'; wt.setAttribute('data-open', 'false'); }
 			} else {
 				const isSubOpen = dd?.classList.contains('mobile-sub-open');
-				if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>'; wt.setAttribute('data-open', isSubOpen ? 'true' : 'false'); }
+				if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;border-top:5px solid currentColor;"></span>'; wt.setAttribute('data-open', 'false'); }
 			}
 		}
 		
@@ -8924,7 +8927,7 @@
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 			const wt = document.getElementById('wissenswert-tab');
-			if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;border-bottom:5px solid currentColor;"></span>'; wt.setAttribute('data-open', 'false'); }
+			if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;border-top:5px solid currentColor;"></span>'; wt.setAttribute('data-open', 'false'); }
 		}
 
 		document.addEventListener('click', function(e) {
@@ -8940,11 +8943,11 @@
 		function toggleWissenswertMobile() {
 			const dd = document.querySelector('.nav-dropdown');
 			const wt = document.getElementById('wissenswert-tab');
-			if (!window.matchMedia('(max-width: 600px)').matches) { showSection('wissenswert'); return; }
+			if (!window.matchMedia('(max-width: 768px)').matches) { showSection('wissenswert'); return; }
 			const isOpen = wt.getAttribute('data-open') === 'true';
 			dd.classList.toggle('mobile-sub-open');
 			wt.setAttribute('data-open', isOpen ? 'false' : 'true');
-			wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>';
+			wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (!isOpen ? 'border-bottom:5px solid currentColor;' : 'border-top:5px solid currentColor;') + '"></span>';
 		}
 
 		function renderLandingFallback() {
