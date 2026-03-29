@@ -1593,10 +1593,10 @@
 				<div class="nav-dropdown">
 					<button class="nav-tab" id="wissenswert-tab" data-open="false" onclick="toggleWissenswertMobile()">Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;vertical-align:middle;margin-left:4px;"></span></button>
 					<div class="dropdown-content" id="wissenswert-dropdown">
-						<a href="#" onclick="event.preventDefault(); showSection('company-search'); closeMobileMenu(); return false;">Unternehmen suchen</a>
-						<a href="#" onclick="event.preventDefault(); showSection('awarded-companies'); closeMobileMenu(); return false;">Ausgezeichnete Unternehmen</a>
-						<a href="#" onclick="event.preventDefault(); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsleitfaden</a>
-						<a href="#" onclick="event.preventDefault(); showSection('internship-tips'); closeMobileMenu(); return false;">Tipps zur Praktikumssuche</a>
+						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('company-search'); closeMobileMenu(); return false;">Unternehmen suchen</a>
+						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('awarded-companies'); closeMobileMenu(); return false;">Ausgezeichnete Unternehmen</a>
+						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsleitfaden</a>
+						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-tips'); closeMobileMenu(); return false;">Tipps zur Praktikumssuche</a>
 					</div>
 				</div>
 			</div>
@@ -7279,6 +7279,14 @@
             return html;
         }
 
+		function formatNameWithBadge(name, badge) {
+            if (!badge) return name;
+            const words = name.split(' ');
+            const lastWord = words.pop();
+            const prefix = words.length > 0 ? words.join(' ') + ' ' : '';
+            return prefix + '<span style="white-space:nowrap;display:inline;">' + lastWord + '\u00A0' + badge + '</span>';
+        }
+
         function createReviewCard(reviewData) {
             const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear);
             const overallRating = calculateOverallRating(reviewData.ratings);
@@ -7289,7 +7297,7 @@
                     <button class="report-btn" onclick="showReportModal('${reviewData.adminId || reviewData.id}')" title="Bewertung melden">!</button>
                     <div class="review-header">
                         <div class="company-info">
-							<p onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark);">${reviewData.companyName} ${getCompanyVerifiedBadge(reviewData.companyName)}</p>
+							<div onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark); line-height: 1.4;">${formatNameWithBadge(reviewData.companyName, getCompanyVerifiedBadge(reviewData.companyName))}</div>							
                             <p>${reviewData.address}</p>
 							<div class="company-badges" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
                                 <div class="category-badge" style="padding: 0.35rem 1.25rem;">${reviewData.category}</div>
@@ -7367,7 +7375,7 @@
                     <div class="job-header">
                         <div class="job-info">
 							<div style="display: flex; align-items: center; gap: 0.5rem;">
-								<h3 onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600;">${reviewData.companyName}${getCompanyVerifiedBadge(reviewData.companyName) ? ' ' + getCompanyVerifiedBadge(reviewData.companyName) : ''}</h3>
+								<h3 onclick="showCompanyPage('${jobData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600;">${jobData.companyName}${getCompanyVerifiedBadge(jobData.companyName) ? ' ' + getCompanyVerifiedBadge(jobData.companyName) : ''}</h3>
 							</div>
                             <p>${jobData.address}</p>
 							<div class="company-badges" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
@@ -7379,7 +7387,7 @@
                             ${jobData.benefits ? `<p>Benefits: ${jobData.benefits}</p>` : ''}							
                         </div>
 						<div style="text-align: center;">
-							<div class="salary-badge ${salaryBadge.class}" title="${salaryBadge.text}" style="font-size: 1rem; font-weight: 500; padding: 0.5rem 1rem;">${jobData.salary}€</div>
+							<div class="salary-badge ${salaryBadge.class} salary-badge-positioned" title="${salaryBadge.text}" style="font-size: 1rem; font-weight: 500; padding: 0.5rem 1rem;">${jobData.salary}€</div>	
                         </div>
                     </div>
                     
