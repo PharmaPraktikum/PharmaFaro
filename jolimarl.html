@@ -956,7 +956,7 @@
 	.overall-rating { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 0; justify-content: flex-start; }
     .rating-number { font-weight: 700; font-size: 1.75rem; color: var(--dark); }
 
-    .stars { display: flex; gap: 2px; margin-top: 0.5rem; margin-bottom: 0; justify-content: center; }
+    .stars { display: flex; gap: 2px; margin-top: 0.2rem; margin-bottom: 0; justify-content: center; }
     .star { color: var(--red); font-size: 1rem; }
     .star.empty { color: var(--border-strong); }
 
@@ -1551,9 +1551,7 @@
 		.job-create-btn { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
 		.overall-rating[style*="transform: scale(1.2)"] { transform: scale(1) !important; }
 
-		.bphd-badge-container { position: static !important; z-index: 10 !important; align-self: flex-start !important; margin-top: 0 !important; }
-		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { flex-direction: row !important; align-items: flex-start !important; text-align: left !important; flex-wrap: wrap !important; }
-		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] img { margin: 0 !important; }
+		.bphd-badge-container { position: absolute !important; top: -20px !important; right: -10px !important; z-index: 10 !important; }
 		#company-section [style*="position: absolute; top: -15px; right: -15px"] { top: -10px !important; right: 10px !important; }
 
 		#company-section [style*="padding: 1rem 2rem; background: #f8f9fa"] span { display: block; margin-bottom: 0.75rem !important; }
@@ -1569,7 +1567,8 @@
 		
 		#write-section button[type="submit"], #jobs-modal button[type="submit"] { display: block !important; margin: 0 auto !important; width: auto !important; min-width: 60% !important; }
 		
-		.salary-badge-positioned { font-size: 0.72rem !important; padding: 0.2rem 0.5rem !important; }
+		.salary-badge-positioned { font-size: 0.85rem !important; padding: 0.3rem 0.65rem !important; }
+		.job-info { padding-right: 5rem !important; }
 	}
 
     @media (max-width: 380px) {
@@ -7376,7 +7375,7 @@
                     <div class="job-header">
                         <div class="job-info">
 							<div style="display: flex; align-items: center; gap: 0.5rem;">
-								<h3 onclick="showCompanyPage('${jobData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600;">${jobData.companyName}${getCompanyVerifiedBadge(jobData.companyName) ? ' ' + getCompanyVerifiedBadge(jobData.companyName) : ''}</h3>
+								<div onclick="showCompanyPage('${jobData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; line-height: 1.4;">${formatNameWithBadge(jobData.companyName, getCompanyVerifiedBadge(jobData.companyName))}</div>
 							</div>
                             <p>${jobData.address}</p>
 							<div class="company-badges" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
@@ -8925,7 +8924,7 @@
 			if (tabs) tabs.classList.remove('mobile-open');
 			document.querySelector('.nav-dropdown')?.classList.remove('mobile-sub-open');
 			const wt = document.getElementById('wissenswert-tab');
-			if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (isOpen ? 'border-top:5px solid currentColor;' : 'border-bottom:5px solid currentColor;') + '"></span>'; wt.setAttribute('data-open', 'false'); }
+			if (wt) { wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;border-bottom:5px solid currentColor;"></span>'; wt.setAttribute('data-open', 'false'); }
 		}
 
 		document.addEventListener('click', function(e) {
@@ -9048,6 +9047,7 @@
 						</div>
 					</div>
 				`;
+				card.setAttribute('data-company-name', company.name);	
 				card.onclick = () => showCompanyPage(company.name);
 				container.appendChild(card);
 			});
@@ -9101,10 +9101,11 @@
 			const sortValue = document.getElementById('company-sort-select').value;
 			
 			companies.sort((a, b) => {
-				const nameA = a.querySelector('h4').textContent;
-				const nameB = b.querySelector('h4').textContent;
+				const nameA = a.getAttribute('data-company-name') || '';
+				const nameB = b.getAttribute('data-company-name') || '';
 				const companyA = Object.values(companiesData).find(c => c.name === nameA);
 				const companyB = Object.values(companiesData).find(c => c.name === nameB);
+				if (!companyA || !companyB) return 0;
 				
 				switch(sortValue) {
 					case 'rating-desc':
