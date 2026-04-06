@@ -1551,6 +1551,7 @@
 		#jobs-section .search-filters > div:first-child h2 { margin-bottom: 1.5rem !important; }
 		.job-create-btn { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
 		.overall-rating[style*="transform: scale(1.2)"] { transform: scale(1) !important; }
+		#min-rating-filter { margin-top: 0 !important; }
 
 		#company-section [style*="position: relative; flex-shrink: 0; width: 140px"] { overflow: visible !important; }
 		#company-section [style*="position: relative; display: flex; align-items: center; gap: 2rem"] { overflow: visible !important; }
@@ -1787,7 +1788,7 @@
                         </div>
 				<div class="filter-group">
     				<label>Mindestbewertung</label>
-    				<div class="star-rating" id="min-rating-filter" style="margin-top: 0.6rem;">
+    				<div class="star-rating" id="min-rating-filter" style="margin-top: 0.3rem;">
         				<span class="star" data-rating="1">★</span>
         				<span class="star" data-rating="2">★</span>
         				<span class="star" data-rating="3">★</span>
@@ -1899,14 +1900,10 @@
                                 <div class="form-group">
                                     <label>Bruttogehalt (€) *</label>
                                     <input type="number" required id="salary" placeholder="z.B. 1040" min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Urlaubstage (pro Halbjahr) *</label>
-                                    <input type="number" required id="vacation-days" placeholder="z.B. 15" min="0">
                                 </div>								
                                 <div class="form-group">
-                                    <label>Samstagsarbeit (x-mal im Monat) *</label>
-                                    <input type="number" required id="saturday-work" placeholder="z.B. 2" min="0">
+                                    <label>Samstagsarbeit (x-mal im Monat)</label>
+                                    <input type="number" id="saturday-work" placeholder="z.B. 2" min="0">
                                 </div>
 								<div class="form-group">
 									<label>Arbeitszeiten *</label>
@@ -1981,8 +1978,8 @@
 
 							<!-- Bereich für Industrie -->
 							<div class="form-group" id="industry-field" style="display: none;">
-								<label>Bereich *</label>
-								<select id="industry-area">
+								<label style="display:block;margin-bottom:0.5rem;">Bereich *</label>
+								<select id="industry-area" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;">
 									<option value="">Bitte wählen</option>
 									<option value="qualitaetskontrolle">Qualitätskontrolle</option>
 									<option value="qualitaetssicherung">Qualitätssicherung</option>
@@ -1992,15 +1989,15 @@
 									<option value="sonstige">Sonstige</option>
 								</select>
 								<div class="form-group" id="industry-sonstige-field" style="display: none; margin-top: 1rem;">
-									<label>Bitte anderen Bereich angeben</label>
-									<input type="text" id="industry-sonstige-input" placeholder="Bitte anderen Bereich angeben" style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
+									<label style="display:block;margin-bottom:0.5rem;">Bitte anderen Bereich angeben</label>
+									<input type="text" id="industry-sonstige-input" placeholder="Bitte anderen Bereich angeben" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:8px;box-sizing:border-box;">
 								</div>
 							</div>
 						
 							<!-- Bereich für Universität -->
 							<div class="form-group" id="university-field" style="display: none;">
-								<label>Bereich *</label>
-								<select id="university-area">
+								<label style="display:block;margin-bottom:0.5rem;">Bereich *</label>
+								<select id="university-area" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;">
 									<option value="">Bitte wählen</option>
 									<option value="pharmazeutische-technologie">Pharmazeutische Technologie</option>
 									<option value="medizinische-pharmazeutische-chemie">Medizinische und pharmazeutische Chemie</option>
@@ -2010,7 +2007,7 @@
 								</select>
 							</div>
 
-							<div class="form-group">
+							<div class="form-group" id="benefits-field">
 								<label>Benefits</label>
 								<div class="checkbox-group">
 									<label><input type="checkbox" value="wohnung"> Wohnung</label>
@@ -2265,7 +2262,11 @@
 									</label>
 									<label style="display: flex; align-items: center; gap: 0.5rem;">
 										<input type="checkbox" id="verified-company-filter" onchange="filterAllCompanies()">
-										Verifiziertes Unternehmen
+										Verifizierte Unternehmen
+									</label>
+									<label style="display: flex; align-items: center; gap: 0.5rem;">
+										<input type="checkbox" id="bphd-company-filter" onchange="filterAllCompanies()">
+										Ausgezeichnete Unternehmen
 									</label>
 								</div>
 							</div>					
@@ -2278,6 +2279,7 @@
 						<span class="sort-label">Sortierung:</span>
 						<select id="company-sort-select" onchange="sortAllCompanies()">
 							<option value="rating-desc">Absteigend nach Bewertung</option>
+							<option value="rating-asc">Aufsteigend nach Bewertung</option>
 							<option value="reviews-desc">Absteigend nach Anzahl Bewertungen</option>
 							<option value="jobs-desc">Absteigend nach Anzahl offener Stellen</option>
 						</select>
@@ -2526,7 +2528,6 @@
 					
 					<div style="text-align: center;">
 						<button class="btn btn-primary" style="margin-right: 1rem;">Änderungen speichern</button>
-						<button type="button" class="btn btn-secondary" onclick="showCompanyProfilePreview()">Vorschau anzeigen</button>
 					</div>
 				</div>
 			</div>			
@@ -2604,10 +2605,6 @@
 								<input type="number" id="job-saturday-work" placeholder="z.B. 2" min="0">
 							</div>
 							<div class="form-group">
-								<label>Urlaubstage (pro Halbjahr)</label>
-								<input type="number" id="job-vacation-days" placeholder="z.B. 15" min="0">
-							</div>
-							<div class="form-group">
 								<label>Arbeitszeiten *</label>
 								<div style="margin-bottom: 1rem;">
 									<select id="job-working-time-type" style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
@@ -2636,80 +2633,78 @@
 								</div>
 							</div>	
 						</div>
-					</div>
 
-					<!-- Spezialisierungen für Offizin -->
-					<div class="form-group" id="job-specializations-field" style="display: none;">
-						<label>Spezialisierungen</label>
-						<div class="checkbox-group">
-							<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
-							<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
-							<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
-							<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
-							<label><input type="checkbox" value="klinikversorgung"> Klinikversorgung</label>
-							<label><input type="checkbox" value="homoeopathie"> Homöopathie</label>
-							<label><input type="checkbox" value="ernaehrungsberatung"> Ernährungsberatung</label>
-							<label><input type="checkbox" value="sonstige" id="job-spec-sonstige"> Sonstige</label>
-						</div>
-						<div class="form-group" id="job-spec-sonstige-field" style="display: none; margin-top: 1rem;">
-							<input type="text" id="job-spec-sonstige-input" placeholder="Bitte andere Spezialisierungen angeben">
-						</div>
-					</div>
-
-					<div class="form-group" id="job-customer-type-field" style="display: none;">
-						<label style="font-weight: 600;">Kundschaft</label>
-						<div class="slider-container">
-							<div id="job-customer-type-buttons" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1rem;">
-								<button type="button" class="job-customer-btn" data-value="0" style="padding: 1rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: center; transition: all 0.2s;">
-									<div>Überwiegend</div>
-									<div>Stammkundschaft</div>
-								</button>
-								<button type="button" class="job-customer-btn active" data-value="1" style="padding: 1rem; border: 2px solid var(--red); border-radius: 8px; background: white; cursor: pointer; text-align: center; color: var(--red); font-weight: 600; transition: all 0.2s;">
-									<div>Gemischte</div>
-									<div>Kundschaft</div>
-								</button>
-								<button type="button" class="job-customer-btn" data-value="2" style="padding: 1rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: center; transition: all 0.2s;">
-									<div>Überwiegend</div>
-									<div>Laufkundschaft</div>
-								</button>
+						<!-- Spezialisierungen für Offizin -->
+						<div class="form-group" id="job-specializations-field" style="display: none;">
+							<label>Spezialisierungen</label>
+							<div class="checkbox-group">
+								<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
+								<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
+								<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
+								<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
+								<label><input type="checkbox" value="klinikversorgung"> Klinikversorgung</label>
+								<label><input type="checkbox" value="homoeopathie"> Homöopathie</label>
+								<label><input type="checkbox" value="ernaehrungsberatung"> Ernährungsberatung</label>
+								<label><input type="checkbox" value="sonstige" id="job-spec-sonstige"> Sonstige</label>
 							</div>
-							<input type="hidden" id="job-customer-type-value" value="1">
+							<div class="form-group" id="job-spec-sonstige-field" style="display: none; margin-top: 1rem;">
+								<input type="text" id="job-spec-sonstige-input" placeholder="Bitte andere Spezialisierungen angeben" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:8px;box-sizing:border-box;">
+							</div>
 						</div>
-					</div>
 
-					<!-- Bereich für Industrie -->
-					<div class="form-group" id="job-industry-field" style="display: none;">
-						<label>Bereich *</label>
-						<select id="job-industry-area">
-							<option value="">Bitte wählen</option>
-							<option value="qualitaetskontrolle">Qualitätskontrolle</option>
-							<option value="qualitaetssicherung">Qualitätssicherung</option>
-							<option value="produktion">Produktion</option>
-							<option value="zulassung">Zulassung</option>
-							<option value="forschung">Forschung</option>
-							<option value="sonstige">Sonstige</option>
-						</select>
-						<div class="form-group" id="job-industry-sonstige-field" style="display: none; margin-top: 1rem;">
-							<input type="text" id="job-industry-sonstige-input" placeholder="Bitte anderen Bereich angeben">
+						<div class="form-group" id="job-customer-type-field" style="display: none;">
+							<label style="font-weight: 600;">Kundschaft</label>
+							<div class="slider-container">
+								<div id="job-customer-type-buttons" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1rem;">
+									<button type="button" class="job-customer-btn" data-value="0" style="padding: 1rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: center; transition: all 0.2s;">
+										<div>Überwiegend</div>
+										<div>Stammkundschaft</div>
+									</button>
+									<button type="button" class="job-customer-btn active" data-value="1" style="padding: 1rem; border: 2px solid var(--red); border-radius: 8px; background: white; cursor: pointer; text-align: center; color: var(--red); font-weight: 600; transition: all 0.2s;">
+										<div>Gemischte</div>
+										<div>Kundschaft</div>
+									</button>
+									<button type="button" class="job-customer-btn" data-value="2" style="padding: 1rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: center; transition: all 0.2s;">
+										<div>Überwiegend</div>
+										<div>Laufkundschaft</div>
+									</button>
+								</div>
+								<input type="hidden" id="job-customer-type-value" value="1">
+							</div>
 						</div>
-					</div>
 
-					<!-- Bereich für Universität -->
-					<div class="form-group" id="job-university-field" style="display: none;">
-						<label>Bereich *</label>
-						<select id="job-university-area">
-							<option value="">Bitte wählen</option>
-							<option value="pharmazeutische-technologie">Pharmazeutische Technologie</option>
-							<option value="medizinische-pharmazeutische-chemie">Medizinische und pharmazeutische Chemie</option>
-							<option value="pharmazeutische-biologie">Pharmazeutische Biologie</option>
-							<option value="pharmakologie-klinische-pharmazie">Pharmakologie/Klinische Pharmazie</option>
-							<option value="pharmaziegeschichte">Pharmaziegeschichte</option>
-						</select>
-					</div>
-							
-					<div class="form-section">
-						<label>Benefits</label>
+						<!-- Bereich für Industrie -->
+						<div class="form-group" id="job-industry-field" style="display: none;">
+							<label>Bereich *</label>
+							<select id="job-industry-area" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;">
+								<option value="">Bitte wählen</option>
+								<option value="qualitaetskontrolle">Qualitätskontrolle</option>
+								<option value="qualitaetssicherung">Qualitätssicherung</option>
+								<option value="produktion">Produktion</option>
+								<option value="zulassung">Zulassung</option>
+								<option value="forschung">Forschung</option>
+								<option value="sonstige">Sonstige</option>
+							</select>
+							<div class="form-group" id="job-industry-sonstige-field" style="display: none; margin-top: 1rem;">
+								<input type="text" id="job-industry-sonstige-input" placeholder="Bitte anderen Bereich angeben">
+							</div>
+						</div>
+
+						<!-- Bereich für Universität -->
+						<div class="form-group" id="job-university-field" style="display: none;">
+							<label>Bereich *</label>
+							<select id="job-university-area" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;">
+								<option value="">Bitte wählen</option>
+								<option value="pharmazeutische-technologie">Pharmazeutische Technologie</option>
+								<option value="medizinische-pharmazeutische-chemie">Medizinische und pharmazeutische Chemie</option>
+								<option value="pharmazeutische-biologie">Pharmazeutische Biologie</option>
+								<option value="pharmakologie-klinische-pharmazie">Pharmakologie/Klinische Pharmazie</option>
+								<option value="pharmaziegeschichte">Pharmaziegeschichte</option>
+							</select>
+						</div>
+								
 						<div class="form-group">
+							<label>Benefits</label>
 							<div class="checkbox-group">
 								<label><input type="checkbox" value="wohnung"> Wohnung</label>
 								<label><input type="checkbox" value="sonderzahlungen"> Sonderzahlungen</label>
@@ -2720,9 +2715,9 @@
 								<label><input type="checkbox" value="sonstige" id="job-benefits-sonstige"> Sonstige</label>
 							</div>
 							<div class="form-group" id="job-benefits-sonstige-field" style="display: none; margin-top: 1rem;">
-								<textarea id="job-benefits-sonstige-input" placeholder="Bitte andere Benefits angeben"></textarea>
+								<textarea id="job-benefits-sonstige-input" placeholder="Bitte andere Benefits angeben" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:8px;box-sizing:border-box;min-height:80px;resize:vertical;font-family:'DM Sans',sans-serif;"></textarea>
 							</div>
-						</div>
+						</div>						
 					</div>
 
 					<hr style="border: none; border-top: 1px solid #ddd; margin: 2.5rem 0;">
@@ -2782,9 +2777,9 @@
                 <button class="close-btn" onclick="closeModal('report-modal')">&times;</button>
             </div>
 			<div class="modal-body">
-				<div id="report-step-1">
-					<p>Sind Sie ein Vertreter des betroffenen Unternehmens?</p>
-					<div style="display: flex; gap: 1rem; margin-top: 1rem;">
+				<div id="report-step-1" style="padding:0.2rem 0;">
+					<p style="margin-bottom:1.7rem;">Sind Sie ein Vertreter des betroffenen Unternehmens?</p>
+					<div style="display: flex; gap: 1rem;">
 						<button class="btn btn-primary" onclick="showReportForm()">Ja, ich vertrete das Unternehmen</button>
 						<button class="btn btn-secondary" onclick="showReportDenied()">Nein</button>
 					</div>
@@ -2807,7 +2802,7 @@
 					</form>
 				</div>
 				<div id="report-step-3" style="display: none;">
-					<p>Bewertungen können nur vom betroffenen Betrieb gemeldet werden.</p>
+					<p style="margin-bottom:1.7rem;">Bewertungen können nur vom betroffenen Betrieb gemeldet werden.</p>
 					<button class="btn btn-secondary" onclick="closeModal('report-modal')">Verstanden</button>
 				</div>
 			</div>	
@@ -2892,7 +2887,7 @@
 		</div>
 	</div>
 		
-    <div id="advanced-filters-modal" class="modal">
+	<div id="advanced-filters-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Weitere Filtermöglichkeiten</h2>
@@ -2900,6 +2895,7 @@
             </div>
 			<div class="modal-body">
 				<div class="form-section">
+					<!-- Umkreissuche -->
 					<div class="form-group">
 						<label style="font-weight: 600;">Umkreissuche</label>
 						<div style="display: flex; gap: 1rem; align-items: flex-start;">
@@ -2918,19 +2914,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
-						<label style="font-weight: 600;">Spezialisierung</label>
-						<div class="checkbox-group">
-							<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
-							<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
-							<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
-							<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
-							<label><input type="checkbox" value="klinikversorgung"> Klinikversorgung</label>
-							<label><input type="checkbox" value="homoeopathie"> Homöopathie</label>
-							<label><input type="checkbox" value="ernaehrungsberatung"> Ernährungsberatung</label>
-							<label><input type="checkbox" value="sonstige-spec"> Sonstige</label>
-						</div>
-					</div>
+					<!-- Benefits -->
 					<div class="form-group">
 						<label style="font-weight: 600;">Benefits</label>
 						<div class="checkbox-group">
@@ -2939,18 +2923,11 @@
 							<label><input type="checkbox" value="fortbildung"> Fort- und Weiterbildungsangebot</label>
 							<label><input type="checkbox" value="kantine"> Kantine</label>
 							<label><input type="checkbox" value="diplomarbeit"> Diplomarbeit</label>
+							<label><input type="checkbox" value="homeoffice"> Homeoffice</label>
 							<label><input type="checkbox" value="sonstige-ben"> Sonstige</label>
 						</div>
 					</div>
-					<div class="form-group">
-						<label style="font-weight: 600;">Kundschaft</label>
-						<select id="customer-type-filter">
-							<option value="">Bitte auswählen</option>
-							<option value="stammkundschaft">Überwiegend Stammkundschaft</option>
-							<option value="gemischt">Gemischte Kundschaft</option>
-							<option value="laufkundschaft">Überwiegend Laufkundschaft</option>
-						</select>
-					</div>
+					<!-- Tarif -->
 					<div class="form-group">
 						<label style="font-weight: 600;">Tarif</label>
 						<div class="checkbox-group" style="grid-template-columns: 1fr;">
@@ -2960,6 +2937,80 @@
 							<label><input type="checkbox" id="undertariff-salary-filter"> Untertarifliche Bezahlung</label>
 						</div>
 					</div>
+					<!-- Kategoriespezifische Filter -->
+					<div class="form-group">
+						<label style="font-weight: 600;">Kategoriespezifische Filter</label>
+						<!-- Offizin -->
+						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
+							<button type="button" id="toggle-offizin" onclick="toggleFilterSection('offizin-content','toggle-offizin')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
+								Offizin <span id="icon-offizin">+</span>
+							</button>
+							<div id="offizin-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+								<div class="form-group" style="margin-bottom:1rem;">
+									<label style="font-weight:600;font-size:0.9rem;">Spezialisierung</label>
+									<div class="checkbox-group">
+										<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
+										<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
+										<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
+										<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
+										<label><input type="checkbox" value="klinikversorgung"> Klinikversorgung</label>
+										<label><input type="checkbox" value="homoeopathie"> Homöopathie</label>
+										<label><input type="checkbox" value="ernaehrungsberatung"> Ernährungsberatung</label>
+										<label><input type="checkbox" value="sonstige-spec"> Sonstige</label>
+									</div>
+								</div>
+								<div class="form-group" style="margin-bottom:0;">
+									<label style="font-weight:600;font-size:0.9rem;">Kundschaft</label>
+									<select id="customer-type-filter">
+										<option value="">Bitte auswählen</option>
+										<option value="stammkundschaft">Überwiegend Stammkundschaft</option>
+										<option value="gemischt">Gemischte Kundschaft</option>
+										<option value="laufkundschaft">Überwiegend Laufkundschaft</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Industrie -->
+						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
+							<button type="button" id="toggle-industrie" onclick="toggleFilterSection('industrie-content','toggle-industrie')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
+								Industrie <span id="icon-industrie">+</span>
+							</button>
+							<div id="industrie-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+								<div class="form-group" style="margin-bottom:0;">
+									<label style="font-weight:600;font-size:0.9rem;">Bereich</label>
+									<select id="industrie-area-filter">
+										<option value="">Bitte auswählen</option>
+										<option value="Qualitätskontrolle">Qualitätskontrolle</option>
+										<option value="Qualitätssicherung">Qualitätssicherung</option>
+										<option value="Produktion">Produktion</option>
+										<option value="Zulassung">Zulassung</option>
+										<option value="Forschung">Forschung</option>
+										<option value="Sonstige">Sonstige</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Universität -->
+						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
+							<button type="button" id="toggle-universitaet" onclick="toggleFilterSection('universitaet-content','toggle-universitaet')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
+								Universität <span id="icon-universitaet">+</span>
+							</button>
+							<div id="universitaet-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+								<div class="form-group" style="margin-bottom:0;">
+									<label style="font-weight:600;font-size:0.9rem;">Bereich</label>
+									<select id="universitaet-area-filter">
+										<option value="">Bitte auswählen</option>
+										<option value="Pharmazeutische Technologie">Pharmazeutische Technologie</option>
+										<option value="Medizinische und pharmazeutische Chemie">Medizinische und pharmazeutische Chemie</option>
+										<option value="Pharmazeutische Biologie">Pharmazeutische Biologie</option>
+										<option value="Pharmakologie/Klinische Pharmazie">Pharmakologie/Klinische Pharmazie</option>
+										<option value="Pharmaziegeschichte">Pharmaziegeschichte</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Zeitmodell -->
 					<div class="form-group">
 						<label style="font-weight: 600;">Zeitmodell</label>
 						<select id="time-model-filter">
@@ -2967,11 +3018,13 @@
 							<option value="fest">Feste Arbeitszeiten</option>
 							<option value="gleitzeit">Gleitzeit</option>
 						</select>
-					</div>					
+					</div>
+					<!-- Auszeichnung & Verifizierung -->
 					<div class="form-group">
-						<label style="font-weight: 600;">Auszeichnung</label>
+						<label style="font-weight: 600;">Auszeichnung & Verifizierung</label>
 						<div class="checkbox-group" style="grid-template-columns: 1fr;">
 							<label><input type="checkbox" id="bphd-award-filter"> Ausgezeichnet vom BPhD</label>
+							<label><input type="checkbox" id="verified-filter"> Verifiziertes Unternehmen</label>
 						</div>
 					</div>
 					<button class="btn btn-primary" onclick="applyAdvancedFilters()">Filter übernehmen</button>
@@ -2988,6 +3041,7 @@
 			</div>
 			<div class="modal-body">
 				<div class="form-section">
+					<!-- Umkreissuche -->
 					<div class="form-group">
 						<label style="font-weight: 600;">Umkreissuche</label>
 						<div style="display: flex; gap: 1rem; align-items: flex-start;">
@@ -3005,20 +3059,8 @@
 								</select>
 							</div>
 						</div>
-					</div>				
-					<div class="form-group">
-						<label style="font-weight: 600;">Spezialisierung</label>
-						<div class="checkbox-group">
-							<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
-							<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
-							<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
-							<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
-							<label><input type="checkbox" value="klinikversorgung"> Klinikversorgung</label>
-							<label><input type="checkbox" value="homoeopathie"> Homöopathie</label>
-							<label><input type="checkbox" value="ernaehrungsberatung"> Ernährungsberatung</label>
-							<label><input type="checkbox" value="sonstige-spec"> Sonstige</label>
-						</div>
 					</div>
+					<!-- Benefits -->
 					<div class="form-group">
 						<label style="font-weight: 600;">Benefits</label>
 						<div class="checkbox-group">
@@ -3027,18 +3069,11 @@
 							<label><input type="checkbox" value="fortbildung"> Fort- und Weiterbildungsangebot</label>
 							<label><input type="checkbox" value="kantine"> Kantine</label>
 							<label><input type="checkbox" value="diplomarbeit"> Diplomarbeit</label>
+							<label><input type="checkbox" value="homeoffice"> Homeoffice</label>
 							<label><input type="checkbox" value="sonstige-ben"> Sonstige</label>
 						</div>
 					</div>
-					<div class="form-group">
-						<label style="font-weight: 600;">Kundschaft</label>
-						<select id="job-customer-type-filter">
-							<option value="">Bitte auswählen</option>
-							<option value="stammkundschaft">Überwiegend Stammkundschaft</option>
-							<option value="gemischt">Gemischte Kundschaft</option>
-							<option value="laufkundschaft">Überwiegend Laufkundschaft</option>
-						</select>
-					</div>
+					<!-- Tarif -->
 					<div class="form-group">
 						<label style="font-weight: 600;">Tarif</label>
 						<div class="checkbox-group" style="grid-template-columns: 1fr;">
@@ -3048,6 +3083,80 @@
 							<label><input type="checkbox" id="job-undertariff-salary-filter"> Untertarifliche Bezahlung</label>
 						</div>
 					</div>
+					<!-- Kategoriespezifische Filter -->
+					<div class="form-group">
+						<label style="font-weight: 600;">Kategoriespezifische Filter</label>
+						<!-- Offizin -->
+						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
+							<button type="button" id="job-toggle-offizin" onclick="toggleFilterSection('job-offizin-content','job-toggle-offizin')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
+								Offizin <span id="icon-job-offizin">+</span>
+							</button>
+							<div id="job-offizin-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+								<div class="form-group" style="margin-bottom:1rem;">
+									<label style="font-weight:600;font-size:0.9rem;">Spezialisierung</label>
+									<div class="checkbox-group">
+										<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
+										<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
+										<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
+										<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
+										<label><input type="checkbox" value="klinikversorgung"> Klinikversorgung</label>
+										<label><input type="checkbox" value="homoeopathie"> Homöopathie</label>
+										<label><input type="checkbox" value="ernaehrungsberatung"> Ernährungsberatung</label>
+										<label><input type="checkbox" value="sonstige-spec"> Sonstige</label>
+									</div>
+								</div>
+								<div class="form-group" style="margin-bottom:0;">
+									<label style="font-weight:600;font-size:0.9rem;">Kundschaft</label>
+									<select id="job-customer-type-filter">
+										<option value="">Bitte auswählen</option>
+										<option value="stammkundschaft">Überwiegend Stammkundschaft</option>
+										<option value="gemischt">Gemischte Kundschaft</option>
+										<option value="laufkundschaft">Überwiegend Laufkundschaft</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Industrie -->
+						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
+							<button type="button" id="job-toggle-industrie" onclick="toggleFilterSection('job-industrie-content','job-toggle-industrie')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
+								Industrie <span id="icon-job-industrie">+</span>
+							</button>
+							<div id="job-industrie-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+								<div class="form-group" style="margin-bottom:0;">
+									<label style="font-weight:600;font-size:0.9rem;">Bereich</label>
+									<select id="job-industrie-area-filter">
+										<option value="">Alle Bereiche</option>
+										<option value="Qualitätskontrolle">Qualitätskontrolle</option>
+										<option value="Qualitätssicherung">Qualitätssicherung</option>
+										<option value="Produktion">Produktion</option>
+										<option value="Zulassung">Zulassung</option>
+										<option value="Forschung">Forschung</option>
+										<option value="Sonstige">Sonstige</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Universität -->
+						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
+							<button type="button" id="job-toggle-universitaet" onclick="toggleFilterSection('job-universitaet-content','job-toggle-universitaet')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
+								Universität <span id="icon-job-universitaet">+</span>
+							</button>
+							<div id="job-universitaet-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+								<div class="form-group" style="margin-bottom:0;">
+									<label style="font-weight:600;font-size:0.9rem;">Bereich</label>
+									<select id="job-universitaet-area-filter">
+										<option value="">Alle Bereiche</option>
+										<option value="Pharmazeutische Technologie">Pharmazeutische Technologie</option>
+										<option value="Medizinische und pharmazeutische Chemie">Medizinische und pharmazeutische Chemie</option>
+										<option value="Pharmazeutische Biologie">Pharmazeutische Biologie</option>
+										<option value="Pharmakologie/Klinische Pharmazie">Pharmakologie/Klinische Pharmazie</option>
+										<option value="Pharmaziegeschichte">Pharmaziegeschichte</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Zeitmodell -->
 					<div class="form-group">
 						<label style="font-weight: 600;">Zeitmodell</label>
 						<select id="job-time-model-filter">
@@ -3055,11 +3164,13 @@
 							<option value="fest">Feste Arbeitszeiten</option>
 							<option value="gleitzeit">Gleitzeit</option>
 						</select>
-					</div>					
+					</div>
+					<!-- Auszeichnung & Verifizierung -->
 					<div class="form-group">
-						<label style="font-weight: 600;">Auszeichnung</label>
+						<label style="font-weight: 600;">Auszeichnung & Verifizierung</label>
 						<div class="checkbox-group" style="grid-template-columns: 1fr;">
 							<label><input type="checkbox" id="job-bphd-award-filter"> Ausgezeichnet vom BPhD</label>
+							<label><input type="checkbox" id="job-verified-filter"> Verifiziertes Unternehmen</label>
 						</div>
 					</div>
 					<button class="btn btn-primary" onclick="applyJobAdvancedFilters()">Filter übernehmen</button>
@@ -3300,8 +3411,7 @@
 				specializations: specializations,
 				customerType: customerType,
 				salary: parseInt(document.getElementById('salary').value),
-				vacationDays: parseInt(document.getElementById('vacation-days').value),
-				saturdayWork: parseInt(document.getElementById('saturday-work').value),
+				saturdayWork: parseInt(document.getElementById('saturday-work').value) || 0,
 				workingHoursData: workingHoursData,
 				ratings: {...ratings},
 				tasks: document.getElementById('tasks').value,
@@ -3567,7 +3677,6 @@
 				area: area,
 				salary: parseInt(document.getElementById('job-salary')?.value || '0'),
 				saturdayWork: parseInt(document.getElementById('job-saturday-work')?.value || '0'),
-				vacationDays: parseInt(document.getElementById('job-vacation-days')?.value || '0'),
 				workingHoursData: workingHoursData,
 				benefits: benefits,
 				customerType: customerType,
@@ -3942,185 +4051,6 @@
 				}
 			}, 800);
 		}		
-
-
-		function showCompanyProfilePreview() {
-			const companyName = "Marien-Apotheke Berlin";
-			const company = Object.values(companiesData).find(c => c.name === companyName);
-			
-			if (!company) {
-				alert('Unternehmen nicht gefunden.');
-				return;
-			}
-			
-			// Erstelle Modal
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			modal.id = 'preview-modal';
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 1400px; width: 95%; max-height: 95vh;">
-					<div class="modal-header">
-						<h2>Vorschau: ${company.name}</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body" style="overflow-y: auto; max-height: calc(95vh - 150px); padding: 0;">
-						<div class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
-							<div id="preview-company-content"></div>
-						</div>
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Schließen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-			
-			// Nutze EXAKT den gleichen Code wie createCompanyPage
-			renderCompanyPagePreview(company);
-		}
-
-		function renderCompanyPagePreview(company) {
-			const container = document.getElementById('preview-company-content');
-			if (!container) return;
-			
-			const bestReview = company.reviews.length > 0 ? 
-				company.reviews.reduce((best, current) => 
-					calculateOverallRating(current.ratings) > calculateOverallRating(best.ratings) ? current : best
-				) : null;
-				
-			const worstReview = company.reviews.length > 1 ? 
-				company.reviews.reduce((worst, current) => 
-					calculateOverallRating(current.ratings) < calculateOverallRating(worst.ratings) ? current : worst
-				) : null;
-			
-			const ratingDistribution = calculateRatingDistribution(company.reviews);
-			const latestJobs = [...company.jobs]
-				.sort((a, b) => a.postedDays - b.postedDays)
-				.slice(0, 2);
-			
-			container.innerHTML = `
-				<!-- Header -->
-				<div class="company-header-box" style="position: relative; display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06); overflow: visible;">
-					${company.bphdAwards && company.bphdAwards.length > 0 ? `
-					<div class="bphd-badge-container" style="position: absolute; top: -20px; right: 0px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${company.name.replace(/'/g, "\\'")}')">
-						<svg width="90" height="100" viewBox="0 0 90 100">
-							<!-- Ribbon -->
-							<path d="M25 0 L35 0 L35 50 L30 45 L25 50 Z" fill="#8B0000"/>
-							<path d="M55 0 L65 0 L65 50 L60 45 L55 50 Z" fill="#8B0000"/>
-							
-							<!-- Medal circle -->
-							<circle cx="45" cy="65" r="30" fill="#DAA520" stroke="#B8860B" stroke-width="2"/>
-							
-							<!-- Inner circle -->
-							<circle cx="45" cy="65" r="24" fill="#FFD700" stroke="#DAA520" stroke-width="1.5"/>
-							
-							<!-- BPhD Text -->
-							<text x="45" y="70" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#8B4513" text-anchor="middle">BPhD</text>
-						</svg>
-					</div>
-					` : ''}					
-					<div style="position: relative; flex-shrink: 0; width: 140px; height: 140px;">
-						<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;" alt="Profilbild">
-					</div>
-					<div style="flex: 1;">
-						<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-							<h1 style="margin: 0; font-size: 2.5rem;">${company.name}</h1>
-							${company.verified ? '<div class="verified-badge" data-tooltip="Verifiziertes Unternehmen"><svg width="38" height="38" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0;"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>' : ''}
-						</div>
-						<p style="margin: 0; color: #666; font-size: 1.1rem;">${company.address}, ${getStateLabel(company.state)}${company.country ? ', ' + company.country : ''}</p>
-						${company.website ? `<p style="margin: 0.5rem 0 0 0; color: var(--red); font-size: 1rem;"><a href="https://${company.website}" target="_blank" style="color: var(--red); text-decoration: none;">${company.website}</a></p>` : ''}
-						<div style="margin-top: 0.5rem;">
-							<div class="category-badge" style="font-size: 0.9rem; padding: 0.4rem 1rem;">${getCategoryLabel(company.category)}</div>
-							<div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="alert('Alle Bewertungen anzeigen')">
-								<div class="stars" style="font-size: 1.2rem; margin: 0;">
-									${generateStarHTML(Math.round(company.averageRating))}
-								</div>
-								<span style="font-weight: 600; color: var(--red); font-size: 1.1rem;">${company.averageRating.toFixed(1)}</span>
-								<span style="color: #666; font-size: 0.9rem;">(${company.reviews.length})</span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Verifizierung/Kontakt -->
-				<div style="margin-bottom: 2rem; padding: 1rem 2rem; background: transparent; border-radius: 10px; text-align: center;">
-					${company.verified ? `
-						<span>Haben Sie Fragen an das Unternehmen?</span>
-						<button class="btn btn-primary" onclick="showContactCompanyModal('${company.name}')" style="margin-left: 1rem;">Unternehmen kontaktieren</button>
-					` : `
-						<span>Ist das Ihr Unternehmen?</span>
-						<button class="btn btn-secondary" onclick="alert('Verifizierung')" style="margin-left: 1rem;">Unternehmen verifizieren</button>
-					`}
-				</div>
-
-				<!-- Bewertungsbereich -->
-				<div style="margin-bottom: 3rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
-
-					<h3 style="margin-bottom: 2rem;">Bewertungen</h3>
-					
-					${company.reviews.length > 0 ? `
-					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 3rem; margin-bottom: 3rem;">
-						<div>
-							<h4 style="font-family: 'Fraunces', serif; color: #155724; margin-bottom: 1rem;">Beste Bewertung</h4>
-							${createReviewCard(bestReview)}
-						</div>
-						<div>
-							<h4 style="font-family: 'Fraunces', serif; color: var(--red); margin-bottom: 1rem;">Schlechteste Bewertung</h4>
-							${company.reviews.length > 1 ? createReviewCard(worstReview) : '<p style="color: #666;">Bisher nur eine Bewertung vorhanden.</p>'}
-						</div>
-					</div>
-					
-					<div style="display: flex; gap: 3rem; align-items: center; margin-bottom: 2rem;">
-						<div style="text-align: center;">
-							<div class="rating-number" style="font-size: 4rem; margin-bottom: 0.5rem;">${company.averageRating.toFixed(1)}</div>
-							<div class="stars" style="font-size: 1.8rem; margin-bottom: 0.5rem; justify-content: center;">
-								${generateStarHTML(Math.round(company.averageRating))}
-							</div>
-							<div style="color: #666;">Durchschnitt aus ${company.reviews.length} Bewertungen</div>
-						</div>
-						<div style="flex: 1;">
-							${Object.keys(ratingDistribution).reverse().map(star => `
-								<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; cursor: pointer;" 
-									 onclick="alert('Filter ${star} Sterne')">
-									<span style="width: 36px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex-shrink: 0;"><span style="width: 10px; text-align: center; font-variant-numeric: tabular-nums;">${star}</span><span style="color: var(--red); line-height: 1; flex-shrink: 0; width: 14px; text-align: center;">★</span></span>
-									<div style="flex: 1; height: 25px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
-										<div style="height: 100%; background: var(--red); width: ${company.reviews.length > 0 ? (ratingDistribution[star] / company.reviews.length) * 100 : 0}%;"></div>
-									</div>
-									<span style="width: 30px; text-align: center; font-variant-numeric: tabular-nums; flex-shrink: 0;">${ratingDistribution[star]}</span>
-								</div>
-							`).join('')}
-						</div>
-					</div>
-					
-					${company.reviews.length > 1 ? `
-					<div style="text-align: center;">
-						<button class="btn btn-primary" onclick="alert('Alle Bewertungen')">Alle Bewertungen anzeigen</button>
-					</div>
-					` : ''}
-					` : '<p style="color: #666;">Noch keine Bewertungen vorhanden.</p>'}
-				</div>
-
-				<!-- Stellenangebote -->
-				<div style="padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
-					<h3 style="margin-bottom: 2rem;">Stellenangebote</h3>
-					
-					${company.jobs.length > 0 ? `
-					<div id="company-jobs-container" style="margin-bottom: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem;">
-						${latestJobs.map(job => createJobCard(job)).join('')}
-					</div>
-					
-					${company.jobs.length > 1 ? `
-					<div style="text-align: center;">
-						<button class="btn btn-primary" onclick="alert('Alle Stellenangebote')">Alle Stellenangebote anzeigen</button>
-					</div>
-					` : ''}
-					` : '<p style="color: #666;">Keine aktuellen Stellenangebote vorhanden.</p>'}
-				</div>
-			`;
-		}
 
 		function switchCompanyTab(event, tabId) {
 			// Deaktiviere alle Tabs
@@ -4734,10 +4664,9 @@
                 chipsContainer.innerHTML = '<h4>Aktive Filter:</h4><div class="filter-chips"></div>';
                 
                 const chipsDiv = chipsContainer.querySelector('.filter-chips');
-                activeAdvancedFilters.forEach((filter, index) => {
+				activeAdvancedFilters.forEach((filter, index) => {
                     const chip = document.createElement('span');
                     chip.className = 'filter-chip';
-					const displayFilter = filter.charAt(0).toUpperCase() + filter.slice(1);
                     chip.innerHTML = `${filter} <button onclick="removeFilter(${index})">&times;</button>`;
                     chipsDiv.appendChild(chip);
                 });
@@ -4750,12 +4679,13 @@
 			const removedFilter = activeAdvancedFilters[index];
 			activeAdvancedFilters.splice(index, 1);
 			
-			// Wenn Umkreissuche entfernt wird, Felder leeren
 			if (removedFilter.startsWith('Im Umkreis von')) {
 				document.getElementById('location-filter').value = '';
 				document.getElementById('radius-plz').value = '';
 				document.getElementById('radius-distance').value = '5';
 			}
+			// Kategorie-Filter bleibt beim Entfernen eines kategoriespezifischen Filters stehen
+			// (kein automatisches Entfernen von category-filter)
 			
 			displayActiveFilters();
 			updateResetButtonVisibility();
@@ -4978,9 +4908,10 @@
 			}
 		}
 
-        function showReportModal(reviewId) {
+		function showReportModal(reviewId) {
             document.getElementById('report-modal').setAttribute('data-review-id', reviewId);
             document.getElementById('report-modal').style.display = 'block';
+            document.getElementById('report-modal').style.zIndex = '9999';
         }
 
         function showReportForm() {
@@ -5204,6 +5135,7 @@
 			}, 100);			
 			
 			currentSection = 'company';
+			if (!isPopState) history.pushState({ section: 'company', companyName: company.name }, '', '#company-' + encodeURIComponent(company.name));
 		}
 
 		function createCompanyPage(company) {
@@ -5278,12 +5210,12 @@
 				` : ''}
 
 				<!-- Verifizierung/Kontakt -->
-				<div style="margin-bottom: 2rem; padding: 1rem 2rem; background: transparent; border-radius: 10px; text-align: center;">
+				<div style="margin-bottom: 2rem; padding: 0.5rem 2rem; background: transparent; border-radius: 10px; text-align: center;">
 					${company.verified ? `
-						<span>Haben Sie Fragen an das Unternehmen?</span>
+						<span style="display:block;margin-bottom:1rem;">Haben Sie Fragen an das Unternehmen?</span>
 						<button class="btn btn-primary" onclick="showContactCompanyModal('${company.name}')" style="margin-left: 1rem;">Unternehmen kontaktieren</button>
 					` : `
-						<span>Ist das Ihr Unternehmen?</span>
+						<span style="display:block;margin-bottom:1rem;">Ist das Ihr Unternehmen?</span>
 						<button class="btn btn-secondary" onclick="showVerificationModal('${company.name}')" style="margin-left: 1rem;">Unternehmen verifizieren</button>
 					`}
 				</div>
@@ -5917,9 +5849,9 @@
 			
 			let jobs = company.jobs;
 			if (type === 'active') {
-				jobs = jobs.filter(j => j.postedDays <= 30);
+				jobs = jobs.filter(j => j.postedDays <= 90);
 			} else {
-				jobs = jobs.filter(j => j.postedDays > 30);
+				jobs = jobs.filter(j => j.postedDays > 90);
 			}
 			
 			if (jobs.length === 0) {
@@ -6384,17 +6316,83 @@
 					}
 				}
                 
-				// Erweiterte Filter prüfen (Gehalts-Filter separat behandelt)
+				const catSpecificFilters = ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung',
+				'Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung',
+				'Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft',
+				'Sonstige Benefits'];
+
+				// Erweiterte Filter prüfen
 				activeAdvancedFilters.forEach(filter => {
-					if (['Bezahlung über Tarif', 'Angemessenes Gehalt', 'Tarifliches Mindestgehalt', 'Untertarifliche Bezahlung'].includes(filter)) return;
+					// Diese Filter werden separat behandelt
+					if (['Bezahlung über Tarif', 'Angemessenes Gehalt', 'Tarifliches Mindestgehalt', 'Untertarifliche Bezahlung',
+						 'Ausgezeichnet vom BPhD', 'Verifiziertes Unternehmen', 'Feste Arbeitszeiten', 'Gleitzeit'].includes(filter)) return;
+					if (filter.startsWith('Im Umkreis von') || filter.startsWith('Bereich: ')) return;
+					if (catSpecificFilters.includes(filter)) return; // Kundschaft/Spezialisierung separat unten
+
 					const reviewText = review.textContent.toLowerCase();
 					const filterLower = filter.toLowerCase();
-					
-					if (!reviewText.includes(filterLower) && 
+					if (!reviewText.includes(filterLower) &&
 						!reviewText.includes(filterLower.replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue'))) {
 						showReview = false;
 					}
 				});
+
+				// Spezialisierungs-Filter (inkl. Sonstige)
+				const activeSpecFilters = activeAdvancedFilters.filter(f =>
+					['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung',
+					 'Klinikversorgung','Homöopathie','Ernährungsberatung'].includes(f)
+				);
+				if (activeSpecFilters.length > 0) {
+					const specText = review.textContent.toLowerCase();
+					const allMatch = activeSpecFilters.every(f => specText.includes(f.toLowerCase()));
+					if (!allMatch) showReview = false;
+				}
+				if (activeAdvancedFilters.includes('Sonstige Spezialisierung')) {
+					// Prüfe ob die Bewertung eine Spezialisierung hat, die NICHT in der Standardliste ist
+					const specEl = review.querySelector('.company-info p');
+					let hasSonstige = false;
+					// Alle p-Elemente in company-info durchsuchen
+					review.querySelectorAll('.company-info p').forEach(p => {
+						if (p.textContent.startsWith('Spezialisierungen:')) {
+							const specText = p.textContent.replace('Spezialisierungen:', '').trim();
+							const standardSpecs = ['sterilherstellung','verblisterung','versandhandel','heimversorgung',
+								'klinikversorgung','homöopathie','ernährungsberatung'];
+							const specParts = specText.split(',').map(s => s.trim().toLowerCase());
+							hasSonstige = specParts.some(s => !standardSpecs.includes(s) && s !== '');
+						}
+					});
+					if (!hasSonstige) showReview = false;
+				}
+
+				// Kundschafts-Filter
+				const activeKundschaftFilters = activeAdvancedFilters.filter(f =>
+					['Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft'].includes(f)
+				);
+				if (activeKundschaftFilters.length > 0) {
+					let kundschaftMatch = false;
+					review.querySelectorAll('.company-info p').forEach(p => {
+						if (p.textContent.startsWith('Kundschaft:')) {
+							const kundText = p.textContent.replace('Kundschaft:', '').trim();
+							if (activeKundschaftFilters.some(f => f === kundText)) kundschaftMatch = true;
+						}
+					});
+					if (!kundschaftMatch) showReview = false;
+				}
+
+				// Sonstige Benefits Filter
+				if (activeAdvancedFilters.includes('Sonstige Benefits')) {
+					const standardBenefits = ['wohnung','sonderzahlungen','fort- und weiterbildungsangebot',
+						'fort- und weiterbildung','kantine','diplomarbeit','homeoffice'];
+					let hasSonstigeBenefits = false;
+					review.querySelectorAll('.company-info p').forEach(p => {
+						if (p.textContent.startsWith('Benefits:')) {
+							const benefitsText = p.textContent.replace('Benefits:', '').trim();
+							const benefitParts = benefitsText.split(',').map(b => b.trim().toLowerCase());
+							hasSonstigeBenefits = benefitParts.some(b => !standardBenefits.includes(b) && b !== '');
+						}
+					});
+					if (!hasSonstigeBenefits) showReview = false;
+				}
                 
 				// Grundfilter prüfen
 				const companyNameInput = document.getElementById('company-name-filter').value.trim();
@@ -6512,6 +6510,49 @@
 							return false;
 						});
 						if (!matchesSome) showReview = false;
+					}
+				}
+
+				// BPhD-Filter
+				if (activeAdvancedFilters.includes('Ausgezeichnet vom BPhD')) {
+					const reviewCompanyName = (review.getAttribute('data-company-name') || '').toLowerCase().trim();
+					// Direkt aus bphdAwardsDatabase
+					let hasBphd = false;
+					if (bphdAwardsDatabase && Object.keys(bphdAwardsDatabase).length > 0) {
+						hasBphd = Object.values(bphdAwardsDatabase).some(yearAwards =>
+							yearAwards.some(a => (a.companyName || '').toLowerCase().trim() === reviewCompanyName)
+						);
+					}
+					// Fallback: companiesData
+					if (!hasBphd) {
+						const comp = Object.values(companiesData).find(c => c.name.toLowerCase() === reviewCompanyName);
+						hasBphd = !!(comp && comp.bphdAwards && comp.bphdAwards.length > 0);
+					}
+					if (!hasBphd) showReview = false;
+				}
+
+				// Verifiziert-Filter
+				if (activeAdvancedFilters.includes('Verifiziertes Unternehmen')) {
+					const reviewCompanyName = (review.getAttribute('data-company-name') || '').toLowerCase().trim();
+					let isVerified = false;
+					// Direkt aus verifiedCompaniesCache
+					if (verifiedCompaniesCache && verifiedCompaniesCache.size > 0) {
+						isVerified = verifiedCompaniesCache.has(reviewCompanyName);
+					}
+					// Fallback: companiesData
+					if (!isVerified) {
+						const comp = Object.values(companiesData).find(c => c.name.toLowerCase() === reviewCompanyName);
+						isVerified = !!(comp && comp.verified);
+					}
+					if (!isVerified) showReview = false;
+				}
+
+				// Bereich-Filter (Industrie/Universität)
+				const bereichFilter = activeAdvancedFilters.find(f => f.startsWith('Bereich: '));
+				if (bereichFilter) {
+					const bereichValue = bereichFilter.replace('Bereich: ', '');
+					if (!review.textContent.includes(bereichValue)) {
+						showReview = false;
 					}
 				}
 
@@ -6664,26 +6705,71 @@
             
             return distance <= radiusKm;
         }
+
+		function toggleFilterSection(contentId, btnId) {
+			const content = document.getElementById(contentId);
+			const iconId = btnId.replace('toggle-', 'icon-');
+			const icon = document.getElementById(iconId);
+			const isOpen = content.style.display !== 'none';
+			content.style.display = isOpen ? 'none' : 'block';
+			if (icon) icon.textContent = isOpen ? '+' : '−';
+		}
+
+		function openFilterSectionIfActive(contentId, btnId, hasActive) {
+			if (!hasActive) return;
+			const content = document.getElementById(contentId);
+			const icon = document.getElementById(btnId.replace('toggle-', 'icon-'));
+			if (content) content.style.display = 'block';
+			if (icon) icon.textContent = '−';
+		}
 		
 		function showAdvancedFilters() {
 			// Modal-State synchronisieren
 			document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]').forEach(cb => cb.checked = false);
 			document.querySelectorAll('#advanced-filters-modal select').forEach(sel => sel.value = '');
+			// Alle ausklappbaren Abschnitte zuklappen
+			['offizin-content','industrie-content','universitaet-content'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.style.display = 'none';
+			});
+			['icon-offizin','icon-industrie','icon-universitaet'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.textContent = '+';
+			});
 			
 			const filterMapping = {
 				'Sterilherstellung': 'sterilherstellung', 'Verblisterung': 'verblisterung',
 				'Versandhandel': 'versandhandel', 'Heimversorgung': 'heimversorgung',
 				'Klinikversorgung': 'klinikversorgung', 'Homöopathie': 'homoeopathie',
-				'Ernährungsberatung': 'ernaehrungsberatung', 'Wohnung': 'wohnung',
-				'Sonderzahlungen': 'sonderzahlungen', 'Fort- und Weiterbildung': 'fortbildung',
-				'Kantine': 'kantine', 'Diplomarbeit': 'diplomarbeit', 'Homeoffice': 'homeoffice'
+				'Ernährungsberatung': 'ernaehrungsberatung', 'Sonstige Spezialisierung': 'sonstige-spec',
+				'Wohnung': 'wohnung', 'Sonderzahlungen': 'sonderzahlungen',
+				'Fort- und Weiterbildung': 'fortbildung', 'Kantine': 'kantine',
+				'Diplomarbeit': 'diplomarbeit', 'Homeoffice': 'homeoffice',
+				'Sonstige Benefits': 'sonstige-ben'
 			};
+
 			const customerTypeMapping = {
-				'Überwiegend Stammkundschaft': 'Stammkundschaft',
-				'Gemischte Kundschaft': 'Gemischt',
-				'Überwiegend Laufkundschaft': 'Laufkundschaft'
+				'Überwiegend Stammkundschaft': 'stammkundschaft',
+				'Gemischte Kundschaft': 'gemischt',
+				'Überwiegend Laufkundschaft': 'laufkundschaft'
 			};
 			
+			// Bereich-Filter wiederherstellen
+			const bereichFilter = activeAdvancedFilters.find(f => f.startsWith('Bereich: '));
+			if (bereichFilter) {
+				const bereichVal = bereichFilter.replace('Bereich: ', '');
+				const industrieEl = document.getElementById('industrie-area-filter');
+				const uniEl = document.getElementById('universitaet-area-filter');
+				if (industrieEl) {
+					const opt = Array.from(industrieEl.options).find(o => o.value === bereichVal);
+					if (opt) industrieEl.value = bereichVal;
+				}
+				if (uniEl) {
+					const opt = Array.from(uniEl.options).find(o => o.value === bereichVal);
+					if (opt) uniEl.value = bereichVal;
+				}
+			}
+
 			activeAdvancedFilters.forEach(filter => {
 				if (filter === 'Bezahlung über Tarif') {
 					const el = document.getElementById('high-salary-filter');
@@ -6700,6 +6786,9 @@
 				} else if (filter === 'Ausgezeichnet vom BPhD') {
 					const el = document.getElementById('bphd-award-filter');
 					if (el) el.checked = true;
+				} else if (filter === 'Verifiziertes Unternehmen') {
+					const el = document.getElementById('verified-filter');
+					if (el) el.checked = true;					
 				} else if (customerTypeMapping[filter]) {
 					const sel = document.getElementById('customer-type-filter');
 					if (sel) sel.value = customerTypeMapping[filter];
@@ -6711,6 +6800,14 @@
 					}
 				}
 			});
+
+			// Abschnitte aufklappen wenn aktive Filter vorhanden
+			const offizinActive = activeAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige','Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft'].includes(f));
+			const industrieActive = activeAdvancedFilters.some(f => f.startsWith('Bereich: ') && ['Qualitätskontrolle','Qualitätssicherung','Produktion','Zulassung','Forschung'].some(b => f.includes(b)));
+			const universitaetActive = activeAdvancedFilters.some(f => f.startsWith('Bereich: ') && ['Pharmazeutische','Medizinische','Pharmakologie','Pharmaziegeschichte'].some(b => f.includes(b)));
+			openFilterSectionIfActive('offizin-content', 'toggle-offizin', offizinActive);
+			openFilterSectionIfActive('industrie-content', 'toggle-industrie', industrieActive);
+			openFilterSectionIfActive('universitaet-content', 'toggle-universitaet', universitaetActive);
 			
 			const modal = document.getElementById('advanced-filters-modal');
 			modal.style.display = 'block';
@@ -6736,7 +6833,7 @@
             // Spezialisierungen sammeln
 			const specializations = document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]:checked');
 			specializations.forEach(checkbox => {
-				const specValues = ['sterilherstellung', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung'];
+				const specValues = ['sterilherstellung', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung', 'sonstige-spec'];
 				if (specValues.includes(checkbox.value)) {
 					const labels = {
 						'sterilherstellung': 'Sterilherstellung',
@@ -6745,14 +6842,20 @@
 						'heimversorgung': 'Heimversorgung',
 						'klinikversorgung': 'Klinikversorgung',
 						'homoeopathie': 'Homöopathie',
-						'ernaehrungsberatung': 'Ernährungsberatung'
+						'ernaehrungsberatung': 'Ernährungsberatung',
+						'sonstige-spec': 'Sonstige Spezialisierung'
 					};
 					activeAdvancedFilters.push(labels[checkbox.value] || checkbox.value);
 				}
 			});
             
+			// Wenn Spezialisierungen ausgewählt, Offizin-Kategorie im Dropdown setzen
+			if (activeAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung'].includes(f))) {
+				document.getElementById('category-filter').value = 'offizin';
+			}
+
             // Benefits sammeln
-			const benefitValues = ['wohnung', 'sonderzahlungen', 'fortbildung', 'kantine', 'diplomarbeit', 'homeoffice'];
+			const benefitValues = ['wohnung', 'sonderzahlungen', 'fortbildung', 'kantine', 'diplomarbeit', 'homeoffice', 'sonstige-ben'];
 			document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]:checked').forEach(checkbox => {
 				if (benefitValues.includes(checkbox.value)) {
 					const labels = {
@@ -6761,21 +6864,26 @@
 						'fortbildung': 'Fort- und Weiterbildung',
 						'kantine': 'Kantine',
 						'diplomarbeit': 'Diplomarbeit',
-						'homeoffice': 'Homeoffice'
+						'homeoffice': 'Homeoffice',
+						'sonstige-ben': 'Sonstige Benefits'
 					};
-					activeAdvancedFilters.push(labels[checkbox.value]);
+					if (labels[checkbox.value]) activeAdvancedFilters.push(labels[checkbox.value]);
 				}
 			});
             
-            // Kundschaft
+			// Kundschaft
             const customerType = document.getElementById('customer-type-filter').value;
             if (customerType) {
                 const labels = {
-                    'Stammkundschaft': 'Überwiegend Stammkundschaft',
-                    'Gemischt': 'Gemischte Kundschaft',
-                    'Laufkundschaft': 'Überwiegend Laufkundschaft'
+                    'stammkundschaft': 'Überwiegend Stammkundschaft',
+                    'gemischt': 'Gemischte Kundschaft',
+                    'laufkundschaft': 'Überwiegend Laufkundschaft'
                 };
-                activeAdvancedFilters.push(labels[customerType]);
+                if (labels[customerType]) {
+                    activeAdvancedFilters.push(labels[customerType]);
+                    // Kategorie Offizin automatisch mitsetzen
+                    document.getElementById('category-filter').value = 'offizin';
+                }
             }
             
             // Hohe Bezahlung
@@ -6809,6 +6917,21 @@
             if (document.getElementById('bphd-award-filter').checked) {
                 activeAdvancedFilters.push('Ausgezeichnet vom BPhD');
             }
+
+			if (document.getElementById('verified-filter').checked) {
+				activeAdvancedFilters.push('Verifiziertes Unternehmen');
+			}
+
+			const industrieArea = document.getElementById('industrie-area-filter')?.value;
+			if (industrieArea) {
+				activeAdvancedFilters.push('Bereich: ' + industrieArea);
+				document.getElementById('category-filter').value = 'industrie';
+			}
+			const universitaetArea = document.getElementById('universitaet-area-filter')?.value;
+			if (universitaetArea) {
+				activeAdvancedFilters.push('Bereich: ' + universitaetArea);
+				document.getElementById('category-filter').value = 'universitaet';
+			}
 
 			// Umkreissuche
 			const radiusPlz = document.getElementById('radius-plz').value.trim();
@@ -6844,6 +6967,16 @@
             document.querySelectorAll('#job-advanced-filters-modal input[type="checkbox"]').forEach(cb => cb.checked = false);
             document.querySelectorAll('#job-advanced-filters-modal select').forEach(sel => sel.value = '');
 
+			// Ausklappbare Abschnitte zuklappen
+			['job-offizin-content','job-industrie-content','job-universitaet-content'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.style.display = 'none';
+			});
+			['icon-job-offizin','icon-job-industrie','icon-job-universitaet'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.textContent = '+';
+			});
+
             const activeJobRadiusFilter = activeJobAdvancedFilters.find(f => f.startsWith('Im Umkreis von'));
             if (activeJobRadiusFilter) {
                 document.getElementById('job-radius-distance').value = activeJobRadiusFilter.match(/\d+/)[0];
@@ -6857,9 +6990,10 @@
                 'Sterilherstellung': 'sterilherstellung', 'Verblisterung': 'verblisterung',
                 'Versandhandel': 'versandhandel', 'Heimversorgung': 'heimversorgung',
                 'Klinikversorgung': 'klinikversorgung', 'Homöopathie': 'homoeopathie',
-                'Ernährungsberatung': 'ernaehrungsberatung', 'Wohnung': 'wohnung',
-                'Sonderzahlungen': 'sonderzahlungen', 'Fort- und Weiterbildung': 'fortbildung',
-                'Kantine': 'kantine', 'Diplomarbeit': 'diplomarbeit', 'Homeoffice': 'homeoffice'
+                'Ernährungsberatung': 'ernaehrungsberatung', 'Sonstige Spezialisierung': 'sonstige-spec',
+                'Wohnung': 'wohnung', 'Sonderzahlungen': 'sonderzahlungen',
+                'Fort- und Weiterbildung': 'fortbildung', 'Kantine': 'kantine',
+                'Diplomarbeit': 'diplomarbeit', 'Homeoffice': 'homeoffice', 'Sonstige Benefits': 'sonstige-ben'
             };
             const customerTypeMapping = {
                 'Überwiegend Stammkundschaft': 'stammkundschaft',
@@ -6867,12 +7001,23 @@
                 'Überwiegend Laufkundschaft': 'laufkundschaft'
             };
 
+			// Bereich-Filter wiederherstellen
+			const jobBereichFilter = activeJobAdvancedFilters.find(f => f.startsWith('Bereich: '));
+			if (jobBereichFilter) {
+				const bereichVal = jobBereichFilter.replace('Bereich: ', '');
+				const industrieEl = document.getElementById('job-industrie-area-filter');
+				const uniEl = document.getElementById('job-universitaet-area-filter');
+				if (industrieEl) { const opt = Array.from(industrieEl.options).find(o => o.value === bereichVal); if (opt) industrieEl.value = bereichVal; }
+				if (uniEl) { const opt = Array.from(uniEl.options).find(o => o.value === bereichVal); if (opt) uniEl.value = bereichVal; }
+			}
+
             activeJobAdvancedFilters.forEach(filter => {
                 if (filter === 'Bezahlung über Tarif') { const el = document.getElementById('job-high-salary-filter'); if (el) el.checked = true; }
                 else if (filter === 'Angemessenes Gehalt') { const el = document.getElementById('job-adequate-salary-filter'); if (el) el.checked = true; }
                 else if (filter === 'Tarifliches Mindestgehalt') { const el = document.getElementById('job-tariff-salary-filter'); if (el) el.checked = true; }
                 else if (filter === 'Untertarifliche Bezahlung') { const el = document.getElementById('job-undertariff-salary-filter'); if (el) el.checked = true; }
-                else if (filter === 'Ausgezeichnet vom BPhD') { const el = document.getElementById('job-bphd-award-filter'); if (el) el.checked = true; }
+				else if (filter === 'Ausgezeichnet vom BPhD') { const el = document.getElementById('job-bphd-award-filter'); if (el) el.checked = true; }
+                else if (filter === 'Verifiziertes Unternehmen') { const el = document.getElementById('job-verified-filter'); if (el) el.checked = true; }
                 else if (filter === 'Feste Arbeitszeiten') { document.getElementById('job-time-model-filter').value = 'fest'; }
                 else if (filter === 'Gleitzeit') { document.getElementById('job-time-model-filter').value = 'gleitzeit'; }
                 else if (customerTypeMapping[filter]) { document.getElementById('job-customer-type-filter').value = customerTypeMapping[filter]; }
@@ -6881,15 +7026,23 @@
                     if (val) { const cb = document.querySelector(`#job-advanced-filters-modal input[value="${val}"]`); if (cb) cb.checked = true; }
                 }
             });
+
+			// Abschnitte aufklappen wenn aktive Filter
+			const jobOffizinActive = activeJobAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung','Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft'].includes(f));
+			const jobIndustrieActive = activeJobAdvancedFilters.some(f => f.startsWith('Bereich: ') && ['Qualitätskontrolle','Qualitätssicherung','Produktion','Zulassung','Forschung'].some(b => f.includes(b)));
+			const jobUniActive = activeJobAdvancedFilters.some(f => f.startsWith('Bereich: ') && ['Pharmazeutische','Medizinische','Pharmakologie','Pharmaziegeschichte'].some(b => f.includes(b)));
+			openFilterSectionIfActive('job-offizin-content', 'job-toggle-offizin', jobOffizinActive);
+			openFilterSectionIfActive('job-industrie-content', 'job-toggle-industrie', jobIndustrieActive);
+			openFilterSectionIfActive('job-universitaet-content', 'job-toggle-universitaet', jobUniActive);
         }
 
         function applyJobAdvancedFilters() {
             activeJobAdvancedFilters = [];
             
-            // Spezialisierungen sammeln
+			// Spezialisierungen sammeln
 			const specializations = document.querySelectorAll('#job-advanced-filters-modal input[type="checkbox"]:checked');
 			specializations.forEach(checkbox => {
-				const specValues = ['sterilherstellung', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung'];
+				const specValues = ['sterilherstellung', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung', 'sonstige-spec'];
 				if (specValues.includes(checkbox.value)) {
 					const labels = {
 						'sterilherstellung': 'Sterilherstellung',
@@ -6898,14 +7051,20 @@
 						'heimversorgung': 'Heimversorgung',
 						'klinikversorgung': 'Klinikversorgung',
 						'homoeopathie': 'Homöopathie',
-						'ernaehrungsberatung': 'Ernährungsberatung'
+						'ernaehrungsberatung': 'Ernährungsberatung',
+						'sonstige-spec': 'Sonstige Spezialisierung'
 					};
 					activeJobAdvancedFilters.push(labels[checkbox.value] || checkbox.value);
 				}
 			});
+
+			// Wenn Spezialisierungen ausgewählt, Offizin-Kategorie im Dropdown setzen
+			if (activeJobAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung'].includes(f))) {
+				document.getElementById('job-category-filter').value = 'offizin';
+			}
             
             // Benefits sammeln
-			const benefitValues = ['wohnung', 'sonderzahlungen', 'fortbildung', 'kantine', 'diplomarbeit', 'homeoffice'];
+			const benefitValues = ['wohnung', 'sonderzahlungen', 'fortbildung', 'kantine', 'diplomarbeit', 'homeoffice', 'sonstige-ben'];
 			document.querySelectorAll('#job-advanced-filters-modal input[type="checkbox"]:checked').forEach(checkbox => {
 				if (benefitValues.includes(checkbox.value)) {
 					const labels = {
@@ -6914,21 +7073,25 @@
 						'fortbildung': 'Fort- und Weiterbildung',
 						'kantine': 'Kantine',
 						'diplomarbeit': 'Diplomarbeit',
-						'homeoffice': 'Homeoffice'
+						'homeoffice': 'Homeoffice',
+						'sonstige-ben': 'Sonstige Benefits'
 					};
-					activeJobAdvancedFilters.push(labels[checkbox.value]);
+					if (labels[checkbox.value]) activeJobAdvancedFilters.push(labels[checkbox.value]);
 				}
 			});
             
-            // Kundschaft
-            const customerType = document.getElementById('job-customer-type-filter').value;
-            if (customerType) {
+			// Kundschaft
+            const jobCustomerType = document.getElementById('job-customer-type-filter').value;
+            if (jobCustomerType) {
                 const labels = {
-                    'Stammkundschaft': 'Überwiegend Stammkundschaft',
-                    'Gemischt': 'Gemischte Kundschaft',
-                    'Laufkundschaft': 'Überwiegend Laufkundschaft'
+                    'stammkundschaft': 'Überwiegend Stammkundschaft',
+                    'gemischt': 'Gemischte Kundschaft',
+                    'laufkundschaft': 'Überwiegend Laufkundschaft'
                 };
-                activeJobAdvancedFilters.push(labels[customerType]);
+                if (labels[jobCustomerType]) {
+                    activeJobAdvancedFilters.push(labels[jobCustomerType]);
+                    document.getElementById('job-category-filter').value = 'offizin';
+                }
             }
             
             // Hohe Bezahlung
@@ -6941,10 +7104,26 @@
                 activeJobAdvancedFilters.push('Tarifliches Mindestgehalt');
             }
 
-            // BPhD Auszeichnung
-            if (document.getElementById('job-bphd-award-filter').checked) {
+			const jobIndustrieArea = document.getElementById('job-industrie-area-filter')?.value;
+			if (jobIndustrieArea) {
+				activeJobAdvancedFilters.push('Bereich: ' + jobIndustrieArea);
+				document.getElementById('job-category-filter').value = 'industrie';
+			}
+			const jobUniArea = document.getElementById('job-universitaet-area-filter')?.value;
+			if (jobUniArea) {
+				activeJobAdvancedFilters.push('Bereich: ' + jobUniArea);
+				document.getElementById('job-category-filter').value = 'universitaet';
+			}
+			if (activeJobAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung'].includes(f))) {
+				document.getElementById('job-category-filter').value = 'offizin';
+			}
+
+			if (document.getElementById('job-bphd-award-filter').checked) {
                 activeJobAdvancedFilters.push('Ausgezeichnet vom BPhD');
             }
+			if (document.getElementById('job-verified-filter')?.checked) {
+				activeJobAdvancedFilters.push('Verifiziertes Unternehmen');
+			}
 
 			// Angemessenes Gehalt
 			if (document.getElementById('job-adequate-salary-filter').checked) {
@@ -7289,7 +7468,7 @@
             const sortedWorkingHours = sortWorkingHours([...reviewData.workingHours]);
             
             return `
-                <div class="review-card" data-admin-id="${reviewData.adminId || reviewData.id}">
+                <div class="review-card" data-admin-id="${reviewData.adminId || reviewData.id}" data-company-name="${reviewData.companyName}">
                     <button class="report-btn" onclick="showReportModal('${reviewData.adminId || reviewData.id}')" title="Bewertung melden">!</button>
                     <div class="review-header">
                         <div class="company-info">
@@ -7298,8 +7477,10 @@
 							<div class="company-badges" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
                                 <div class="category-badge" style="padding: 0.35rem 1.25rem;">${reviewData.category}</div>
                             </div>
+							${reviewData.benefits ? `<p>Benefits: ${reviewData.benefits}</p>` : ''}
+							${reviewData.customerType ? `<p>Kundschaft: ${reviewData.customerType}</p>` : ''}
 							${reviewData.specializations ? `<p>Spezialisierungen: ${reviewData.specializations}</p>` : ''}
-							${reviewData.area ? `<p>Bereich: ${reviewData.area}</p>` : ''}
+							${reviewData.area ? `<p>Bereich: ${reviewData.area}</p>` : ''}							
                         </div>
 						<div style="text-align: center; padding-top: 0;">
                             <div class="overall-rating" style="transform: scale(1.2); margin-top: 0.75rem;">
@@ -7326,10 +7507,6 @@
 							<span class="working-hours-list"><div>${reviewData.saturdayWork}x pro Monat</div>${reviewData.saturdayHours ? reviewData.saturdayHours.map(time => `<div>${time}</div>`).join('') : ''}</span>
 						</div>
 						` : ''}
-						<div class="job-detail-row">
-							<span class="job-detail-label">Urlaubstage:</span>
-							<span>${reviewData.vacationDays} pro Halbjahr</span>
-						</div>
 					</div>
 
                     <div class="comments-section">
@@ -7407,10 +7584,6 @@
 							<span class="working-hours-list"><div>${jobData.saturdayWork}x pro Monat</div>${jobData.saturdayHours ? jobData.saturdayHours.map(time => `<div>${time}</div>`).join('') : ''}</span>
 						</div>
                         ` : ''}
-                        <div class="job-detail-row">
-                            <span class="job-detail-label">Urlaubstage:</span>
-                            <span>${jobData.vacationDays} pro Halbjahr</span>
-                        </div>
                     </div>
                     
 					<div class="comments-section">
@@ -7470,7 +7643,6 @@
                 html += '</div></div>';
             }
             
-            html += `<div class="job-detail-row"><span class="job-detail-label">Urlaubstage:</span><span>${reviewData.vacationDays} pro Halbjahr</span></div>`;
             html += '</div>';
             
             return html;
@@ -7591,18 +7763,115 @@
                     }
                 }
 
-				// Erweiterte Filter prüfen (ohne Gehalts-Filter)
+				// Erweiterte Filter prüfen
+				const jobCatSpecificFilters = ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung',
+					'Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung',
+					'Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft',
+					'Sonstige Benefits'];
+
 				activeJobAdvancedFilters.forEach(filter => {
-					if (['Bezahlung über Tarif', 'Angemessenes Gehalt', 'Tarifliches Mindestgehalt', 'Untertarifliche Bezahlung'].includes(filter)) return;
-					
+					if (['Bezahlung über Tarif', 'Angemessenes Gehalt', 'Tarifliches Mindestgehalt', 'Untertarifliche Bezahlung',
+						 'Ausgezeichnet vom BPhD', 'Feste Arbeitszeiten', 'Gleitzeit'].includes(filter)) return;
+					if (filter.startsWith('Im Umkreis von') || filter.startsWith('Bereich: ')) return;
+					if (jobCatSpecificFilters.includes(filter)) return;
+
 					const jobText = job.textContent.toLowerCase();
 					const filterLower = filter.toLowerCase();
-					
-					if (!jobText.includes(filterLower) && 
+					if (!jobText.includes(filterLower) &&
 						!jobText.includes(filterLower.replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue'))) {
 						showJob = false;
 					}
 				});
+
+				// Spezialisierungs-Filter (inkl. Sonstige)
+				const activeJobSpecFilters = activeJobAdvancedFilters.filter(f =>
+					['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung',
+					 'Klinikversorgung','Homöopathie','Ernährungsberatung'].includes(f)
+				);
+				if (activeJobSpecFilters.length > 0) {
+					const specText = job.textContent.toLowerCase();
+					if (!activeJobSpecFilters.every(f => specText.includes(f.toLowerCase()))) showJob = false;
+				}
+				if (activeJobAdvancedFilters.includes('Sonstige Spezialisierung')) {
+					const standardSpecs = ['sterilherstellung','verblisterung','versandhandel','heimversorgung',
+						'klinikversorgung','homöopathie','ernährungsberatung'];
+					let hasSonstige = false;
+					job.querySelectorAll('.job-info p').forEach(p => {
+						if (p.textContent.startsWith('Spezialisierungen:')) {
+							const specText = p.textContent.replace('Spezialisierungen:', '').trim();
+							hasSonstige = specText.split(',').map(s => s.trim().toLowerCase())
+								.some(s => !standardSpecs.includes(s) && s !== '');
+						}
+					});
+					if (!hasSonstige) showJob = false;
+				}
+
+				// Kundschafts-Filter
+				const activeJobKundschaftFilters = activeJobAdvancedFilters.filter(f =>
+					['Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft'].includes(f)
+				);
+				if (activeJobKundschaftFilters.length > 0) {
+					let kundschaftMatch = false;
+					job.querySelectorAll('.job-info p').forEach(p => {
+						if (p.textContent.startsWith('Kundschaft:')) {
+							if (activeJobKundschaftFilters.some(f => f === p.textContent.replace('Kundschaft:', '').trim()))
+								kundschaftMatch = true;
+						}
+					});
+					if (!kundschaftMatch) showJob = false;
+				}
+
+				// Sonstige Benefits Filter
+				if (activeJobAdvancedFilters.includes('Sonstige Benefits')) {
+					const standardBenefits = ['wohnung','sonderzahlungen','fort- und weiterbildungsangebot',
+						'fort- und weiterbildung','kantine','diplomarbeit','homeoffice'];
+					let hasSonstigeBenefits = false;
+					job.querySelectorAll('.job-info p').forEach(p => {
+						if (p.textContent.startsWith('Benefits:')) {
+							const benefitsText = p.textContent.replace('Benefits:', '').trim();
+							hasSonstigeBenefits = benefitsText.split(',').map(b => b.trim().toLowerCase())
+								.some(b => !standardBenefits.includes(b) && b !== '');
+						}
+					});
+					if (!hasSonstigeBenefits) showJob = false;
+				}
+
+				// BPhD-Filter für Jobs
+				if (activeJobAdvancedFilters.includes('Ausgezeichnet vom BPhD')) {
+					const jobCompanyName = (job.querySelector('.job-info [onclick]')?.textContent || '').toLowerCase().trim();
+					let hasBphd = false;
+					if (bphdAwardsDatabase && Object.keys(bphdAwardsDatabase).length > 0) {
+						hasBphd = Object.values(bphdAwardsDatabase).some(yearAwards =>
+							yearAwards.some(a => (a.companyName || '').toLowerCase().trim() === jobCompanyName)
+						);
+					}
+					if (!hasBphd) {
+						const comp = Object.values(companiesData).find(c => c.name.toLowerCase() === jobCompanyName);
+						hasBphd = !!(comp && comp.bphdAwards && comp.bphdAwards.length > 0);
+					}
+					if (!hasBphd) showJob = false;
+				}
+
+				// Verifiziert-Filter für Jobs
+				if (activeJobAdvancedFilters.includes('Verifiziertes Unternehmen')) {
+					const jobCompanyName = (job.querySelector('.job-info [onclick]')?.textContent || '').toLowerCase().trim();
+					let isVerified = false;
+					if (verifiedCompaniesCache && verifiedCompaniesCache.size > 0) {
+						isVerified = verifiedCompaniesCache.has(jobCompanyName);
+					}
+					if (!isVerified) {
+						const comp = Object.values(companiesData).find(c => c.name.toLowerCase() === jobCompanyName);
+						isVerified = !!(comp && comp.verified);
+					}
+					if (!isVerified) showJob = false;
+				}
+
+				// Bereich-Filter
+				const jobBereichFilter = activeJobAdvancedFilters.find(f => f.startsWith('Bereich: '));
+				if (jobBereichFilter) {
+					const bereichValue = jobBereichFilter.replace('Bereich: ', '');
+					if (!job.textContent.includes(bereichValue)) showJob = false;
+				}
 
 				// Gehalts-Filter (OR-Logik)
 				const salaryCategories = ['Bezahlung über Tarif', 'Angemessenes Gehalt', 'Tarifliches Mindestgehalt', 'Untertarifliche Bezahlung'];
@@ -8451,7 +8720,9 @@
 		let isPopState = false;
 		window.addEventListener('popstate', function(e) {
 			isPopState = true;
-			if (e.state && e.state.section) {
+			if (e.state && e.state.section === 'company' && e.state.companyName) {
+				showCompanyPage(e.state.companyName);
+			} else if (e.state && e.state.section) {
 				showSection(e.state.section);
 			} else {
 				showSection('landing');
@@ -9022,7 +9293,7 @@
 			});
 		}
 
-		function renderAllCompanies(nameFilter = '', categoryFilter = '', stateFilter = '', openPositionsFilter = false, verifiedFilter = false) {
+		function renderAllCompanies(nameFilter = '', categoryFilter = '', stateFilter = '', openPositionsFilter = false, verifiedFilter = false, bphdFilter = false) {
 			const container = document.getElementById('all-companies-container');
 			container.innerHTML = '';
 			
@@ -9034,10 +9305,11 @@
 					if (companyCategory !== getCategoryLabel(categoryFilter)) return;
 				}
 				if (stateFilter && company.state !== stateFilter) return;
-				if (openPositionsFilter && company.jobs.filter(j => j.postedDays <= 30).length === 0) return;
-				if (verifiedFilter && !company.verified) return;  // NEU
+				if (openPositionsFilter && company.jobs.filter(j => j.postedDays <= 90).length === 0) return;
+				if (verifiedFilter && !company.verified) return;
+				if (bphdFilter && (!company.bphdAwards || company.bphdAwards.length === 0)) return;
 				
-				const activeJobs = company.jobs.filter(j => j.postedDays <= 30).length;
+				const activeJobs = company.jobs.filter(j => j.postedDays <= 90).length;
 				
 				const card = document.createElement('div');
 				card.style.cssText = 'background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06); margin-bottom: 1rem; cursor: pointer; transition: transform 0.2s;';
@@ -9064,6 +9336,13 @@
 				container.appendChild(card);
 			});
 			
+			if (container.children.length === 0) {
+				const noResults = document.createElement('div');
+				noResults.style.cssText = 'padding: 3rem; text-align: center; color: #666; font-size: 1.1rem; background: white; border-radius: 10px; margin-top: 2rem;';
+				noResults.textContent = 'Keines der Unternehmen passt zu den ausgewählten Filtern.';
+				container.appendChild(noResults);
+				return;
+			}
 			// Standard-Sortierung nach dem Rendern anwenden
 			sortAllCompanies();
 		}
@@ -9090,11 +9369,12 @@
 			const stateFilter = document.getElementById('company-state-filter').value;
 			const openPositionsFilter = document.getElementById('open-positions-filter').checked;
 			const verifiedFilter = document.getElementById('verified-company-filter').checked;
+			const bphdFilter = document.getElementById('bphd-company-filter').checked;
 			
-			const hasFilters = nameFilter || categoryFilter || stateFilter || openPositionsFilter || verifiedFilter;
+			const hasFilters = nameFilter || categoryFilter || stateFilter || openPositionsFilter || verifiedFilter || bphdFilter;
 			document.getElementById('company-reset-filters-btn').style.display = hasFilters ? 'inline-block' : 'none';
 			
-			renderAllCompanies(nameFilter, categoryFilter, stateFilter, openPositionsFilter, verifiedFilter);
+			renderAllCompanies(nameFilter, categoryFilter, stateFilter, openPositionsFilter, verifiedFilter, bphdFilter);
 		}
 
 		function resetCompanyFilters() {
@@ -9103,6 +9383,7 @@
 			document.getElementById('company-state-filter').value = '';
 			document.getElementById('open-positions-filter').checked = false;
 			document.getElementById('verified-company-filter').checked = false;
+			document.getElementById('bphd-company-filter').checked = false;
 			document.getElementById('company-reset-filters-btn').style.display = 'none';
 			renderAllCompanies();
 		}
@@ -9122,11 +9403,13 @@
 				switch(sortValue) {
 					case 'rating-desc':
 						return companyB.averageRating - companyA.averageRating;
+					case 'rating-asc':
+						return companyA.averageRating - companyB.averageRating;	
 					case 'reviews-desc':
 						return companyB.reviews.length - companyA.reviews.length;
 					case 'jobs-desc':
-						const jobsA = companyA.jobs.filter(j => j.postedDays <= 30).length;
-						const jobsB = companyB.jobs.filter(j => j.postedDays <= 30).length;
+						const jobsA = companyA.jobs.filter(j => j.postedDays <= 90).length;
+						const jobsB = companyB.jobs.filter(j => j.postedDays <= 90).length;
 						return jobsB - jobsA;
 					default:
 						return 0;
@@ -10266,7 +10549,7 @@
 							benefits: job.benefits || '',
 							applicationNotes: job.application_notes || '',
 							description: job.description,
-							postedDays: job.posted_days || 0,
+							postedDays: job.activated_at ? Math.floor((new Date() - new Date(job.activated_at)) / (1000 * 60 * 60 * 24)) : (job.posted_days || 0),
 							contactPerson: job.contact_person,
 							contactEmail: job.contact_email,
 							workingHours: formatWorkingHoursForDisplay(job.working_hours_data || []).regular || [],
@@ -10468,18 +10751,6 @@
 			loadTariffSalary();
 			loadGuideContent();
 			loadTipsContent();
-
-			// Verifiziertes Unternehmen mit vollständigen Daten erstellen
-			const marienApotheke = companiesData[createCompanyKey("Marien-Apotheke Berlin", "Unter den Linden 78", "Berlin", "")];
-			if (marienApotheke) {
-				marienApotheke.verified = true;
-				marienApotheke.description = "Die Marien-Apotheke Berlin ist seit über 25 Jahren eine moderne Traditionsapotheke im Herzen der Hauptstadt, direkt am Brandenburger Tor gelegen. Wir sind spezialisiert auf Sterilherstellung, professionelle Verblisterung und die Versorgung der Charité. Unser erfahrenes 8-köpfiges Team legt größten Wert auf exzellente Beratung und höchste pharmazeutische Qualität. Als BPhD-ausgezeichnete Lehrwerkstatt bilden wir seit Jahren erfolgreich PharmaziepraktikantInnen aus und bieten ihnen optimale Bedingungen für einen gelungenen Start ins Berufsleben.";
-				marienApotheke.profileImage = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2328a745'/><rect x='35' y='20' width='8' height='40' rx='4' fill='white'/><rect x='57' y='20' width='8' height='40' rx='4' fill='white'/><rect x='20' y='35' width='40' height='8' rx='4' fill='white'/><rect x='40' y='35' width='40' height='8' rx='4' fill='white'/><text x='50' y='75' font-family='Arial' font-size='12' fill='white' text-anchor='middle' font-weight='bold'>MARIEN</text></svg>";
-				marienApotheke.contactPerson = "Frau Dr. med. Schmidt";
-				marienApotheke.contactEmail = "kontakt@marien-apotheke-berlin.de";
-				marienApotheke.phone = "030/12345678";
-				marienApotheke.website = "www.marien-apotheke-berlin.de";
-			}
 			
 			renderReviews();
 			renderJobs();
