@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 	<!-- Supabase Backend Integration -->
 	<script type="module">
 		import { supabase } from './js/supabase-client.js';
@@ -738,23 +740,88 @@
     #search-suggestions div:hover { background: var(--red-light) !important; color: var(--red) !important; }
 
     /* ── FOOTER ── */
-    .footer {
+	.footer {
         background: var(--dark);
         color: white;
         padding: 2.5rem 0;
         margin-top: 3rem;
+        border-top: 3px solid var(--red);
     }
 
-    .footer-content { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+	.footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
 
-    .footer h3 {
+    .footer-brand { }
+
+    .footer-brand h3 {
         font-family: 'Fraunces', serif;
-        margin-bottom: 1rem;
-        font-size: 1.1rem;
-        letter-spacing: -0.01em;
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: white;
+        margin: 0 0 0.4rem;
     }
 
-    .footer p { margin-bottom: 0.5rem; line-height: 1.6; color: rgba(255,255,255,0.55); font-size: 0.9rem; }
+    .footer-brand p {
+        font-size: 0.82rem;
+        color: rgba(255,255,255,0.4);
+        font-style: italic;
+        margin: 0;
+    }
+
+	.footer-nav { text-align: left; }
+
+    .footer-nav a {
+        display: block;
+        color: rgba(255,255,255,0.55);
+        font-size: 0.88rem;
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .footer-nav a:hover { color: white; }
+
+    .footer-legal { text-align: left; }
+
+    .footer-legal a {
+        display: block;
+        color: rgba(255,255,255,0.55);
+        font-size: 0.88rem;
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .footer-legal a:hover { color: white; }
+
+    .footer-bottom {
+        max-width: 1200px;
+        margin: 1.5rem auto 0;
+        padding: 1.25rem 2rem 0;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.25);
+    }
+
+    @media (max-width: 768px) {
+        .footer-content {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        .footer-nav, .footer-legal { text-align: left; }
+        .footer-legal { text-align: left; }
+    }	
 
     /* ── FILTER CHIPS ── */
     .checkbox-group {
@@ -2348,7 +2415,7 @@
 			<div id="internship-tips-section" class="content-section">
 				<div class="container">
 					<h2>Tipps zur Praktikumssuche</h2>
-					<p style="color: #666; margin-bottom: 2rem;">Hilfreiche Ratschläge für eine erfolgreiche Praktikumssuche</p>
+					<p style="color: #666; margin-bottom: 2rem;">Die folgendenden Ratschläge basieren auf dem Austausch persönlicher Erfahrungen und sollen euch als Hilfestellung für eure Praktikumssuche dienen.</p>
 					
 					<div style="display: grid; gap: 1.25rem;">
 						<div style="background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05);">
@@ -2809,6 +2876,31 @@
         </div>
     </div>
 
+	<div id="impressum-modal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>Impressum</h2>
+				<button class="close-btn" onclick="closeModal('impressum-modal')">&times;</button>
+			</div>
+			<div class="modal-body">
+				<p><strong>PharmaFaro</strong></p>
+				<p>Musterstraße 123<br>12345 Musterstadt<br>Deutschland</p>
+				<br>
+				<p><strong>Geschäftsführer:</strong> Max Mustermann</p>
+				<p><strong>Registergericht:</strong> Amtsgericht Musterstadt</p>
+				<p><strong>Handelsregisternummer:</strong> HRB 12345</p>
+				<p><strong>Umsatzsteuer-ID:</strong> DE123456789</p>
+				<br>
+				<p><strong>Kontakt:</strong></p>
+				<p>E-Mail: info@pharmafaro.de</p>
+				<p>Telefon: +49 (0) 123 456789</p>
+				<br>
+				<p><strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong></p>
+				<p>Max Mustermann, Musterstraße 123, 12345 Musterstadt</p>
+			</div>
+		</div>
+	</div>
+
 	<div id="bphd-awards-modal" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -3225,29 +3317,28 @@
 	<!-- Footer -->
 	<div class="footer">
 		<div class="footer-content">
-			<h3>Impressum</h3>
-			<p><strong>PharmaFaro</strong></p>
-			<p>Musterstraße 123</p>
-			<p>12345 Musterstadt</p>
-			<p>Deutschland</p>
-			<br>
-			<p><strong>Geschäftsführer:</strong> Max Mustermann</p>
-			<p><strong>Registergericht:</strong> Amtsgericht Musterstadt</p>
-			<p><strong>Handelsregisternummer:</strong> HRB 12345</p>
-			<p><strong>Umsatzsteuer-ID:</strong> DE123456789</p>
-			<br>
-			<p><strong>Kontakt:</strong></p>
-			<p>E-Mail: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="21484f474e61514940534c405b48445153404a55484a544c0f4544">[email&#160;protected]</a></p>
-			<p>Telefon: +49 (0) 123 456789</p>
-			<br>
-			<p><strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong></p>
-			<p>Max Mustermann, Musterstraße 123, 12345 Musterstadt</p>
-			<br>
-			<p>
-				<span style="text-decoration: underline; cursor: pointer; color: #ccc;" onclick="showPrivacyModal()">Datenschutzerklärung</span>
-				&nbsp;·&nbsp;
-				<span style="text-decoration: underline; cursor: pointer; color: #ccc;" onclick="showAgbModal()">Nutzungsbedingungen</span>
-			</p>
+			<!-- Links: Marke -->
+			<div class="footer-brand">
+				<h3>PharmaFaro</h3>
+				<p>Bewertungsplattform für Pharmaziepraktika</p>
+			</div>
+			<!-- Mitte: Navigation -->
+			<nav class="footer-nav">
+				<a onclick="showSection('landing')">Startseite</a>
+				<a onclick="showSection('search')">Bewertungen</a>
+				<a onclick="showSection('jobs')">Stellenangebote</a>
+				<a onclick="showSection('company-search')">Unternehmen</a>
+				<a onclick="showSection('write')">Bewertung schreiben</a>
+			</nav>
+			<!-- Rechts: Rechtliches -->
+			<div class="footer-legal">
+				<a onclick="showImpressumModal()">Impressum</a>
+				<a onclick="showPrivacyModal()">Datenschutzerklärung</a>
+				<a onclick="showAgbModal()">Nutzungsbedingungen</a>
+			</div>
+		</div>
+		<div class="footer-bottom">
+			© <script>document.write(new Date().getFullYear())</script> PharmaFaro · Alle Rechte vorbehalten
 		</div>
 	</div>
 
@@ -3319,7 +3410,6 @@
 		let minRatingFilter = 0;
 		let activeAdvancedFilters = [];
         let activeJobAdvancedFilters = [];
-		let activeJobRadiusPlz = '';
 
         // Simulated Database
         let reviewDatabase = [];
@@ -3328,6 +3418,33 @@
         // Job Database
         let jobDatabase = [];
         let nextJobId = 1;
+
+		function escapeHtml(str) {
+			if (!str) return '';
+			return String(str)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#039;');
+		}
+
+		function escapeAttr(str) {
+			if (!str) return '';
+			return String(str)
+				.replace(/\\/g, '\\\\')
+				.replace(/'/g, "\\'")
+				.replace(/"/g, '\\"')
+				.replace(/\n/g, '\\n')
+				.replace(/\r/g, '\\r');
+		}
+
+		function sanitizeUrl(url) {
+			if (!url) return '#';
+			const clean = url.trim();
+			if (/^(javascript|data|vbscript):/i.test(clean)) return '#';
+			return clean.startsWith('http') ? clean : 'https://' + clean;
+		}
         
         // Simulate review submission
 		function collectReviewFormData() {
@@ -3727,107 +3844,6 @@
 				}
 				document.getElementById('bphd-awards-text').textContent = text;
 				document.getElementById('bphd-awards-modal').style.display = 'block';
-			}
-		}
-
-		// Lade pending Reviews vom Backend beim Admin-Panel öffnen
-		async function loadPendingReviews() {
-			
-			try {
-				// Hole ALLE Reviews (nicht nur active) - braucht Admin-Rechte
-				const { data, error } = await window.supabase
-					.from('reviews')
-					.select('*')
-					.order('created_at', { ascending: false });
-				
-				if (error) throw error;
-				
-				// Leere reviewDatabase und fülle neu
-				reviewDatabase = [];
-				
-				data.forEach(review => {
-					reviewDatabase.push({
-						id: review.id,
-						email: review.user_email,
-						companyName: review.company_name,
-						address: review.address,
-						state: review.state,
-						country: review.country,
-						category: review.category,
-						salary: review.salary,
-						vacationDays: review.vacation_days,
-						saturdayWork: review.saturday_work,
-						ratings: review.ratings,
-						tasks: review.tasks,
-						feedback: review.feedback,
-						highlights: review.highlights,
-						benefits: review.benefits,
-						specializations: review.specializations,
-						customerType: review.customer_type,
-						workingHoursData: review.working_hours_data,
-						verificationFile: review.pdf_filename,
-						pdfUrl: review.pdf_url,
-						status: review.status,
-						verified: review.verified,
-						submittedAt: review.created_at,
-						activatedAt: review.activated_at,
-						editedAt: review.updated_at
-					});
-				});
-				
-				// Update Stats
-				updateAdminStats();
-				renderAdminReviews();
-				
-			} catch (error) {
-				console.error('❌ Fehler beim Laden der Reviews für Admin:', error);
-			}
-		}
-
-		async function loadPendingJobs() {
-			
-			try {
-				const { data, error } = await window.supabase
-					.from('jobs')
-					.select('*')
-					.order('created_at', { ascending: false });
-				
-				if (error) throw error;
-				
-				jobDatabase = [];
-				
-				data.forEach(job => {
-					jobDatabase.push({
-						id: job.id,
-						companyName: job.company_name,
-						address: job.address,
-						state: job.state,
-						country: job.country,
-						category: job.category,
-						salary: job.salary,
-						vacationDays: job.vacation_days,
-						saturdayWork: job.saturday_work,
-						specializations: job.specializations,
-						customerType: job.customer_type,
-						area: job.area,
-						benefits: job.benefits,
-						description: job.description,
-						applicationNotes: job.application_notes,
-						workingHoursData: job.working_hours_data,
-						contactPerson: job.contact_person,
-						contactEmail: job.contact_email,
-						status: job.status,
-						submittedAt: job.created_at,
-						activatedAt: job.activated_at,
-						deactivatedAt: job.updated_at
-					});
-				});
-				
-				updateJobAdminStats();
-				renderAdminJobs();
-				
-			} catch (error) {
-				console.error('❌ Fehler beim Laden der Jobs für Admin:', error);
 			}
 		}
 
@@ -4661,7 +4677,7 @@
             if (activeAdvancedFilters.length > 0) {
                 const chipsContainer = document.createElement('div');
                 chipsContainer.className = 'active-filters-chips';
-                chipsContainer.innerHTML = '<h4>Aktive Filter:</h4><div class="filter-chips"></div>';
+                chipsContainer.innerHTML = '<h4>Aktive Zusatzfilter:</h4><div class="filter-chips"></div>';
                 
                 const chipsDiv = chipsContainer.querySelector('.filter-chips');
 				activeAdvancedFilters.forEach((filter, index) => {
@@ -4703,7 +4719,7 @@
             if (activeJobAdvancedFilters.length > 0) {
                 const chipsContainer = document.createElement('div');
                 chipsContainer.className = 'active-filters-chips';
-                chipsContainer.innerHTML = '<h4>Aktive Filter:</h4><div class="filter-chips"></div>';
+                chipsContainer.innerHTML = '<h4>Aktive Zusatzfilter:</h4><div class="filter-chips"></div>';
                 
                 const chipsDiv = chipsContainer.querySelector('.filter-chips');
                 activeJobAdvancedFilters.forEach((filter, index) => {
@@ -4729,7 +4745,6 @@
             displayJobActiveFilters();
             updateJobResetButtonVisibility();
             filterJobs();
-			activeJobRadiusPlz = '';
         }
 
         function updateJobResetButtonVisibility() {
@@ -4780,8 +4795,6 @@
             
             // Reset-Button verstecken und Filter anwenden
             updateJobResetButtonVisibility();
-			
-			activeJobRadiusPlz = '';
         }
 
         // Sterne-Bewertung mit Hover-Effekt
@@ -5168,7 +5181,7 @@
 					<div class="profile-img-wrapper" style="flex-shrink: 0; width: 140px; height: 140px;">
 						<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;" alt="Profilbild">
 						${company.bphdAwards && company.bphdAwards.length > 0 ? `
-						<div class="bphd-badge-container" style="position: absolute; top: -20px; right: 0px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${company.name.replace(/'/g, "\\'")}')">
+						div class="bphd-badge-container" style="position: absolute; top: -20px; right: 0px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${escapeAttr(company.name)}')">						
 							<svg width="90" height="100" viewBox="0 0 90 100">
 								<path d="M25 0 L35 0 L35 50 L30 45 L25 50 Z" fill="#8B0000"/>
 								<path d="M55 0 L65 0 L65 50 L60 45 L55 50 Z" fill="#8B0000"/>
@@ -5185,10 +5198,10 @@
 							${company.verified ? '<div class="verified-badge" data-tooltip="Verifiziertes Unternehmen"><svg width="38" height="38" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0;"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>' : ''}
 						</div>
 						<p style="margin: 0; color: #666; font-size: 1.1rem;">${company.address}, ${getStateLabel(company.state)}${company.country ? ', ' + company.country : ''}</p>
-						${company.website ? `<p style="margin: 0.5rem 0 0 0; color: var(--red); font-size: 1rem;"><a href="https://${company.website}" target="_blank" style="color: var(--red); text-decoration: none;">${company.website}</a></p>` : ''}
+						${company.website ? `<p style="margin: 0.5rem 0 0 0; color: var(--red); font-size: 1rem;"><a href="${sanitizeUrl(company.website)}" target="_blank" style="color: var(--red); text-decoration: none;">${company.website}</a></p>` : ''}
 						<div style="margin-top: 0.5rem;">
 							<div class="category-badge" style="font-size: 0.9rem; padding: 0.4rem 1rem;">${getCategoryLabel(company.category)}</div>
-							<div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="showAllReviewsModal('${company.name}')">
+							<div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="showAllReviewsModal('${escapeAttr(company.name)}')">
 								<div class="stars" style="font-size: 1.2rem; margin: 0;">
 									${generateStarHTML(Math.round(company.averageRating))}
 								</div>
@@ -5213,10 +5226,10 @@
 				<div style="margin-bottom: 2rem; padding: 0.5rem 2rem; background: transparent; border-radius: 10px; text-align: center;">
 					${company.verified ? `
 						<span style="display:block;margin-bottom:1rem;">Haben Sie Fragen an das Unternehmen?</span>
-						<button class="btn btn-primary" onclick="showContactCompanyModal('${company.name}')" style="margin-left: 1rem;">Unternehmen kontaktieren</button>
+						<button class="btn btn-primary" data-company-name="${escapeHtml(company.name)}" onclick="showContactCompanyModal(this.getAttribute('data-company-name'))" style="margin-left: 1rem;">Unternehmen kontaktieren</button>
 					` : `
 						<span style="display:block;margin-bottom:1rem;">Ist das Ihr Unternehmen?</span>
-						<button class="btn btn-secondary" onclick="showVerificationModal('${company.name}')" style="margin-left: 1rem;">Unternehmen verifizieren</button>
+						<button class="btn btn-secondary" onclick="showVerificationModal('${escapeAttr(company.name)}')" style="margin-left: 1rem;">Unternehmen verifizieren</button>
 					`}
 				</div>
 
@@ -5248,7 +5261,7 @@
 						<div style="flex: 1;">
 							${Object.keys(ratingDistribution).reverse().map(star => `
 								<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; cursor: pointer;" 
-									 onclick="showRatingFilterModal('${company.name}', ${star})">
+									onclick="showRatingFilterModal('${escapeAttr(company.name)}', ${star})">
 									<span style="width: 36px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; flex-shrink: 0;"><span style="width: 10px; text-align: center; font-variant-numeric: tabular-nums;">${star}</span><span style="color: var(--red); line-height: 1; flex-shrink: 0; width: 14px; text-align: center;">★</span></span>
 									<div style="flex: 1; height: 25px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
 										<div style="height: 100%; background: var(--red); width: ${company.reviews.length > 0 ? (ratingDistribution[star] / company.reviews.length) * 100 : 0}%;"></div>
@@ -5261,7 +5274,7 @@
 					
 					${company.reviews.length > 1 ? `
 					<div style="text-align: center;">
-						<button class="btn btn-primary" onclick="showAllReviewsModal('${company.name}')">Alle Bewertungen anzeigen</button>
+						<button class="btn btn-primary" onclick="showAllReviewsModal('${escapeAttr(company.name)}')">Alle Bewertungen anzeigen</button>
 					</div>
 					` : ''}
 					` : '<p style="color: #666;">Noch keine Bewertungen vorhanden.</p>'}
@@ -5278,7 +5291,7 @@
 					
 					${company.jobs.length > 1 ? `
 					<div style="text-align: center;">
-						<button class="btn btn-primary" onclick="showAllJobsModal('${company.name}')">Alle Stellenangebote anzeigen</button>
+						<button class="btn btn-primary" onclick="showAllJobsModal('${escapeAttr(company.name)}')">Alle Stellenangebote anzeigen</button>
 					</div>
 					` : ''}
 					` : '<p style="color: #666;">Keine aktuellen Stellenangebote vorhanden.</p>'}
@@ -5309,7 +5322,7 @@
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
 				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-				contactHTML += '<div style="min-width:0;"><strong>Ansprechperson:</strong><br>' + company.contactPerson + '</div>';
+				contactHTML += '<div style="min-width:0;"><strong>Ansprechperson:</strong><br>' + escapeHtml(company.contactPerson) + '</div>';
 				contactHTML += '</div>';
 			}
 			
@@ -5317,7 +5330,7 @@
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
 				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
-				contactHTML += '<div style="min-width:0;"><strong>E-Mail:</strong><br><a href="mailto:' + company.contactEmail + '" style="color:var(--red);">' + company.contactEmail + '</a></div>';
+				contactHTML += '<div style="min-width:0;"><strong>E-Mail:</strong><br><a href="mailto:' + escapeHtml(company.contactEmail) + '" style="color:var(--red);">' + escapeHtml(company.contactEmail) + '</a></div>';
 				contactHTML += '</div>';
 			}
 			
@@ -5325,16 +5338,16 @@
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
 				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
-				contactHTML += '<div style="min-width:0;"><strong>Telefon:</strong><br><a href="tel:' + company.phone.replace(/\s/g, '') + '" style="color:var(--red);">' + company.phone + '</a></div>';
+				contactHTML += '<div style="min-width:0;"><strong>Telefon:</strong><br><a href="tel:' + escapeHtml(company.phone.replace(/\s/g, '')) + '" style="color:var(--red);">' + escapeHtml(company.phone) + '</a></div>';
 				contactHTML += '</div>';
 			}
 			
 			if (company.website) {
-				const websiteUrl = company.website.startsWith('http') ? company.website : 'https://' + company.website;
+				const websiteUrl = sanitizeUrl(company.website);
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
 				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
-				contactHTML += '<div style="min-width:0;"><strong>Website:</strong><br><a href="' + websiteUrl + '" target="_blank" style="color:var(--red);">' + company.website + '</a></div>';
+				contactHTML += '<div style="min-width:0;"><strong>Website:</strong><br><a href="' + websiteUrl + '" target="_blank" style="color:var(--red);">' + escapeHtml(company.website) + '</a></div>';
 				contactHTML += '</div>';
 			}
 			
@@ -5907,307 +5920,6 @@
 			}
 		}
 
-		function mergeCompanies() {
-			const checkboxes = document.querySelectorAll('input[name="company-select"]:checked');
-			
-			if (checkboxes.length !== 2) {
-				alert('Bitte wählen Sie genau 2 Unternehmen zum Zusammenführen aus.');
-				return;
-			}
-			
-			const selectedNames = Array.from(checkboxes).map(cb => cb.value);
-			
-			// Suche Unternehmen - case-insensitive
-			const company1 = Object.values(companiesData).find(c => 
-				c.name.toLowerCase() === selectedNames[0].toLowerCase()
-			);
-			const company2 = Object.values(companiesData).find(c => 
-				c.name.toLowerCase() === selectedNames[1].toLowerCase()
-			);
-			
-			if (!company1) {
-				alert(`Unternehmen "${selectedNames[0]}" nicht gefunden.`);
-				return;
-			}
-			
-			if (!company2) {
-				alert(`Unternehmen "${selectedNames[1]}" nicht gefunden.`);
-				return;
-			}
-			
-			// Stelle sicher, dass reviews und jobs Arrays sind
-			company1.reviews = company1.reviews || [];
-			company1.jobs = company1.jobs || [];
-			company2.reviews = company2.reviews || [];
-			company2.jobs = company2.jobs || [];
-			
-			showMergeModal(company1, company2);
-		}
-
-		function startMergeProcess(companyName) {
-			const company1 = Object.values(companiesData).find(c => c.name === companyName);
-			
-			if (!company1) {
-				alert('Unternehmen nicht gefunden.');
-				return;
-			}
-			
-			// Erstelle Auswahl-Modal
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			modal.id = 'select-merge-target-modal';
-			
-			const otherCompanies = Object.values(companiesData).filter(c => c.name !== companyName);
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 800px; width: 90%;">
-					<div class="modal-header">
-						<h2>Unternehmen zusammenführen</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body">
-						<div style="background: #fff3cd; padding: 1rem; border-left: 4px solid #ffc107; border-radius: 4px; margin-bottom: 1.5rem;">
-							<strong>Hinweis:</strong> <strong>${companyName}</strong> wird zu dem ausgewählten Unternehmen hinzugefügt. 
-							Alle Bewertungen und Stellenangebote von <strong>${companyName}</strong> werden übertragen und 
-							<strong>${companyName}</strong> wird anschließend gelöscht.
-						</div>
-						
-						<p style="margin-bottom: 1rem; color: #666;">
-							Wählen Sie das Ziel-Unternehmen aus:
-						</p>
-						
-						<div style="max-height: 400px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 8px;">
-							${otherCompanies.map(company => `
-								<div style="padding: 1rem; border-bottom: 1px solid #e9ecef; cursor: pointer; transition: background 0.2s;" 
-									 onmouseenter="this.style.background='#f8f9fa'" 
-									 onmouseleave="this.style.background='white'"
-									 onclick="confirmMerge('${companyName.replace(/'/g, "\\'")}', '${company.name.replace(/'/g, "\\'")}')">
-									<div style="display: flex; align-items: center; gap: 1rem;">
-										<img src="${company.profileImage}" style="width: 50px; height: 50px; border-radius: 50%;">
-										<div style="flex: 1;">
-											<div style="font-weight: 600; margin-bottom: 0.25rem;">${company.name}</div>
-											<div style="font-size: 0.9rem; color: #666;">${company.address}</div>
-											<div style="font-size: 0.85rem; color: #999; margin-top: 0.25rem;">
-												${company.reviews?.length || 0} Bewertungen • ${company.jobs?.length || 0} Jobs
-											</div>
-										</div>
-									</div>
-								</div>
-							`).join('')}
-						</div>
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Abbrechen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-		}
-
-		function confirmMerge(sourceCompanyName, targetCompanyName) {
-			// Schließe Auswahl-Modal
-			document.getElementById('select-merge-target-modal').remove();
-			
-			// Zeige Bestätigungs-Modal
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			
-			const sourceCompany = Object.values(companiesData).find(c => c.name === sourceCompanyName);
-			const targetCompany = Object.values(companiesData).find(c => c.name === targetCompanyName);
-			
-			if (!sourceCompany || !targetCompany) {
-				alert('Fehler beim Laden der Unternehmen.');
-				return;
-			}
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 700px; width: 90%;">
-					<div class="modal-header">
-						<h2>Zusammenführung bestätigen</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body">
-						<div style="background: #f8d7da; padding: 1rem; border-left: 4px solid #dc3545; border-radius: 4px; margin-bottom: 1.5rem;">
-							<strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden!
-						</div>
-						
-						<div style="margin-bottom: 1.5rem;">
-							<h4 style="margin-bottom: 0.5rem;">Wird gelöscht:</h4>
-							<div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
-								<strong>${sourceCompany.name}</strong><br>
-								<small style="color: #666;">${sourceCompany.address}</small><br>
-								<small style="color: #999; margin-top: 0.5rem; display: block;">
-									${sourceCompany.reviews?.length || 0} Bewertungen • ${sourceCompany.jobs?.length || 0} Jobs
-								</small>
-							</div>
-						</div>
-						
-						<div style="text-align: center; margin: 1rem 0; font-size: 1.5rem; color: var(--red);">
-							↓
-						</div>
-						
-						<div>
-							<h4 style="margin-bottom: 0.5rem;">Wird übertragen zu:</h4>
-							<div style="background: #d4edda; padding: 1rem; border-radius: 8px; border: 2px solid #155724;">
-								<strong>${targetCompany.name}</strong><br>
-								<small style="color: #666;">${targetCompany.address}</small><br>
-								<small style="color: #666; margin-top: 0.5rem; display: block;">
-									Aktuell: ${targetCompany.reviews?.length || 0} Bewertungen • ${targetCompany.jobs?.length || 0} Jobs
-								</small>
-								<small style="color: #155724; font-weight: 600; margin-top: 0.5rem; display: block;">
-									Nach Zusammenführung: ${(targetCompany.reviews?.length || 0) + (sourceCompany.reviews?.length || 0)} Bewertungen • ${(targetCompany.jobs?.length || 0) + (sourceCompany.jobs?.length || 0)} Jobs
-								</small>
-							</div>
-						</div>
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Abbrechen</button>
-						<button class="btn btn-primary" onclick="executeMerge('${sourceCompanyName.replace(/'/g, "\\'")}', '${targetCompanyName.replace(/'/g, "\\'")}')">Jetzt zusammenführen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-		}
-
-		function calculateAverageRating(reviews) {
-			if (!reviews || reviews.length === 0) {
-				return 0;
-			}
-			
-			let totalRating = 0;
-			reviews.forEach(review => {
-				const reviewRating = calculateOverallRating(review.ratings);
-				totalRating += reviewRating;
-			});
-			
-			return totalRating / reviews.length;
-		}
-
-		function executeMerge(sourceCompanyName, targetCompanyName) {
-			
-			const sourceCompany = Object.values(companiesData).find(c => c.name === sourceCompanyName);
-			const targetCompany = Object.values(companiesData).find(c => c.name === targetCompanyName);
-			
-			if (!sourceCompany || !targetCompany) {
-				alert('Fehler beim Laden der Unternehmen.');
-				console.error('Nicht gefunden:', sourceCompanyName, targetCompanyName);
-				return;
-			}
-			
-			// Stelle sicher dass Arrays existieren
-			sourceCompany.reviews = sourceCompany.reviews || [];
-			sourceCompany.jobs = sourceCompany.jobs || [];
-			targetCompany.reviews = targetCompany.reviews || [];
-			targetCompany.jobs = targetCompany.jobs || [];
-			
-			// Übertrage alle Bewertungen zu Ziel-Unternehmen
-			sourceCompany.reviews.forEach(review => {
-				review.companyName = targetCompany.name;
-				review.address = targetCompany.address; // "Straße Hausnummer, PLZ Ort"
-				review.state = targetCompany.state; // Bundesland
-				review.category = targetCompany.category;
-				
-				// Aktualisiere auch in reviewsData
-				const reviewInData = reviewsData.find(r => r.id === review.id);
-				if (reviewInData) {
-					reviewInData.companyName = targetCompany.name;
-					reviewInData.address = targetCompany.address;
-					reviewInData.state = targetCompany.state;
-					reviewInData.category = targetCompany.category;
-				}
-				
-				// Aktualisiere auch in reviewDatabase
-				const reviewInDb = reviewDatabase.find(r => r.id === review.id);
-				if (reviewInDb) {
-					reviewInDb.companyName = targetCompany.name;
-					reviewInDb.address = targetCompany.address;
-					reviewInDb.state = targetCompany.state;
-					reviewInDb.category = targetCompany.category;
-				}
-				
-				targetCompany.reviews.push(review);
-			});
-			
-			// Übertrage alle Jobs zu Ziel-Unternehmen
-			sourceCompany.jobs.forEach(job => {
-				job.companyName = targetCompany.name;
-				job.address = targetCompany.address;
-				job.state = targetCompany.state;
-				job.category = targetCompany.category;
-				
-				// Aktualisiere auch in jobsData
-				const jobInData = jobsData.find(j => j.id === job.id);
-				if (jobInData) {
-					jobInData.companyName = targetCompany.name;
-					jobInData.address = targetCompany.address;
-					jobInData.state = targetCompany.state;
-					jobInData.category = targetCompany.category;
-				}
-				
-				// Aktualisiere auch in jobDatabase
-				const jobInDb = jobDatabase.find(j => j.id === job.id);
-				if (jobInDb) {
-					jobInDb.companyName = targetCompany.name;
-					jobInDb.address = targetCompany.address;
-					jobInDb.state = targetCompany.state;
-					jobInDb.category = targetCompany.category;
-				}
-				
-				targetCompany.jobs.push(job);
-			});
-			
-			// Kombiniere BPhD Awards
-			if (sourceCompany.bphdAwards && sourceCompany.bphdAwards.length > 0) {
-				targetCompany.bphdAwards = targetCompany.bphdAwards || [];
-				const mergedAwards = [...targetCompany.bphdAwards, ...sourceCompany.bphdAwards];
-				targetCompany.bphdAwards = [...new Set(mergedAwards)].sort((a, b) => b - a);
-			}
-			
-			// Kombiniere verified Status
-			if (sourceCompany.verified) {
-				targetCompany.verified = true;
-			}
-			
-			// Berechne neue Durchschnittsbewertung
-			if (targetCompany.reviews.length > 0) {
-				let totalRating = 0;
-				targetCompany.reviews.forEach(review => {
-					const reviewRating = calculateOverallRating(review.ratings);
-					totalRating += reviewRating;
-				});
-				targetCompany.averageRating = totalRating / targetCompany.reviews.length;
-			} else {
-				targetCompany.averageRating = 0;
-			}
-			
-			// LÖSCHE Source-Unternehmen KOMPLETT
-			delete companiesData[sourceCompany.name.toLowerCase()];
-
-			// Entferne auch aus allen anderen Strukturen
-			// Verhindere, dass das Unternehmen in der Suche erscheint
-			const sourceKey = sourceCompany.name.toLowerCase();
-			if (companiesData[sourceKey]) {
-				delete companiesData[sourceKey];
-			}
-
-			// Alternative Schreibweisen auch löschen
-			Object.keys(companiesData).forEach(key => {
-				if (companiesData[key].name === sourceCompany.name) {
-					delete companiesData[key];
-				}
-			});
-			
-			// Schließe Modal
-			const modals = document.querySelectorAll('.modal');
-			modals.forEach(m => m.remove());
-			
-			alert(`Erfolgreich zusammengeführt!\n\n${sourceCompanyName} wurde zu ${targetCompanyName} hinzugefügt.\n\n${targetCompany.reviews.length} Bewertungen und ${targetCompany.jobs.length} Stellenangebote sind nun bei ${targetCompanyName}.`);
-		}
-
         function toggleDistanceSorting() {
             const locationFilter = document.getElementById('location-filter').value;
             const distanceOption = document.getElementById('distance-sort-option');
@@ -6299,7 +6011,6 @@
             
             reviews.forEach(review => {
                 let showReview = true;
-                let plzScore = 0;
                 
                 // Mindestbewertung prüfen
 				if (minRatingFilter > 0) {
@@ -6572,13 +6283,13 @@
                 
 				if (showReview) {
 					review.style.display = 'block'; // Zeige alle gefilterten Reviews
-					reviewsToSort.push({ element: review, plzScore: plzScore });
+					reviewsToSort.push(review);
 				} else {
 					review.style.display = 'none';
 				}
             });
             
-			reviewsToSort.forEach(item => item.element.style.display = 'block');
+			reviewsToSort.forEach(item => item.style.display = 'block');
 
 			// Warte auf alle Radius-Checks parallel
 			if (window.radiusPromises && window.radiusPromises.length > 0) {
@@ -7148,7 +6859,6 @@
 			if (jobRadiusPlz) {
 				if (jobRadiusPlz.length === 5 && /^\d{5}$/.test(jobRadiusPlz)) {
 					activeJobAdvancedFilters.push(`Im Umkreis von ${jobRadiusDistance} km`);
-					activeJobRadiusPlz = jobRadiusPlz;
 					document.getElementById('job-location-filter').value = jobRadiusPlz;
 				} else {
 					document.getElementById('job-radius-plz-error').style.display = 'block';
@@ -7343,34 +7053,6 @@
             return hours * 60 + minutes;
         }
 
-        function formatWorkingHoursDisplay(workingHours, saturdayHours) {
-            // Sortiere normale Arbeitszeiten nach frühestem Beginn
-            const sortedHours = sortWorkingHours(workingHours);
-            
-            let html = '<div>';
-            sortedHours.forEach(time => {
-                html += `<div>${time}</div>`;
-            });
-            html += '</div>';
-            
-            return html;
-        }
-
-        function formatSaturdayDisplay(saturdayFrequency, saturdayHours) {
-            let html = '<div>';
-            if (saturdayFrequency) {
-                html += `<div>${saturdayFrequency}</div>`;
-            }
-            if (saturdayHours && saturdayHours.length > 0) {
-                saturdayHours.forEach(time => {
-                    html += `<div>${time}</div>`;
-                });
-            }
-            html += '</div>';
-            
-            return html;
-        }
-
 		function getTariffForYear(year) {
 			// Tarifhistorie: window.tariffHistory = [{from: 2020, to: 2022, amount: 1000}, ...]
 			// to: null bedeutet "Aktuell"
@@ -7462,7 +7144,17 @@
             return prefix + '<span style="display:inline-flex;align-items:center;gap:0.25rem;vertical-align:baseline;">' + lastWord + '<span style="display:inline-flex;align-items:center;vertical-align:middle;">' + badge + '</span></span>';
         }
 
-        function createReviewCard(reviewData) {
+		function createReviewCard(reviewData) {
+            // Alle Nutzerdaten escapen
+            const safeCompanyName = escapeHtml(reviewData.companyName);
+            const safeAddress = escapeHtml(reviewData.address);
+            const safeSpecializations = escapeHtml(reviewData.specializations);
+            const safeArea = escapeHtml(reviewData.area);
+            const safeCustomerType = escapeHtml(reviewData.customerType);
+            const safeBenefits = escapeHtml(reviewData.benefits);
+            const safeTasks = escapeHtml(reviewData.tasks);
+            const safeFeedback = escapeHtml(reviewData.feedback);
+            const safeHighlights = escapeHtml(reviewData.highlights);
             const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear);
             const overallRating = calculateOverallRating(reviewData.ratings);
             const sortedWorkingHours = sortWorkingHours([...reviewData.workingHours]);
@@ -7472,7 +7164,7 @@
                     <button class="report-btn" onclick="showReportModal('${reviewData.adminId || reviewData.id}')" title="Bewertung melden">!</button>
                     <div class="review-header">
                         <div class="company-info">
-							<div onclick="showCompanyPage('${reviewData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark); line-height: 1.4;">${formatNameWithBadge(reviewData.companyName, getCompanyVerifiedBadge(reviewData.companyName))}</div>							
+							<div onclick="showCompanyPage('${escapeAttr(reviewData.companyName)}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark); line-height: 1.4;">${formatNameWithBadge(reviewData.companyName, getCompanyVerifiedBadge(reviewData.companyName))}</div>							
                             <p>${reviewData.address}</p>
 							<div class="company-badges" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
                                 <div class="category-badge" style="padding: 0.35rem 1.25rem;">${reviewData.category}</div>
@@ -7539,7 +7231,14 @@
             `;
         }
 
-        function createJobCard(jobData) {
+		function createJobCard(jobData) {
+            const safeCompanyName = escapeHtml(jobData.companyName);
+            const safeAddress = escapeHtml(jobData.address);
+            const safeDescription = escapeHtml(jobData.description);
+            const safeSpecializations = escapeHtml(jobData.specializations);
+            const safeArea = escapeHtml(jobData.area);
+            const safeCustomerType = escapeHtml(jobData.customerType);
+            const safeBenefits = escapeHtml(jobData.benefits);
             const salaryBadge = getSalaryBadge(jobData.salary);
             const sortedWorkingHours = sortWorkingHours([...jobData.workingHours]);
             
@@ -7548,7 +7247,7 @@
                     <div class="job-header">
                         <div class="job-info">
 							<div style="display: flex; align-items: center; gap: 0.5rem;">
-								<div onclick="showCompanyPage('${jobData.companyName}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; line-height: 1.4;">${formatNameWithBadge(jobData.companyName, getCompanyVerifiedBadge(jobData.companyName))}</div>
+								<div onclick="showCompanyPage('${escapeAttr(jobData.companyName)}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; line-height: 1.4;">${formatNameWithBadge(jobData.companyName, getCompanyVerifiedBadge(jobData.companyName))}</div>
 							</div>
                             <p>${jobData.address}</p>
 							<div class="company-badges" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
@@ -7591,7 +7290,7 @@
 							<div class="comment-label">Bewerbung & Kontakt:</div>
 							<div class="comment-text">
 								<strong>Ansprechperson:</strong> ${jobData.contactPerson}<br>
-								<strong>E-Mail:</strong> <a href="mailto:${jobData.contactEmail}" style="color: var(--red);">${jobData.contactEmail}</a>
+								<strong>E-Mail:</strong> <a href="mailto:${escapeHtml(jobData.contactEmail)}" style="color: var(--red);" rel="nofollow">${escapeHtml(jobData.contactEmail).split('').map(c => `&#${c.charCodeAt(0)};`).join('')}</a>
 								${jobData.applicationNotes ? `<br><br>${jobData.applicationNotes}` : ''}
 							</div>
 						</div>
@@ -9347,17 +9046,6 @@
 			sortAllCompanies();
 		}
 
-		function updateWissenswertsTab() {
-			const wissenswertsTab = document.getElementById('wissenswert-tab');
-			const currentSections = ['company-search', 'awarded-companies', 'internship-guide', 'internship-tips', 'company'];
-			
-			if (currentSections.includes(currentSection)) {
-				wissenswertsTab.classList.add('active');
-			} else {
-				wissenswertsTab.classList.remove('active');
-			}
-		}
-
 		function toggleWissenswertsMenu() {
 			const dropdown = document.querySelector('.nav-dropdown');
 			dropdown.classList.toggle('open');
@@ -9797,27 +9485,11 @@
 		}
 
 		function truncateText(text, maxLength, elementId) {
-			if (!text || text.length <= maxLength) {
-				return text;
-			}
-			
-			const truncated = text.substring(0, maxLength);
-			const showMoreId = `show-more-${elementId}`;
-			
-			return `
-				<span id="truncated-${elementId}">${truncated}... 
-					<span style="color: var(--red); cursor: pointer; text-decoration: underline;" 
-						  onclick="document.getElementById('truncated-${elementId}').style.display='none'; document.getElementById('full-${elementId}').style.display='inline';">
-						Mehr anzeigen
-					</span>
-				</span>
-				<span id="full-${elementId}" style="display: none;">${text}
-					<span style="color: var(--red); cursor: pointer; text-decoration: underline;" 
-						  onclick="document.getElementById('full-${elementId}').style.display='none'; document.getElementById('truncated-${elementId}').style.display='inline';">
-						Weniger anzeigen
-					</span>
-				</span>
-			`;
+			if (!text) return '';
+			const safe = escapeHtml(text);
+			if (text.length <= maxLength) return safe;
+			const truncated = escapeHtml(text.substring(0, maxLength));
+			return `<span id="truncated-${elementId}">${truncated}... <span style="color: var(--red); cursor: pointer; text-decoration: underline;" onclick="document.getElementById('truncated-${elementId}').style.display='none'; document.getElementById('full-${elementId}').style.display='inline';">Mehr anzeigen</span></span><span id="full-${elementId}" style="display: none;">${safe} <span style="color: var(--red); cursor: pointer; text-decoration: underline;" onclick="document.getElementById('full-${elementId}').style.display='none'; document.getElementById('truncated-${elementId}').style.display='inline';">Weniger anzeigen</span></span>`;
 		}
 
 		function populateYearSelect() {
@@ -11415,6 +11087,10 @@
 			}
 		}
 		waitForSupabaseAndPreload();
+
+		function showImpressumModal() {
+			document.getElementById('impressum-modal').style.display = 'block';
+		}
 
 		async function showPrivacyModal() {
 			const modal = document.getElementById('privacy-modal');
