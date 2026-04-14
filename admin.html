@@ -899,8 +899,80 @@
 	</div>
 	
 	<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
-		import { supabase } from './js/supabase-client.js';
+		import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 		import * as api from './js/api.js';
+		import { supabase as anonSupabase } from './js/supabase-client.js';
+		const supabase = anonSupabase;
+
+		async function callAdminFunction(action, params = {}) {
+			const { data: { session } } = await anonSupabase.auth.getSession();
+			if (!session) throw new Error('Nicht eingeloggt');
+			
+			const response = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-operations`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${session.access_token}`,
+					'apikey': window.SUPABASE_ANON_KEY
+				},
+				body: JSON.stringify({ action, ...params })
+			});
+			const result = await response.json();
+			if (!result.success) throw new Error(result.error || 'Fehler');
+			return result;
+		}
+
+		const adminApi = {
+			activateReview: async (id) => {
+				const result = await callAdminFunction('activateReview', { id });
+				return { success: true, data: result.data };
+			},
+			deactivateReview: async (id) => {
+				const result = await callAdminFunction('deactivateReview', { id });
+				return { success: true, data: result.data };
+			},
+			activateJob: async (id) => {
+				const result = await callAdminFunction('activateJob', { id });
+				if (result.data?.contact_email && window.sendConfirmationEmail) {
+					await window.sendConfirmationEmail('job_activated', {
+						email: result.data.contact_email,
+						companyName: result.data.company_name,
+						contactPerson: result.data.contact_person,
+						id: typeof result.data.id === 'string' ? result.data.id.substring(0, 8) : result.data.id,
+						deactivateToken: result.data.deactivate_token
+					});
+				}
+				return { success: true, data: result.data };
+			},
+			deactivateJob: async (id) => {
+				const result = await callAdminFunction('deactivateJob', { id });
+				return { success: true, data: result.data };
+			},
+			approveVerification: async (id) => {
+				const result = await callAdminFunction('approveVerification', { id });
+				if (result.data?.contact_email && window.sendConfirmationEmail) {
+					await window.sendConfirmationEmail('verification_approved', {
+						email: result.data.contact_email,
+						companyName: result.data.company_name,
+						contactPerson: result.data.contact_person,
+						editToken: result.data.edit_token
+					});
+				}
+				return { success: true, data: result.data };
+			},
+			rejectVerification: async (id, reason) => {
+				const result = await callAdminFunction('rejectVerification', { id, reason });
+				if (result.data?.contact_email && window.sendConfirmationEmail) {
+					await window.sendConfirmationEmail('verification_rejected', {
+						email: result.data.contact_email,
+						companyName: result.data.company_name,
+						contactPerson: result.data.contact_person,
+						reason
+					});
+				}
+				return { success: true, data: result.data };
+			}
+		};
 
 		// ========== E-MAIL FUNKTION FÜR ADMIN ==========
 		window.sendConfirmationEmail = async function(type, data) {
@@ -960,7 +1032,7 @@
 		}
 		
 		async function checkAuth() {
-			const { data: { session } } = await supabase.auth.getSession();
+			const { data: { session } } = await anonSupabase.auth.getSession();
 			
 			if (session) {
 				const isAdmin = await checkIfAdmin(session.user.email);
@@ -970,13 +1042,13 @@
 					await showDashboard();
 				} else {
 					showError('Sie haben keine Admin-Berechtigung.');
-					await supabase.auth.signOut();
+					await anonSupabase.auth.signOut();
 				}
 			}
 		}
 		
 		async function checkIfAdmin(email) {
-			const { data, error } = await supabase
+			const { data, error } = await anonSupabase
 				.from('admin_users')
 				.select('email')
 				.eq('email', email)
@@ -997,7 +1069,7 @@
 			hideMessages();
 			
 			try {
-				const { data, error } = await supabase.auth.signInWithPassword({
+				const { data, error } = await anonSupabase.auth.signInWithPassword({
 					email: email,
 					password: password
 				});
@@ -1007,7 +1079,7 @@
 				const isAdmin = await checkIfAdmin(email);
 				
 				if (!isAdmin) {
-					await supabase.auth.signOut();
+					await anonSupabase.auth.signOut();
 					throw new Error('Sie haben keine Admin-Berechtigung.');
 				}
 				
@@ -1090,22 +1162,11 @@
 		};
 		
 		async function loadReviews() {
-			console.log('📥 Lade Reviews...');
-			
 			try {
-				const { data, error } = await supabase
-					.from('reviews')
-					.select('*')
-					.order('created_at', { ascending: false });
-				
-				if (error) throw error;
-				
-				allReviews = data;
-				console.log(`✅ ${data.length} Reviews geladen`);
-				
+				const result = await callAdminFunction('loadReviews');
+				allReviews = result.data;
 				updateStats();
 				renderReviews();
-				
 			} catch (error) {
 				console.error('❌ Fehler beim Laden:', error);
 				showError('Fehler beim Laden der Bewertungen.');
@@ -1113,22 +1174,11 @@
 		}
 		
 		async function loadJobs() {
-			console.log('📥 Lade Jobs...');
-			
 			try {
-				const { data, error } = await supabase
-					.from('jobs')
-					.select('*')
-					.order('created_at', { ascending: false });
-				
-				if (error) throw error;
-				
-				allJobs = data;
-				console.log(`✅ ${data.length} Jobs geladen`);
-				
+				const result = await callAdminFunction('loadJobs');
+				allJobs = result.data;
 				updateJobStats();
 				renderJobs();
-				
 			} catch (error) {
 				console.error('❌ Fehler beim Laden der Jobs:', error);
 				showError('Fehler beim Laden der Stellenangebote.');
@@ -1856,7 +1906,7 @@
 				if (!confirm(`"${verification.company_name}" verifizieren und Antrag genehmigen?`)) return;
 				
 				// Nutze die neue API-Funktion
-				const result = await api.approveVerification(verificationId);
+				const result = await adminApi.approveVerification(verificationId);
 				
 				if (!result.success) {
 					throw new Error(result.error || 'Fehler beim Genehmigen');
@@ -1889,7 +1939,7 @@
 				if (reason === null) return; // Abbrechen gedrückt
 				
 				// Nutze die neue API-Funktion
-				const result = await api.rejectVerification(verificationId, reason);
+				const result = await adminApi.rejectVerification(verificationId, reason);
 				
 				if (!result.success) {
 					throw new Error(result.error || 'Fehler beim Ablehnen');
@@ -3027,10 +3077,10 @@
 			
 			try {
 				if (newStatus === 'active') {
-					const result = await api.activateReview(reviewId);
+					const result = await adminApi.activateReview(reviewId);
 					if (!result.success) throw new Error(result.error);
 				} else {
-					const result = await api.deactivateReview(reviewId);
+					const result = await adminApi.deactivateReview(reviewId);
 					if (!result.success) throw new Error(result.error);
 				}
 				
@@ -3052,7 +3102,7 @@
 			try {
 				if (newStatus === 'active') {
 					// Bei Aktivierung: Nutze die neue activateJob Funktion aus api.js
-					const result = await api.activateJob(jobId);
+					const result = await adminApi.activateJob(jobId);
 					
 					if (!result.success) {
 						throw new Error(result.error || 'Fehler beim Aktivieren');
@@ -3061,7 +3111,7 @@
 					showSuccess('Stellenangebot erfolgreich aktiviert und E-Mail gesendet!');
 				} else {
 					// Bei Deaktivierung: Direkt Supabase nutzen
-					const result = await api.deactivateJob(jobId);
+					const result = await adminApi.deactivateJob(jobId);
 					
 					if (!result.success) {
 						throw new Error(result.error || 'Fehler beim Deaktivieren');
@@ -3079,7 +3129,7 @@
 		};
 		
 		window.logout = async function() {
-			await supabase.auth.signOut();
+			await anonSupabase.auth.signOut();
 			location.reload();
 		};
 		
