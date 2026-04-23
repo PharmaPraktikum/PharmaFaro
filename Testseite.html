@@ -611,7 +611,34 @@
         letter-spacing: -0.01em;
     }
 
-    .modal-body { padding: 2rem; overflow-y: auto; flex: 1; }
+	.modal-body { padding: 2rem; overflow-y: auto; flex: 1; }
+
+	#agb-content-display p,
+	#privacy-content-display p {
+		margin-bottom: 0.85rem;
+		line-height: 1.75;
+	}
+	#agb-content-display h3,
+	#privacy-content-display h3 {
+		margin-top: 1.5rem;
+		margin-bottom: 0.5rem;
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--dark);
+	}
+	#agb-content-display h2,
+	#privacy-content-display h2 {
+		margin-top: 2rem;
+		margin-bottom: 0.6rem;
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: var(--dark);
+	}
+	#agb-content-display ul,
+	#privacy-content-display ul {
+		margin: 0.5rem 0 0.85rem 1.5rem;
+		line-height: 1.75;
+	}
 
     .close-btn {
         background: none; border: none; font-size: 1.5rem;
@@ -2883,20 +2910,16 @@
 				<button class="close-btn" onclick="closeModal('impressum-modal')">&times;</button>
 			</div>
 			<div class="modal-body">
-				<p><strong>PharmaFaro</strong></p>
-				<p>Musterstraße 123<br>12345 Musterstadt<br>Deutschland</p>
+				<p><strong>PharmaFaro.de</strong></p>
 				<br>
-				<p><strong>Geschäftsführer:</strong> Max Mustermann</p>
-				<p><strong>Registergericht:</strong> Amtsgericht Musterstadt</p>
-				<p><strong>Handelsregisternummer:</strong> HRB 12345</p>
-				<p><strong>Umsatzsteuer-ID:</strong> DE123456789</p>
+				<p><strong>Angaben gemäß § 5 TMG:</strong></p>
+				<p>Marlon Krompholz<br>Otto-Himmel-Weg 1<br>38104 Braunschweig<br>Deutschland</p>
 				<br>
 				<p><strong>Kontakt:</strong></p>
 				<p>E-Mail: info@pharmafaro.de</p>
-				<p>Telefon: +49 (0) 123 456789</p>
 				<br>
-				<p><strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong></p>
-				<p>Max Mustermann, Musterstraße 123, 12345 Musterstadt</p>
+				<p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong></p>
+				<p>Marlon Krompholz<br>Otto-Himmel-Weg 1<br>38104 Braunschweig<br>Deutschland</p>
 			</div>
 		</div>
 	</div>
@@ -5181,7 +5204,7 @@
 					<div class="profile-img-wrapper" style="flex-shrink: 0; width: 140px; height: 140px;">
 						<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;" alt="Profilbild">
 						${company.bphdAwards && company.bphdAwards.length > 0 ? `
-						div class="bphd-badge-container" style="position: absolute; top: -20px; right: 0px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${escapeAttr(company.name)}')">						
+						<div class="bphd-badge-container" style="position: absolute; top: -20px; right: 0px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${escapeAttr(company.name)}')">						
 							<svg width="90" height="100" viewBox="0 0 90 100">
 								<path d="M25 0 L35 0 L35 50 L30 45 L25 50 Z" fill="#8B0000"/>
 								<path d="M55 0 L65 0 L65 50 L60 45 L55 50 Z" fill="#8B0000"/>
@@ -11120,19 +11143,71 @@
 
 		function downloadPrivacyPdf() {
 			const { jsPDF } = window.jspdf;
-			const doc = new jsPDF();
+			const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 			const date = document.getElementById('privacy-date').textContent;
-			const content = document.getElementById('privacy-content-display').innerText;
+
+			const pageWidth = doc.internal.pageSize.getWidth();
+			const pageHeight = doc.internal.pageSize.getHeight();
+			const marginLeft = 20, marginRight = 20, marginTop = 20, marginBottom = 20;
+			const usableWidth = pageWidth - marginLeft - marginRight;
+
 			doc.setFontSize(16);
-			doc.text('Datenschutzerklärung', 20, 20);
+			doc.setTextColor(42, 18, 16);
+			doc.setFont('helvetica', 'bold');
+			doc.text('Datenschutzerklärung – PharmaFaro.de', marginLeft, marginTop);
 			doc.setFontSize(10);
-			doc.setTextColor(100);
-			doc.text(date, 20, 30);
-			doc.setFontSize(11);
-			doc.setTextColor(0);
-			const lines = doc.splitTextToSize(content, 170);
-			doc.text(lines, 20, 42);
-			doc.save('Datenschutzerklaerung.pdf');
+			doc.setFont('helvetica', 'normal');
+			doc.setTextColor(120, 120, 120);
+			doc.text(date, marginLeft, marginTop + 8);
+			doc.setDrawColor(184, 50, 40);
+			doc.setLineWidth(0.4);
+			doc.line(marginLeft, marginTop + 12, pageWidth - marginRight, marginTop + 12);
+
+			const contentEl = document.getElementById('privacy-content-display');
+			const blocks = [];
+			contentEl.querySelectorAll('h1,h2,h3,p,li').forEach(el => {
+				const tag = el.tagName.toLowerCase();
+				const text = el.innerText.trim();
+				if (!text) return;
+				if (tag === 'h1' || tag === 'h2') blocks.push({ type: 'h2', text });
+				else if (tag === 'h3') blocks.push({ type: 'h3', text });
+				else if (tag === 'li') blocks.push({ type: 'li', text: '– ' + text });
+				else blocks.push({ type: 'p', text });
+			});
+			if (blocks.length === 0) {
+				contentEl.innerText.trim().split('\n').forEach(line => {
+					const t = line.trim(); if (t) blocks.push({ type: 'p', text: t });
+				});
+			}
+
+			let curY = marginTop + 18;
+			function addPage() { doc.addPage(); curY = marginTop; }
+			function checkPage(h) { if (curY + h > pageHeight - marginBottom) addPage(); }
+
+			for (const block of blocks) {
+				let fontSize, fontStyle, textColor, spaceBefore, spaceAfter, indent;
+				if (block.type === 'h2') { fontSize=13; fontStyle='bold'; textColor=[42,18,16]; spaceBefore=6; spaceAfter=2; indent=0; }
+				else if (block.type === 'h3') { fontSize=11; fontStyle='bold'; textColor=[61,26,23]; spaceBefore=4; spaceAfter=1; indent=0; }
+				else if (block.type === 'li') { fontSize=10; fontStyle='normal'; textColor=[30,30,30]; spaceBefore=1; spaceAfter=1; indent=4; }
+				else { fontSize=10; fontStyle='normal'; textColor=[30,30,30]; spaceBefore=2; spaceAfter=2; indent=0; }
+				doc.setFontSize(fontSize);
+				doc.setFont('helvetica', fontStyle);
+				doc.setTextColor(...textColor);
+				const lines = doc.splitTextToSize(block.text, usableWidth - indent);
+				const blockHeight = lines.length * (fontSize * 0.38) + spaceBefore + spaceAfter;
+				checkPage(blockHeight + 2);
+				curY += spaceBefore;
+				doc.text(lines, marginLeft + indent, curY);
+				curY += lines.length * (fontSize * 0.38) + spaceAfter;
+			}
+
+			const totalPages = doc.internal.getNumberOfPages();
+			for (let i = 1; i <= totalPages; i++) {
+				doc.setPage(i);
+				doc.setFontSize(9); doc.setTextColor(160,160,160); doc.setFont('helvetica','normal');
+				doc.text(`Seite ${i} von ${totalPages}  –  PharmaFaro.de`, pageWidth/2, pageHeight-10, { align: 'center' });
+			}
+			doc.save('PharmaFaro_Datenschutzerklaerung.pdf');
 		}
 
 		async function showAgbModal() {
@@ -11163,22 +11238,73 @@
 
 		function downloadAgbPdf() {
 			const { jsPDF } = window.jspdf;
-			const doc = new jsPDF();
+			const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 			const date = document.getElementById('agb-date').textContent;
-			const content = document.getElementById('agb-content-display').innerText;
+
+			const pageWidth = doc.internal.pageSize.getWidth();
+			const pageHeight = doc.internal.pageSize.getHeight();
+			const marginLeft = 20, marginRight = 20, marginTop = 20, marginBottom = 20;
+			const usableWidth = pageWidth - marginLeft - marginRight;
+
 			doc.setFontSize(16);
-			doc.text('Nutzungsbedingungen', 20, 20);
+			doc.setTextColor(42, 18, 16);
+			doc.setFont('helvetica', 'bold');
+			doc.text('Nutzungsbedingungen – PharmaFaro.de', marginLeft, marginTop);
 			doc.setFontSize(10);
-			doc.setTextColor(100);
-			doc.text(date, 20, 30);
-			doc.setFontSize(11);
-			doc.setTextColor(0);
-			const lines = doc.splitTextToSize(content, 170);
-			doc.text(lines, 20, 42);
-			doc.save('Nutzungsbedingungen.pdf');
+			doc.setFont('helvetica', 'normal');
+			doc.setTextColor(120, 120, 120);
+			doc.text(date, marginLeft, marginTop + 8);
+			doc.setDrawColor(184, 50, 40);
+			doc.setLineWidth(0.4);
+			doc.line(marginLeft, marginTop + 12, pageWidth - marginRight, marginTop + 12);
+
+			const contentEl = document.getElementById('agb-content-display');
+			const blocks = [];
+			contentEl.querySelectorAll('h1,h2,h3,p,li').forEach(el => {
+				const tag = el.tagName.toLowerCase();
+				const text = el.innerText.trim();
+				if (!text) return;
+				if (tag === 'h1' || tag === 'h2') blocks.push({ type: 'h2', text });
+				else if (tag === 'h3') blocks.push({ type: 'h3', text });
+				else if (tag === 'li') blocks.push({ type: 'li', text: '– ' + text });
+				else blocks.push({ type: 'p', text });
+			});
+			if (blocks.length === 0) {
+				contentEl.innerText.trim().split('\n').forEach(line => {
+					const t = line.trim(); if (t) blocks.push({ type: 'p', text: t });
+				});
+			}
+
+			let curY = marginTop + 18;
+			function addPage() { doc.addPage(); curY = marginTop; }
+			function checkPage(h) { if (curY + h > pageHeight - marginBottom) addPage(); }
+
+			for (const block of blocks) {
+				let fontSize, fontStyle, textColor, spaceBefore, spaceAfter, indent;
+				if (block.type === 'h2') { fontSize=13; fontStyle='bold'; textColor=[42,18,16]; spaceBefore=6; spaceAfter=2; indent=0; }
+				else if (block.type === 'h3') { fontSize=11; fontStyle='bold'; textColor=[61,26,23]; spaceBefore=4; spaceAfter=1; indent=0; }
+				else if (block.type === 'li') { fontSize=10; fontStyle='normal'; textColor=[30,30,30]; spaceBefore=1; spaceAfter=1; indent=4; }
+				else { fontSize=10; fontStyle='normal'; textColor=[30,30,30]; spaceBefore=2; spaceAfter=2; indent=0; }
+				doc.setFontSize(fontSize);
+				doc.setFont('helvetica', fontStyle);
+				doc.setTextColor(...textColor);
+				const lines = doc.splitTextToSize(block.text, usableWidth - indent);
+				const blockHeight = lines.length * (fontSize * 0.38) + spaceBefore + spaceAfter;
+				checkPage(blockHeight + 2);
+				curY += spaceBefore;
+				doc.text(lines, marginLeft + indent, curY);
+				curY += lines.length * (fontSize * 0.38) + spaceAfter;
+			}
+
+			const totalPages = doc.internal.getNumberOfPages();
+			for (let i = 1; i <= totalPages; i++) {
+				doc.setPage(i);
+				doc.setFontSize(9); doc.setTextColor(160,160,160); doc.setFont('helvetica','normal');
+				doc.text(`Seite ${i} von ${totalPages}  –  PharmaFaro.de`, pageWidth/2, pageHeight-10, { align: 'center' });
+			}
+			doc.save('PharmaFaro_Nutzungsbedingungen.pdf');
 		}
 
-		// Lausche auf Verifizierungs-Änderungen
 		window.addEventListener('storage', function(e) {
 			if (e.key === 'verification_updated') {
 			}
