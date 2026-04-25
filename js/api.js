@@ -41,7 +41,6 @@ export async function createReview(reviewData) {
 
         if (error) throw error;
         
-        console.log('✅ Review erstellt:', data.id);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Erstellen der Review:', error);
@@ -54,15 +53,14 @@ export async function createReview(reviewData) {
  */
 export async function getActiveReviews() {
     try {
-        const { data, error } = await supabase
-            .from('reviews')
-            .select('*')
-            .eq('status', 'active')
-            .order('created_at', { ascending: false });
+		const { data, error } = await supabase
+			.from('public_reviews')  // statt 'reviews'
+			.select('*')
+			.eq('status', 'active')
+			.order('created_at', { ascending: false });
 
         if (error) throw error;
         
-        console.log(`✅ ${data.length} aktive Reviews geladen`);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Laden der Reviews:', error);
@@ -83,7 +81,6 @@ export async function getReviewByToken(token) {
 
         if (error) throw error;
         
-        console.log('✅ Review gefunden:', data.id);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Review nicht gefunden:', error);
@@ -100,6 +97,13 @@ export async function getReviewByToken(token) {
  */
 export async function uploadCertificate(file, reviewId) {
     try {
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            return { success: false, error: 'Ungültiges Dateiformat. Erlaubt sind PDF, JPG und PNG.' };
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            return { success: false, error: 'Die Datei ist zu groß. Maximale Größe: 10 MB.' };
+        }
         const fileExt = file.name.split('.').pop();
         const fileName = `${reviewId}/${Date.now()}.${fileExt}`;
         
@@ -112,7 +116,6 @@ export async function uploadCertificate(file, reviewId) {
 
         if (error) throw error;
         
-        console.log('✅ PDF hochgeladen:', fileName);
         return { success: true, path: data.path };
     } catch (error) {
         console.error('❌ Fehler beim PDF-Upload:', error);
@@ -131,7 +134,6 @@ export async function getCertificateUrl(path) {
 
         if (!data.signedUrl) throw new Error('Keine URL erhalten');
         
-        console.log('✅ PDF-URL erstellt');
         return { success: true, url: data.signedUrl };
     } catch (error) {
         console.error('❌ Fehler beim Erstellen der PDF-URL:', error);
@@ -169,9 +171,10 @@ export async function createJob(jobData) {
 			area: jobData.area || null,
 			application_notes: jobData.applicationNotes || null,
 			working_hours_data: jobData.workingHoursData,
+			earliest_start: jobData.earliestStart || null,
             deactivate_token: deactivateToken,
 			status: 'pending'
-		};		
+		};	
 		
 		const { data, error } = await supabase
             .from('jobs')
@@ -181,7 +184,6 @@ export async function createJob(jobData) {
 
         if (error) throw error;
         
-        console.log('✅ Job erstellt:', data.id);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Erstellen des Jobs:', error);
@@ -202,7 +204,6 @@ export async function getActiveJobs() {
 
         if (error) throw error;
         
-        console.log(`✅ ${data.length} aktive Jobs geladen`);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Laden der Jobs:', error);
@@ -223,7 +224,6 @@ export async function getJobByDeactivateToken(token) {
 
         if (error) throw error;
         
-        console.log('✅ Job gefunden:', data.id);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Job nicht gefunden:', error);
@@ -249,7 +249,6 @@ export async function deactivateJobByToken(token) {
 
         if (error) throw error;
         
-        console.log('✅ Job deaktiviert:', data.id);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Deaktivieren:', error);
@@ -283,7 +282,6 @@ export async function createVerificationRequest(verificationData) {
 
         if (error) throw error;
         
-        console.log('✅ Verifizierungsantrag erstellt:', data.id);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Erstellen des Antrags:', error);
@@ -305,7 +303,6 @@ export async function getCompanyByEditToken(token) {
 
         if (error) throw error;
         
-        console.log('✅ Unternehmen gefunden:', data.company_name);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Unternehmen nicht gefunden:', error);
@@ -336,7 +333,6 @@ export async function updateCompanyProfile(token, profileData) {
 
         if (error) throw error;
         
-        console.log('✅ Unternehmensprofil aktualisiert:', data.company_name);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Aktualisieren:', error);
@@ -365,7 +361,6 @@ export async function activateReview(reviewId) {
 
         if (error) throw error;
         
-        console.log('✅ Review aktiviert:', reviewId);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Aktivieren:', error);
@@ -387,7 +382,6 @@ export async function deactivateReview(reviewId) {
 
         if (error) throw error;
         
-        console.log('✅ Review deaktiviert:', reviewId);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Deaktivieren:', error);
@@ -413,7 +407,6 @@ export async function activateJob(jobId) {
 
         if (error) throw error;
         
-        console.log('✅ Job aktiviert:', jobId);
         
         // Sende E-Mail an Ansprechperson
         if (data.contact_email && window.sendConfirmationEmail) {
@@ -447,7 +440,6 @@ export async function deactivateJob(jobId) {
 
         if (error) throw error;
         
-        console.log('✅ Job deaktiviert:', jobId);
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Deaktivieren:', error);
@@ -472,7 +464,6 @@ export async function approveVerification(verificationId) {
 
         if (error) throw error;
         
-        console.log('✅ Verifizierung genehmigt:', verificationId);
         
         // Sende E-Mail an Ansprechperson
         if (data.contact_email && window.sendConfirmationEmail) {
@@ -508,7 +499,6 @@ export async function rejectVerification(verificationId, reason) {
 
         if (error) throw error;
         
-        console.log('✅ Verifizierung abgelehnt:', verificationId);
         
         // Sende E-Mail an Ansprechperson
         if (data.contact_email && window.sendConfirmationEmail) {
