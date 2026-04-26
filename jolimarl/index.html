@@ -367,6 +367,8 @@
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
     .content-section { display: none; }
     .content-section.active { display: block; }
+	body.write-active .main-content { background: #ffffff; }
+    body.write-active { background: #ffffff; }
 
     /* ── FILTERS ── */
     .search-filters {
@@ -1221,15 +1223,6 @@
     }
     .year-tab.active, .year-tab:hover { background: var(--red); color: white; border-color: var(--red); }
 
-    /* ── COMPANY PROFILE ── */
-    #company-profile-section h3 {
-        font-family: 'Fraunces', serif;
-        letter-spacing: -0.01em;
-        margin-bottom: 1.25rem;
-        font-size: 1.1rem;
-        color: var(--dark);
-    }
-
     /* ── STATUS BADGES (Admin) ── */
     .status-pending { background: #fff3cd; color: #856404; border: 1px solid rgba(133,100,4,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
     .status-active { background: #d4edda; color: #155724; border: 1px solid rgba(21,87,36,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
@@ -2017,8 +2010,8 @@
 					<form id="review-form">
                         <div class="form-group" style="margin-top: 1rem;">
                             <label>E-Mail-Adresse *</label>
-                            <input type="email" required id="reviewer-email" placeholder="ihre.email@beispiel.de">
-                            <div class="verification-note">Ihre E-Mail-Adresse wird nur zur Verwaltung der Bewertung verwendet und ist nicht öffentlich einsehbar.</div>
+                            <input type="email" required id="reviewer-email" placeholder="deine.email@beispiel.de">
+                            <div class="verification-note">Deine E-Mail-Adresse wird nur zur Verwaltung der Bewertung verwendet und ist nicht öffentlich einsehbar.</div>
                         </div>
 						
 						<div class="form-group">
@@ -2026,7 +2019,7 @@
 							<select required id="internship-year">
 								<!-- Wird per JS gefüllt -->
 							</select>
-							<p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">Ihr Praktikumsbeginn wird nur zur Auswahl des zu dem Zeitpunkt geltenden Tarifgehalts verwendet und ist nicht öffentlich einsehbar.</p>
+							<p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">Dein Praktikumsbeginn wird nur zur Auswahl des zu dem Zeitpunkt geltenden Tarifgehalts verwendet und ist nicht öffentlich einsehbar.</p>
 						</div>						
 
                         <div class="form-section">
@@ -2306,12 +2299,12 @@
                             
                             <div class="form-group">
                                 <label>Im Praktikum absolvierte Aufgaben *</label>
-                                <textarea required id="tasks" placeholder="Beschreiben Sie die Aufgaben, die Sie während des Praktikums ausgeführt haben..." maxlength="2000"></textarea>
+                                <textarea required id="tasks" placeholder="Beschreibe die Aufgaben, die du während des Praktikums ausgeführt hast..." maxlength="2000"></textarea>
                             </div>
 
                             <div class="form-group">
                                 <label>Lob/Kritik</label>
-                                <textarea id="feedback" placeholder="Was hat Ihnen besonders gut gefallen? Was könnte verbessert werden?" maxlength="2000"></textarea>
+                                <textarea id="feedback" placeholder="Was hat dir besonders gut gefallen? Was könnte verbessert werden?" maxlength="2000"></textarea>
                             </div>
 
                             <div class="form-group">
@@ -2332,20 +2325,20 @@
 									<button type="button" id="remove-file-btn" class="btn btn-secondary" onclick="removeSelectedFile()" style="display: none; margin-left: 1rem; padding: 0.25rem 0.75rem;">✕</button>
 								</div>
 								<small style="color: #666; display: block; margin-top: 0.5rem;">PDF oder Bilddatei zur Verifizierung Ihres Praktikums</small>
-								<p style="font-size: 0.85rem; color: var(--mid); margin-top: 0.75rem; line-height: 1.6;">Die Praktikumsbestätigung wird benötigt, um sicherzustellen, dass das bewertete Praktikum wirklich stattgefunden hat. Dadurch soll das Einreichen von Fake-Bewertungen, die den Eindruck über Unternehmen potentiell verschlechtern oder verbessern könnten, verhindert werden. Ihre Praktikumsbestätigung ist nicht öffentlich einsehbar.</p>
+								<p style="font-size: 0.85rem; color: var(--mid); margin-top: 0.75rem; line-height: 1.6;">Die Praktikumsbestätigung wird benötigt, um sicherzustellen, dass das bewertete Praktikum wirklich stattgefunden hat. Dadurch soll das Einreichen von Fake-Bewertungen, die den Eindruck über Unternehmen potentiell verschlechtern oder verbessern könnten, verhindert werden. Deine Praktikumsbestätigung ist nicht öffentlich einsehbar.</p>
 							</div>
 						</div>
 
 						<div class="form-group" style="margin-top: 2rem; padding: 1rem; background: transparent; border-radius: 8px;">
-							<label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; margin: 0;">
-								<input type="checkbox" id="guidelines-checkbox" required style="margin-top: 0.25rem; width: 18px; height: 18px; cursor: pointer;">
+							<label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin: 0;">
+								<input type="checkbox" id="guidelines-checkbox" required style="flex-shrink: 0; width: 18px; height: 18px; cursor: pointer;">
 								<span>Ich bestätige, dass ich die <span style="text-decoration: underline; color: var(--red); cursor: pointer;" onclick="event.preventDefault(); showGuidelinesModal();">Richtlinien zum Verfassen von Bewertungen</span> gelesen und beim Schreiben meiner Bewertung beachtet habe.</span>
 							</label>
 						</div>
 
 						<div class="form-group" style="margin-top: 0.75rem; padding: 1rem; background: transparent; border-radius: 8px;">
-							<label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; margin: 0;">
-								<input type="checkbox" id="privacy-checkbox-review" required style="margin-top: 0.25rem; width: 18px; height: 18px; cursor: pointer;">
+							<label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin: 0;">
+								<input type="checkbox" id="privacy-checkbox-review" required style="flex-shrink: 0; width: 18px; height: 18px; cursor: pointer;">
 								<span>Ich habe die <span style="text-decoration: underline; color: var(--red); cursor: pointer;" onclick="event.preventDefault(); showPrivacyModal();">Datenschutzerklärung</span> und die <span style="text-decoration: underline; color: var(--red); cursor: pointer;" onclick="event.preventDefault(); showAgbModal();">Nutzungsbedingungen</span> gelesen und stimme diesen zu.</span>
 							</label>
 						</div>
@@ -2658,66 +2651,8 @@
 
                 <div id="jobs-container">
                     <!-- Stellenangebote werden dynamisch hier eingefügt -->
-                </div>
-				
-            </div>
-			
-			<!-- Unternehmensprofil bearbeiten -->
-			<div id="company-profile-section" class="content-section">
-				<div class="form-container">
-					<h2>Unternehmensprofil verwalten</h2>
-					<p style="color: #666; margin-bottom: 2rem;">Verwalten Sie Ihr verifiziertes Unternehmensprofil</p>
-					
-					<div style="background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05); margin-bottom: 2rem;">
-						<h3>Profilbild</h3>
-						<div style="display: flex; gap: 2rem; align-items: center; margin: 1.5rem 0;">
-							<img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2328a745'/><text x='50' y='65' font-family='Arial' font-size='32' fill='white' text-anchor='middle'>M</text></svg>" style="width: 100px; height: 100px; border-radius: 50%;">
-							<div>
-								<input type="file" accept=".jpg,.jpeg,.png,.svg" style="margin-bottom: 1rem;">
-								<p style="color: #666; font-size: 0.9rem;">Empfohlen: 200x200px, JPG oder PNG</p>
-							</div>
-						</div>
-					</div>
-					
-					<div style="background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05); margin-bottom: 2rem;">
-						<h3>Unternehmensinformationen</h3>
-						<div class="form-group">
-							<label>Unternehmensname</label>
-							<input type="text" value="Marien-Apotheke Berlin" readonly style="background: #f8f9fa;">
-						</div>
-						<div class="form-group">
-							<label>Beschreibung</label>
-							<textarea rows="6" placeholder="Beschreiben Sie Ihr Unternehmen...">Die Marien-Apotheke Berlin ist seit über 25 Jahren eine moderne Traditionsapotheke im Herzen der Hauptstadt, direkt am Brandenburger Tor gelegen. Wir sind spezialisiert auf Sterilherstellung, professionelle Verblisterung und die Versorgung der Charité.</textarea>
-						</div>
-						<div class="form-group">
-							<label>Website</label>
-							<input type="url" value="www.marien-apotheke-berlin.de" placeholder="www.beispiel.de">
-						</div>
-					</div>
-					
-					<div style="background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05); margin-bottom: 2rem;">
-						<h3>Kontaktinformationen</h3>
-						<div class="filter-row">
-							<div class="form-group">
-								<label>Ansprechperson</label>
-								<input type="text" value="Frau Dr. med. Schmidt" placeholder="Name der Ansprechperson">
-							</div>
-							<div class="form-group">
-								<label>E-Mail</label>
-								<input type="email" value="kontakt@marien-apotheke-berlin.de" placeholder="kontakt@unternehmen.de">
-							</div>
-							<div class="form-group">
-								<label>Telefon</label>
-								<input type="tel" value="030/12345678" placeholder="030/12345678">
-							</div>
-						</div>
-					</div>
-					
-					<div style="text-align: center;">
-						<button class="btn btn-primary" style="margin-right: 1rem;">Änderungen speichern</button>
-					</div>
-				</div>
-			</div>			
+                </div>				
+            </div>		
         </div>
     </div>
 
@@ -2965,15 +2900,15 @@
 					</div>
 
 					<div class="form-group" style="margin-top: 2rem; padding: 1rem; background: transparent; border-radius: 8px;">
-						<label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin: 0;">
-							<input type="checkbox" id="job-terms-checkbox" required style="width: 18px; height: 18px; min-width: 18px; cursor: pointer; accent-color: var(--red);">
+						<label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin-bottom: 0;">
+							<input type="checkbox" id="job-terms-checkbox" required style="flex-shrink: 0; width: 18px; height: 18px; min-width: 18px; cursor: pointer; accent-color: var(--red);">
 							<span>Ich akzeptiere die <span style="text-decoration: underline; color: var(--red); cursor: pointer;" onclick="event.preventDefault(); showJobTermsModal();">Bedingungen für das Einreichen von Stellenangeboten</span>.</span>
 						</label>
 					</div>					
 
 					<div class="form-group" style="margin-top: 0.75rem; padding: 1rem; background: transparent; border-radius: 8px;">
-						<label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin: 0;">
-							<input type="checkbox" id="privacy-checkbox-job" required style="width: 18px; height: 18px; min-width: 18px; cursor: pointer; accent-color: var(--red);">
+						<label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin-bottom: 0;">
+							<input type="checkbox" id="privacy-checkbox-job" required style="flex-shrink: 0; width: 18px; height: 18px; min-width: 18px; cursor: pointer; accent-color: var(--red);">
 							<span>Ich habe die <span style="text-decoration: underline; color: var(--red); cursor: pointer;" onclick="event.preventDefault(); showPrivacyModal();">Datenschutzerklärung</span> und die <span style="text-decoration: underline; color: var(--red); cursor: pointer;" onclick="event.preventDefault(); showAgbModal();">Nutzungsbedingungen</span> gelesen und stimme diesen zu.</span>
 						</label>
 					</div>
@@ -4658,205 +4593,6 @@
             return 'user_' + reviewId + '_' + Math.random().toString(36).substr(2, 9);
         }
         
-        // Simulate user management link
-        function simulateUserLink(token) {
-            const reviewId = parseInt(token.split('_')[1]);
-            const review = reviewDatabase.find(r => r.id === reviewId);
-            
-            if (review) {
-                showUserManagementModal(review);
-            } else {
-                alert('Ungültiger Link oder Bewertung nicht gefunden.');
-            }
-        }
-        
-        function showUserManagementModal(review) {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'block';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>Ihre Bewertung verwalten</h2>
-                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-                    </div>
-                    <div style="margin-bottom: 2rem;">
-                        <p><strong>Bewertungs-ID:</strong> #${review.id}</p>
-                        <p><strong>Betrieb:</strong> ${review.companyName}</p>
-                        <p><strong>Status:</strong> ${getStatusText(review.status)}</p>
-                        <p><strong>Eingereicht am:</strong> ${formatDate(review.submittedAt)}</p>
-                    </div>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="editUserReview(${review.id})">Bewertung bearbeiten</button>
-                        <button class="btn btn-secondary" onclick="verifyUserReview(${review.id})">Bewertung verifizieren</button>
-                        <button class="btn" style="background: #dc3545; color: white;" onclick="deleteUserReview(${review.id})">Bewertung löschen</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function editUserReview(reviewId) {
-            alert(`Bearbeitungsformular für Bewertung #${reviewId} würde hier geöffnet.`);
-        }
-        
-        function verifyUserReview(reviewId) {
-            const review = reviewDatabase.find(r => r.id === reviewId);
-            if (review) {
-                alert(`Verifizierung für Bewertung #${reviewId} wurde angefordert. Der Seitenbetreiber wird Ihre Unterlagen prüfen.`);
-            }
-        }
- 
-        function deleteUserReview(reviewId) {
-            if (confirm(`Sind Sie sicher, dass Sie Ihre Bewertung #${reviewId} löschen möchten?`)) {
-                const reviewIndex = reviewDatabase.findIndex(r => r.id === reviewId);
-                if (reviewIndex > -1) {
-                    reviewDatabase.splice(reviewIndex, 1);
-                    alert('Ihre Bewertung wurde gelöscht.');
-                    document.querySelector('.modal').remove();
-                }
-            }
-        }
-
-        // Contact User Function
-        function contactUser(reviewId) {
-            const review = reviewDatabase.find(r => r.id === reviewId);
-            if (!review) return;
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'block';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>Nutzer kontaktieren</h2>
-                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-                    </div>
-                    <form id="contact-user-form">
-                        <div class="form-group">
-                            <label>E-Mail-Adresse des Nutzers</label>
-                            <input type="email" value="${review.email}" readonly style="background: #f8f9fa;">
-                        </div>
-						<div class="form-group">
-							<label>Betreff</label>
-							<input type="text" id="contact-subject" value="Ihre Bewertung - ${review.companyName}" required>
-						</div>
-                        <div class="form-group">
-                            <label>Nachricht *</label>
-                            <textarea id="contact-message" rows="6" placeholder="Ihr Anliegen..." required></textarea>
-                        </div>
-                        <div style="display: flex; gap: 1rem;">
-                            <button type="submit" class="btn btn-primary">E-Mail senden</button>
-                            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Abbrechen</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            // Form submission handler
-            document.getElementById('contact-user-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                sendContactEmail(reviewId, review.email, 
-                    document.getElementById('contact-subject').value,
-                    document.getElementById('contact-message').value
-                );
-            });
-        }
-
-		// Contact Job Creator Function
-		function contactJobCreator(jobId) {
-			const job = jobDatabase.find(j => j.id === jobId);
-			if (!job) return;
-			
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			modal.innerHTML = `
-				<div class="modal-content">
-					<div class="modal-header">
-						<h2>Stellenangebot-Ersteller kontaktieren</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<form id="contact-job-creator-form">
-						<div class="form-group">
-							<label>E-Mail-Adresse des Erstellers</label>
-							<input type="email" value="${job.contactEmail || 'Nicht verfügbar'}" readonly style="background: #f8f9fa;">
-						</div>
-						<div class="form-group">
-							<label>Betreff</label>
-							<input type="text" id="job-contact-subject" value="Ihr Stellenangebot - ${job.companyName}" required>
-						</div>
-						<div class="form-group">
-							<label>Nachricht *</label>
-							<textarea id="job-contact-message" rows="6" placeholder="Ihr Anliegen..." required></textarea>
-						</div>
-						<div style="display: flex; gap: 1rem;">
-							<button type="submit" class="btn btn-primary">E-Mail senden</button>
-							<button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Abbrechen</button>
-						</div>
-					</form>
-				</div>
-			`;
-			document.body.appendChild(modal);
-			
-			// Form submission handler
-			document.getElementById('contact-job-creator-form').addEventListener('submit', function(e) {
-				e.preventDefault();
-				sendJobCreatorEmail(jobId, job.contactEmail, 
-					document.getElementById('job-contact-subject').value,
-					document.getElementById('job-contact-message').value
-				);
-			});
-		}
-
-		function sendJobCreatorEmail(jobId, creatorEmail, subject, message) {
-			const adminEmail = "admin@pharmafaro.de";
-			
-			alert(`E-Mail erfolgreich gesendet!\n\nEmpfänger: ${creatorEmail}\nBetreff: ${subject}\n\nSie erhalten eine Bestätigungs-E-Mail an ${adminEmail}`);
-			
-			document.querySelector('.modal').remove();
-		}
-
-        function sendContactEmail(reviewId, userEmail, subject, message) {
-            // Simulate email sending
-            const adminEmail = "admin@pharmaziepraktikum.de";
-            
-            alert(`E-Mail erfolgreich gesendet!\n\nEmpfänger: ${userEmail}\nBetreff: ${subject}\n\nSie erhalten eine Bestätigungs-E-Mail an ${adminEmail}`);
-            
-            // Close modal
-            document.querySelector('.modal').remove();
-        }
-        
-		function previewJob(jobId) {
-			const job = jobDatabase.find(j => j.id === jobId);
-			if (!job) {
-				alert('Stellenangebot nicht gefunden.');
-				return;
-			}
-			
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 900px; width: 90%; max-height: 90vh;">
-					<div class="modal-header">
-						<h2>Vorschau: Stellenangebot #${jobId}</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body" style="overflow-y: auto;">
-						${createJobCard(job)}
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Schließen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-		}
-        
 		function convertToPublicJob(adminJob) {
 			const workingHours = formatWorkingHoursForDisplay(adminJob.workingHoursData || []);
 			
@@ -4940,7 +4676,8 @@
 			
 			displayActiveFilters();
 			updateResetButtonVisibility();
-			applyFilters();			
+			applyFilters();
+			applySorting();			
 		}
 
         function displayJobActiveFilters() {
@@ -4987,6 +4724,7 @@
             displayJobActiveFilters();
             updateJobResetButtonVisibility();
             filterJobs();
+            applyJobSorting();
         }
 
         function updateJobResetButtonVisibility() {
@@ -5607,13 +5345,17 @@
 			const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear);
 			const overallRating = calculateOverallRating(reviewData.ratings);
 			
+			const miniSafeCompany = escapeHtml(reviewData.companyName);
+			const miniSafeCategory = escapeHtml(reviewData.category);
+			const miniSafeFeedback = reviewData.feedback ? escapeHtml(reviewData.feedback) : '';
+
 			return `
 				<div class="review-card" style="margin: 0; transform: scale(0.85); transform-origin: top left;">
 					<div class="review-header">
 						<div class="company-info">
-							<h3 style="margin: 0;">${reviewData.companyName}</h3>
+							<h3 style="margin: 0;">${miniSafeCompany}</h3>
 							<div class="company-badges">
-								<div class="category-badge">${reviewData.category}</div>
+								<div class="category-badge">${miniSafeCategory}</div>
 							</div>
 						</div>
 						<div style="text-align: center;">
@@ -5627,11 +5369,11 @@
 							<span class="salary-badge ${salaryBadge.class}">${reviewData.salary}€</span>
 						</div>
 					</div>
-					${reviewData.feedback ? `
+					${miniSafeFeedback ? `
 						<div class="comments-section">
 							<div class="comment-item">
 								<div class="comment-label">Lob/Kritik:</div>
-								<div class="comment-text">${reviewData.feedback.substring(0, 100)}${reviewData.feedback.length > 100 ? '...' : ''}</div>
+								<div class="comment-text">${miniSafeFeedback.substring(0, 100)}${miniSafeFeedback.length > 100 ? '...' : ''}</div>
 							</div>
 						</div>
 					` : ''}
@@ -6143,27 +5885,6 @@
 			`;
 			
 			document.body.appendChild(modal);
-		}
-
-		function sendContactMessage(companyName) {
-			const subject = document.getElementById('contact-subject').value;
-			const message = document.getElementById('contact-message').value;
-			
-			if (!subject || !message) {
-				alert('Bitte füllen Sie alle Felder aus.');
-				return;
-			}
-			
-			document.querySelector('.modal').remove();
-			alert(`Nachricht an ${companyName} wurde versendet!`);
-		}
-
-		function toggleCompanyStatus(companyName) {
-			const company = Object.values(companiesData).find(c => c.name === companyName);
-			if (company) {
-				company.status = company.status === 'inactive' ? 'active' : 'inactive';
-				alert(`${companyName} wurde ${company.status === 'active' ? 'aktiviert' : 'deaktiviert'}.`);
-			}
 		}
 
         function toggleDistanceSorting() {
@@ -7857,24 +7578,18 @@
 
 				// Frühester Beginn Filter
 				const startFilter = activeJobAdvancedFilters.find(f => f.startsWith('Frühester Beginn:'));
-				console.log('activeJobAdvancedFilters:', JSON.stringify(activeJobAdvancedFilters));
-				console.log('startFilter:', startFilter);
 				if (startFilter) {
 					const jobStart = job.getAttribute('data-earliest-start') || '';
-					console.log('jobStart from DOM:', jobStart);
 					if (startFilter === 'Frühester Beginn: Flexibel') {
 						if (jobStart.toLowerCase() !== 'flexibel') showJob = false;
 					} else {
 						const match = startFilter.match(/ab (\d{2})\/(\d{4})/);
-						console.log('regex match on filter:', match);
 						if (match) {
 							const filterDate = parseInt(match[2]) * 12 + parseInt(match[1]);
 							if (jobStart && jobStart.toLowerCase() !== 'flexibel') {
 								const startMatch = jobStart.match(/(\d{2})\/(\d{4})/);
-								console.log('regex match on jobStart:', startMatch);
 								if (startMatch) {
 									const jobDate = parseInt(startMatch[2]) * 12 + parseInt(startMatch[1]);
-									console.log('jobDate:', jobDate, 'filterDate:', filterDate, 'showJob bleibt:', jobDate >= filterDate);
 									if (jobDate < filterDate) showJob = false;
 								} else {
 									showJob = false;
@@ -7951,7 +7666,6 @@
 					}
 				}
 
-				console.log('display gesetzt auf:', showJob ? 'block' : 'none', '| data-earliest-start:', job.getAttribute('data-earliest-start'));
 				job.style.display = showJob ? 'block' : 'none';
             });
 
@@ -8778,6 +8492,7 @@
 				document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
 				document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 				document.querySelectorAll('.dropdown-content a').forEach(a => a.classList.remove('active'));
+				document.body.classList.remove('write-active');
 				document.getElementById('landing-section').classList.add('active');
 				currentSection = 'landing';
 				if (!isPopState) history.pushState({ section: 'landing' }, '', '#landing');
@@ -8905,6 +8620,7 @@
 			document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
 			document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 			document.querySelectorAll('.dropdown-content a').forEach(a => a.classList.remove('active'));
+			document.body.classList.toggle('write-active', section === 'write');
 			
 			document.getElementById(section + '-section').classList.add('active');
 			
@@ -10448,46 +10164,9 @@
 
         // Initialisierung
 		document.addEventListener('DOMContentLoaded', function() {
-			// NUR ZUM TESTEN - DANACH WIEDER ENTFERNEN
-			localStorage.removeItem('internship-guide-content');
-			localStorage.removeItem('internship-tips-content');
-
 		
 			// Suchfeld leeren beim Laden
-			document.getElementById('company-search').value = '';			
-			
-			// Beispieldaten zu Admin-Datenbanken hinzufügen
-			reviewsData.forEach((review, index) => {
-				const adminReview = {
-					...review,
-					id: index + 1,
-					email: `reviewer${index + 1}@example.com`,
-					submittedAt: new Date().toISOString(),
-					status: 'active',
-					activatedAt: new Date().toISOString(),
-					editedAt: null,
-					deactivatedAt: null,
-					reportedAt: null
-				};
-				reviewDatabase.push(adminReview);
-			});
-			
-			jobsData.forEach((job, index) => {
-				const adminJob = {
-					...job,
-					id: index + 1,
-					submittedAt: new Date(Date.now() - job.postedDays * 24 * 60 * 60 * 1000).toISOString(),
-					status: 'active',
-					activatedAt: new Date().toISOString(),
-					deactivatedAt: null,
-					reportedAt: null
-				};
-				jobDatabase.push(adminJob);
-			});
-			
-			// Update next IDs
-			nextReviewId = reviewDatabase.length + 1;
-			nextJobId = jobDatabase.length + 1;		
+			document.getElementById('company-search').value = '';					
 
 			// Lade Reviews vom Backend
 			async function loadReviewsFromBackend() {
