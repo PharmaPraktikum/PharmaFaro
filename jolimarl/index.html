@@ -2891,6 +2891,7 @@
 						<div class="form-group">
 							<label>E-Mail-Adresse der Ansprechperson *</label>
 							<input type="email" required id="job-contact-email" placeholder="z.B. mueller@marktapotheke.de">
+							<small style="color: var(--mid); font-size: 0.82rem; margin-top: 0.4rem; display: block;">Der Name und die E-Mail-Adresse der Ansprechperson werden im veröffentlichten Stellenangebot angezeigt und sind damit öffentlich sichtbar.</small>
 						</div>
 
 						<div class="form-group">
@@ -2968,13 +2969,13 @@
 				<p><strong>PharmaFaro.de</strong></p>
 				<br>
 				<p><strong>Angaben gemäß § 5 TMG:</strong></p>
-				<p>Marlon Krompholz<br>Otto-Himmel-Weg 1<br>38104 Braunschweig<br>Deutschland</p>
+				<p>Marlon Krompholz<br>Davidstraße 5a<br>27313 Dörverden<br>Deutschland</p>
 				<br>
 				<p><strong>Kontakt:</strong></p>
 				<p>E-Mail: info@pharmafaro.de</p>
 				<br>
 				<p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong></p>
-				<p>Marlon Krompholz<br>Otto-Himmel-Weg 1<br>38104 Braunschweig<br>Deutschland</p>
+				<p>Marlon Krompholz<br>Davidstraße 5a<br>27313 Dörverden<br>Deutschland</p>
 			</div>
 		</div>
 	</div>
@@ -3528,6 +3529,30 @@
         let jobDatabase = [];
         let nextJobId = 1;
 
+		function showToast(message, type = 'info', duration = 4000) {
+			const existing = document.getElementById('pf-toast');
+			if (existing) existing.remove();
+			const colors = {
+				success: { bg: '#fdecea', border: 'var(--red)', icon: '✓', iconBg: 'var(--red)', iconColor: 'white' },
+				error:   { bg: '#fff3f3', border: '#c0392b', icon: '✕', iconBg: '#c0392b', iconColor: 'white' },
+				warning: { bg: '#fff8ec', border: '#e67e22', icon: '!', iconBg: '#e67e22', iconColor: 'white' },
+				info:    { bg: '#f0f4ff', border: 'var(--dark)', icon: 'i', iconBg: 'var(--dark)', iconColor: 'white' }
+			};
+			const c = colors[type] || colors.info;
+			const toast = document.createElement('div');
+			toast.id = 'pf-toast';
+			toast.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);z-index:99999;background:${c.bg};border:1.5px solid ${c.border};border-radius:12px;padding:1rem 1.5rem;max-width:480px;width:90%;display:flex;align-items:flex-start;gap:0.75rem;box-shadow:0 8px 32px rgba(42,18,16,0.15);font-family:'DM Sans',sans-serif;animation:toastIn 0.25s ease;`;
+			toast.innerHTML = `<div style="width:24px;height:24px;border-radius:50%;background:${c.iconBg};color:${c.iconColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0;">${c.icon}</div><p style="margin:0;color:var(--dark);font-size:0.92rem;line-height:1.5;flex:1;">${message}</p><button onclick="this.closest('#pf-toast').remove()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--mid);padding:0;line-height:1;flex-shrink:0;">&times;</button>`;
+			if (!document.getElementById('pf-toast-style')) {
+				const style = document.createElement('style');
+				style.id = 'pf-toast-style';
+				style.textContent = '@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(1rem)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+				document.head.appendChild(style);
+			}
+			document.body.appendChild(toast);
+			setTimeout(() => toast?.remove(), duration);
+		}
+
 		function escapeHtml(str) {
 			if (!str) return '';
 			return String(str)
@@ -3674,6 +3699,7 @@
 						id: data.id || 'N/A',
 						editToken: data.editToken || '',
 						deactivateToken: data.deactivateToken || '',
+						deleteToken: data.deleteToken || '',
 						reason: data.reason || '',
 						baseUrl: baseUrl
 					})
@@ -3699,7 +3725,7 @@
 			// Prüfe ob Bescheinigung hochgeladen wurde
 			const certificateFile = document.getElementById('verification-file').files[0];
 			if (!certificateFile) {
-				alert('Bitte laden Sie eine Praktikumsbescheinigung hoch. Dies ist verpflichtend zur Verifizierung.');
+				showToast('Bitte laden Sie eine Praktikumsbescheinigung hoch. Dies ist verpflichtend zur Verifizierung.', 'warning');
 				return null;
 			}
 
@@ -3717,7 +3743,7 @@
 					.neq('status', 'deleted');
 				
 				if (existingReviews && existingReviews.length > 0) {
-					alert('Sie haben bereits eine Bewertung für dieses Unternehmen abgegeben. Es ist nicht zulässig, mehrere Bewertungen für das gleiche Unternehmen abzugeben. Sollten Sie versuchen, dieses Gebot zu umgehen, wird die Bewertung nachträglich entfernt.');
+					showToast('Sie haben bereits eine Bewertung für dieses Unternehmen abgegeben. Mehrfachbewertungen sind nicht zulässig.', 'warning');
 					return null;
 				}
 			} catch (error) {
@@ -3728,7 +3754,7 @@
 			const result = await window.api.createReview(formData);
 			
 			if (!result.success) {
-				alert('Fehler beim Einreichen der Bewertung: ' + result.error);
+				showToast('Fehler beim Einreichen der Bewertung: ' + result.error, 'error');
 				return null;
 			}			
 			
@@ -3750,7 +3776,7 @@
 			
 			// Füge NICHT zu reviewDatabase hinzu - kommt erst nach Admin-Aktivierung
 			// Return ID für Success-Message
-			return result.data.id;
+			return result.data;
 		}
 
 		function formatWorkingHoursForDisplay(workingHoursData) {
@@ -3876,7 +3902,7 @@
 			if (document.getElementById('job-spec-sonstige')?.checked && specSonstige) {
 				specializationsChecked.push(specSonstige);
 			}
-			const specializations = specializationsChecked.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ');
+			const specializations = specializationsChecked.map(s => getSpecializationLabel(s)).join(', ');
 
 			// Customer Type - Slider bei Offizin
 			let customerType = '';
@@ -3987,10 +4013,31 @@
         
 		async function submitJobToDatabase(formData) {
 			
+			// Backend-Check für Duplikate bei Stellenangeboten
+			try {
+				const { data: existingJobs } = await window.supabase
+					.from('jobs')
+					.select('id')
+					.ilike('company_name', formData.companyName)
+					.ilike('address', formData.address)
+					.eq('salary', formData.salary)
+					.eq('earliest_start', formData.earliestStart || '')
+					.eq('status', 'active');
+
+				if (existingJobs && existingJobs.length > 0) {
+					showToast('Für dieses Unternehmen existiert bereits ein identisches aktives Stellenangebot (gleicher Unternehmensname, gleiche Adresse, gleiches Gehalt und gleicher frühester Beginn). Bitte prüfen Sie, ob Ihr Angebot bereits veröffentlicht wurde.', 'warning', 7000);
+					submitBtn.disabled = false;
+					submitBtn.textContent = 'Stellenangebot einreichen';
+					return;
+				}
+			} catch (dupError) {
+				console.error('Fehler bei Job-Duplikat-Prüfung:', dupError);
+			}
+
 			const result = await window.api.createJob(formData);
 			
 			if (!result.success) {
-				alert('Fehler beim Einreichen des Stellenangebots: ' + result.error);
+				showToast('Fehler beim Einreichen des Stellenangebots: ' + result.error, 'error');
 				return null;
 			}
 			
@@ -4033,7 +4080,7 @@
 			const wordCount = address.split(/[\s,]+/).filter(w => w.length > 1).length;
 			
 			if (wordCount === 1 && address.length < 6) {
-				validationDiv.innerHTML = '<span style="color: #ff9800;">💡 Bitte geben Sie mehr Details ein (Hausnummer, Stadt)</span>';
+				validationDiv.innerHTML = '<span style="color: #ff9800;">Bitte geben Sie mehr Details ein (Straße, Stadt)</span>';
 				return;
 			}
 			
@@ -4373,7 +4420,7 @@
 		function previewReview(reviewId) {
 			const review = reviewDatabase.find(r => r.id === reviewId);
 			if (!review) {
-				alert('Bewertung nicht gefunden. ID: ' + reviewId);
+				showToast('Bewertung nicht gefunden.', 'error');
 				return;
 			}
 			
@@ -5097,7 +5144,7 @@
 			);
 			
 			if (!company) {
-				alert('Unternehmen nicht gefunden.');
+				showToast('Unternehmen nicht gefunden.', 'error');
 				return;
 			}
 			
@@ -5294,7 +5341,7 @@
 			);
 			
 			if (!company || !company.verified) {
-				alert('Kontaktinformationen sind nur für verifizierte Unternehmen verfügbar.');
+				showToast('Kontaktinformationen sind nur für verifizierte Unternehmen verfügbar.', 'info');
 				return;
 			}
 			
@@ -5810,7 +5857,7 @@
 		function showCompanyReviewIds(companyName) {
 			const company = Object.values(companiesData).find(c => c.name === companyName);
 			if (!company || !company.reviews || company.reviews.length === 0) {
-				alert(`Keine Bewertungen für ${companyName} gefunden.`);
+				showToast(`Keine Bewertungen für ${companyName} gefunden.`, 'info');
 				return;
 			}
 			
@@ -5844,7 +5891,7 @@
 		function showCompanyJobIds(companyName, type) {
 			const company = Object.values(companiesData).find(c => c.name === companyName);
 			if (!company || !company.jobs) {
-				alert(`Keine Stellenangebote für ${companyName} gefunden.`);
+				showToast(`Keine Stellenangebote für ${companyName} gefunden.`, 'info');
 				return;
 			}
 			
@@ -5856,7 +5903,7 @@
 			}
 			
 			if (jobs.length === 0) {
-				alert(`Keine ${type === 'active' ? 'aktiven' : 'abgelaufenen'} Stellenangebote für ${companyName} gefunden.`);
+				showToast(`Keine ${type === 'active' ? 'aktiven' : 'abgelaufenen'} Stellenangebote für ${companyName} gefunden.`, 'info');
 				return;
 			}
 			
@@ -7229,12 +7276,6 @@
 							<div class="comment-text">${truncateText(reviewData.highlights, 300, `highlights-${reviewData.id}`)}</div>
 						</div>
 						` : ''}
-                        ${reviewData.benefits ? `
-                        <div class="comment-item">
-                            <div class="comment-label">Benefits:</div>
-                            <div class="comment-text">${safeBenefits}</div>
-                        </div>
-                        ` : ''}
                     </div>
                 </div>
             `;
@@ -7712,14 +7753,14 @@
 			
 			for (let rating of requiredRatings) {
 				if (!ratings[rating] || ratings[rating] === 0) {
-					alert('Bitte bewerten Sie alle erforderlichen Kategorien mit Sternen.');
+					showToast('Bitte bewerten Sie alle erforderlichen Kategorien mit Sternen.', 'warning');
 					return;
 				}
 			}
 			
 			// Aufgaben-Validierung
 			if (!document.getElementById('tasks').value.trim()) {
-				alert('Bitte beschreiben Sie die im Praktikum absolvierten Aufgaben.');
+				showToast('Bitte beschreiben Sie die im Praktikum absolvierten Aufgaben.', 'warning');
 				return;
 			}
 			
@@ -7731,7 +7772,7 @@
 					document.querySelector('.working-hours-end').value.trim();
 				
 				if (!hasValidWorkingHours) {
-					alert('Bitte geben Sie mindestens eine Arbeitszeit an.');
+					showToast('Bitte geben Sie mindestens eine Arbeitszeit an.', 'warning');
 					return;
 				}
 			}
@@ -7745,7 +7786,8 @@
 			try {
 				// Bewertungsdaten sammeln und verarbeiten
 				const formData = collectReviewFormData();
-				const reviewId = await submitReviewToDatabase(formData);
+				const reviewResult = await submitReviewToDatabase(formData);
+				const reviewId = reviewResult?.id;
 				if (!reviewId) {
 					if (submitBtn) {
 						submitBtn.disabled = false;
@@ -7758,7 +7800,9 @@
 				await sendConfirmationEmail('review_submitted', {
 					email: formData.email,
 					companyName: formData.companyName,
-					id: typeof reviewId === 'string' ? reviewId.substring(0, 8) : reviewId
+					id: typeof reviewId === 'string' ? reviewId.substring(0, 8) : reviewId,
+					deleteToken: reviewResult?.delete_token || '',
+					editToken: reviewResult?.edit_token || '',
 				});
 
 				// Zeige schönes Success-Modal mit Konfetti
@@ -7775,7 +7819,7 @@
 				document.querySelectorAll('.star-rating .star').forEach(star => star.classList.remove('filled'));
 				
 			} catch(err) {
-				alert('Fehler beim Einreichen: ' + err.message);
+				showToast('Fehler beim Einreichen: ' + err.message, 'error');
 			} finally {
 				if (submitBtn) {
 					submitBtn.disabled = false;
@@ -7817,7 +7861,7 @@
 					document.getElementById('job-spec-sonstige-field').style.display = 'none';
 				}
 			} catch(err) {
-				alert('Fehler: ' + err.message);
+				showToast('Fehler: ' + err.message, 'error');
 			} finally {
 				if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Stellenangebot einreichen'; }
 			}
@@ -7853,12 +7897,12 @@
 				
 				if (error) throw error;
 				
-				alert('Ihre Meldung wurde erfolgreich eingereicht und wird geprüft.');
+				showToast('Ihre Meldung wurde erfolgreich eingereicht und wird geprüft.', 'success');
 				closeModal('report-modal');
 				this.reset();
 				resetReportModal();
 			} catch(err) {
-				alert('Fehler beim Einreichen der Meldung: ' + err.message);
+				showToast('Fehler beim Einreichen der Meldung: ' + err.message, 'error');
 			} finally {
 				if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Meldung einreichen'; }
 			}
@@ -7962,7 +8006,7 @@
             const countryInput = document.getElementById('country-input');
             
             if (this.value === 'Ausland') {
-                countryField.style.display = 'block';
+                countryField.style.display = 'flex';
                 countryInput.required = true;
             } else {
                 countryField.style.display = 'none';
@@ -7977,7 +8021,7 @@
             const countryInput = document.getElementById('job-country-input');
             
             if (this.value === 'Ausland') {
-                countryField.style.display = 'block';
+                countryField.style.display = 'flex';
                 countryInput.required = true;
             } else {
                 countryField.style.display = 'none';
@@ -8830,8 +8874,7 @@
 				const scored = reviews
 					.filter(r => {
 						const vals = Object.values(r.ratings || {}).filter(v => typeof v === 'number');
-						const avg = vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
-						return avg >= 3;
+						return vals.length > 0;
 					})
 					.map(r => {
 						const vals = Object.values(r.ratings || {}).filter(v => typeof v === 'number');
@@ -9573,7 +9616,7 @@
 			const reason = document.getElementById('award-reason').value.trim();
 			
 			if (!companyName || !companyAddress || !reason) {
-				alert('Bitte alle Felder ausfüllen.');
+				showToast('Bitte füllen Sie alle Felder aus.', 'warning');
 				return;
 			}
 			
@@ -10247,7 +10290,8 @@
 							contactEmail: job.contact_email,
 							workingHours: formatWorkingHoursForDisplay(job.working_hours_data || []).regular || [],
 							saturdayHours: formatWorkingHoursForDisplay(job.working_hours_data || []).saturday || [],
-							earliestStart: job.earliest_start || ''
+							earliestStart: job.earliest_start || '',
+							specializations: job.specializations || ''
 						};
 						
 						jobsData.push(formattedJob);
@@ -10350,9 +10394,63 @@
 			// Lade neue Jobs vom Backend
 			loadJobsFromBackend();		
 
+			function showConfirmModal(title, message, onConfirm) {
+				const existing = document.getElementById('pf-confirm-overlay');
+				if (existing) existing.remove();
+				const modal = document.createElement('div');
+				modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;';
+				modal.id = 'pf-confirm-overlay';
+				modal.innerHTML = '<div style="background:white;padding:2rem;border-radius:16px;max-width:500px;width:90%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.2);">' +
+					'<div style="width:60px;height:60px;background:#ffc107;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.8rem;color:#333;">&#9888;</div>' +
+					'<h2 style="margin:0 0 1rem;color:#333;font-size:1.5rem;">' + title + '</h2>' +
+					'<p style="margin:0 0 2rem;color:#666;line-height:1.6;">' + message + '</p>' +
+					'<div style="display:flex;gap:1rem;justify-content:center;">' +
+					'<button id="pf-cancel-btn" style="flex:1;background:#e0e0e0;color:#333;border:none;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;cursor:pointer;">Abbrechen</button>' +
+					'<button id="pf-confirm-btn" style="flex:1;background:#b83228;color:white;border:none;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;cursor:pointer;">Bestätigen</button>' +
+					'</div></div>';
+				document.body.appendChild(modal);
+				document.getElementById('pf-cancel-btn').addEventListener('click', function() {
+					document.getElementById('pf-confirm-overlay').remove();
+				});
+				document.getElementById('pf-confirm-btn').addEventListener('click', function() {
+					document.getElementById('pf-confirm-overlay').remove();
+					onConfirm();
+				});
+			}
+
 			// ========== JOB DEAKTIVIERUNG PRÜFEN ==========
 			(async function checkJobDeactivation() {
 				const urlParams = new URLSearchParams(window.location.search);
+
+				// ── Bewertung löschen via Token ──
+				const deleteReviewToken = urlParams.get('delete_review');
+				if (deleteReviewToken) {
+					history.replaceState({}, '', window.location.pathname);
+					setTimeout(function() {
+						showConfirmModal(
+							'Bewertung löschen?',
+							'Möchten Sie Ihre Bewertung wirklich unwiderruflich löschen?',
+							async function() {
+								try {
+									const { error } = await window.supabase
+										.from('reviews')
+										.update({ status: 'deleted' })
+										.eq('delete_token', deleteReviewToken)
+										.neq('status', 'deleted');
+
+									if (!error) {
+										showToast('Ihre Bewertung wurde erfolgreich gelöscht.', 'success', 6000);
+									} else {
+										showToast('Bewertung nicht gefunden oder bereits gelöscht.', 'error');
+									}
+								} catch (e) {
+									showToast('Fehler beim Löschen der Bewertung.', 'error');
+								}
+							}
+						);
+					}, 800);
+				}
+
 				const deactivateToken = urlParams.get('deactivate_job');
 				
 				if (deactivateToken) {
@@ -10360,7 +10458,7 @@
 						const jobResult = await window.api.getJobByDeactivateToken(deactivateToken);
 						
 						if (!jobResult.success) {
-							alert('Job nicht gefunden oder bereits deaktiviert.');
+							showToast('Stellenangebot nicht gefunden oder bereits deaktiviert.', 'error');
 							window.history.replaceState({}, document.title, window.location.pathname);
 							return;
 						}
@@ -10382,7 +10480,7 @@
 										window.location.reload();
 									}, 2000);
 								} else {
-									alert('Fehler: ' + result.error);
+									showToast('Fehler: ' + result.error, 'error');
 								}
 								window.history.replaceState({}, document.title, window.location.pathname);
 							}
@@ -10392,31 +10490,10 @@
 						
 					} catch (error) {
 						console.error('Fehler bei Job-Deaktivierung:', error);
-						alert('Ein Fehler ist aufgetreten.');
+						showToast('Ein Fehler ist aufgetreten.', 'error');
 					}
 				}
 			})();
-
-			function showConfirmModal(title, message, onConfirm) {
-				const modal = document.createElement('div');
-				modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;';
-				
-				modal.innerHTML = '<div style="background:white;padding:2rem;border-radius:16px;max-width:500px;width:90%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.2);">' +
-					'<div style="width:60px;height:60px;background:#ffc107;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:2rem;">⚠️</div>' +
-					'<h2 style="margin:0 0 1rem;color:#333;font-size:1.5rem;">' + title + '</h2>' +
-					'<p style="margin:0 0 2rem;color:#666;line-height:1.6;">' + message + '</p>' +
-					'<div style="display:flex;gap:1rem;justify-content:center;">' +
-					'<button onclick="this.closest(\'div\').parentElement.remove()" style="flex:1;background:#e0e0e0;color:#333;border:none;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;cursor:pointer;">Abbrechen</button>' +
-					'<button id="confirm-btn" style="flex:1;background:#dc3545;color:white;border:none;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;cursor:pointer;">Deaktivieren</button>' +
-					'</div></div>';
-				
-				document.body.appendChild(modal);
-				
-				document.getElementById('confirm-btn').addEventListener('click', function() {
-					modal.remove();
-					onConfirm();
-				});
-			}
 
 			// ========== UNTERNEHMENSBEARBEITUNG PRÜFEN ==========
 			(async function checkCompanyEdit() {
@@ -10428,7 +10505,7 @@
 						const result = await window.api.getCompanyByEditToken(editToken);
 						
 						if (!result.success) {
-							alert('Unternehmen nicht gefunden oder nicht verifiziert.');
+							showToast('Unternehmen nicht gefunden oder nicht verifiziert.', 'error');
 							return;
 						}
 						
@@ -10437,7 +10514,7 @@
 						
 					} catch (error) {
 						console.error('Fehler beim Laden des Unternehmens:', error);
-						alert('Ein Fehler ist aufgetreten.');
+						showToast('Ein Fehler ist aufgetreten.', 'error');
 					}
 				}
 			})();
@@ -10448,6 +10525,9 @@
 			
 			renderReviews();
 			renderJobs();
+			
+			landingReviewsLoaded = false;
+			loadLandingHighlightReviews();			
 
 			// Standard-Sortierung SOFORT anwenden - NACH dem Rendering
 			const sortSelect = document.getElementById('sort-select');
@@ -10675,7 +10755,7 @@
 				
 			} catch (err) {
 				console.error('Fehler beim Verifizierungsantrag:', err);
-				alert('Fehler beim Einreichen: ' + err.message);
+				showToast('Fehler beim Einreichen: ' + err.message, 'error');
 			} finally {
 				submitBtn.disabled = false;
 				submitBtn.textContent = 'Verifizierung beantragen';
@@ -10715,9 +10795,9 @@
 			}
 
 			const htmlContent = 
-				'<div style="background:var(--bg);border-radius:16px;max-width:640px;width:95%;max-height:95vh;overflow-y:auto;margin:1rem auto;border:1px solid var(--border);box-shadow:0 20px 60px rgba(42,18,16,0.14);">' +
-				// Header braun
-				'<div style="background:linear-gradient(135deg,var(--dark),#3d1a17);border-radius:16px 16px 0 0;padding:1.5rem 2rem;border-bottom:3px solid var(--red);display:flex;justify-content:space-between;align-items:center;">' +
+				'<div style="background:var(--bg);border-radius:16px;max-width:640px;width:95%;max-height:95vh;overflow-y:auto;margin:1rem auto;border:1px solid var(--border);box-shadow:0 20px 60px rgba(42,18,16,0.14);display:flex;flex-direction:column;">' +
+				// Header braun - sticky
+				'<div style="background:linear-gradient(135deg,var(--dark),#3d1a17);border-radius:16px 16px 0 0;padding:1.5rem 2rem;border-bottom:3px solid var(--red);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">' +
 				'<h2 style="margin:0;font-family:\'Fraunces\',serif;color:white;letter-spacing:-0.02em;font-size:1.3rem;">Unternehmensseite bearbeiten</h2>' +
 				'<button onclick="closeCompanyEditModal()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;opacity:0.7;line-height:1;padding:0;">&times;</button>' +
 				'</div>' +
@@ -10879,11 +10959,11 @@
 							window.location.reload(); // Reload um neue Daten zu zeigen
 						}, 2000);
 					} else {
-						alert('Fehler: ' + result.error);
+						showToast('Fehler: ' + result.error, 'error');
 					}
 				} catch (error) {
 					console.error('Fehler beim Speichern:', error);
-					alert('Fehler beim Speichern der Daten.');
+					showToast('Fehler beim Speichern der Daten.', 'error');
 				} finally {
 					submitBtn.disabled = false;
 					submitBtn.textContent = 'Änderungen speichern';
