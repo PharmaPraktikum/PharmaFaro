@@ -10809,9 +10809,8 @@
 				'<h3 style="margin-top:0;font-family:\'DM Sans\',sans-serif;font-weight:600;color:var(--dark);">Profilbild</h3>' +
 				'<div style="display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;">' +
 				'<img id="company-logo-preview" src="' + (logoUrl || 'https://via.placeholder.com/100/28a745/ffffff?text=' + initial) + '" style="width:100px;height:100px;border-radius:50%;object-fit:cover;flex-shrink:0;">' +
-				'<div id="cropper-container" style="display:none;width:100%;max-width:300px;">' +
-				'<div style="width:100%;max-height:300px;overflow:hidden;">' +
-				'<img id="cropper-image" style="max-width:100%;display:block;max-height:300px;">' +
+				'<div id="cropper-container" style="display:none;width:100%;max-width:300px;height:300px;position:relative;">' +
+				'<img id="cropper-image" style="display:block;max-width:100%;">' +
 				'</div>' +
 				'<div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:center;align-items:center;">' +
 				'<button type="button" id="crop-zoom-out" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;">−</button>' +
@@ -10891,6 +10890,9 @@
 						zoomable: true,
 						wheelZoomRatio: 0.1,
 						ready: function() {
+							// Originalbild verstecken
+							const img = document.getElementById('cropper-image');
+							if (img) img.style.opacity = '0';
 							// Runden Ausschnitt per CSS
 							const cropBox = document.querySelector('.cropper-crop-box');
 							if (cropBox) {
