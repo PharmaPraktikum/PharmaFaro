@@ -10808,20 +10808,19 @@
 				'<div style="background:white;padding:1.5rem;border-radius:10px;margin-bottom:1.5rem;border:1px solid var(--border);">' +
 				'<h3 style="margin-top:0;font-family:\'DM Sans\',sans-serif;font-weight:600;color:var(--dark);">Profilbild</h3>' +
 				'<div style="display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;">' +
-				'<img id="company-logo-preview" src="' + (logoUrl || 'https://via.placeholder.com/100/28a745/ffffff?text=' + initial) + '" style="width:100px;height:100px;border-radius:50%;object-fit:cover;flex-shrink:0;">' +
-				'<div id="cropper-container" style="display:none;width:100%;max-width:300px;height:300px;position:relative;">' +
-				'<img id="cropper-image" style="display:block;max-width:100%;">' +
+				'<img id="company-logo-preview" src="' + (logoUrl || '') + '" style="width:100px;height:100px;border-radius:50%;object-fit:cover;' + (logoUrl ? '' : 'display:none;') + '">' +
+				'<div id="logo-canvas-container" style="display:none;flex-direction:column;align-items:center;gap:0.75rem;">' +
+				'<canvas id="logo-canvas" width="280" height="280" style="border-radius:50%;border:2px solid var(--border);cursor:move;touch-action:none;"></canvas>' +
+				'<div style="display:flex;gap:0.5rem;">' +
+				'<button type="button" id="crop-zoom-out" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;font-weight:600;">−</button>' +
+				'<button type="button" id="crop-zoom-in" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;font-weight:600;">+</button>' +
 				'</div>' +
-				'<div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:center;align-items:center;">' +
-				'<button type="button" id="crop-zoom-out" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;">−</button>' +
-				'<button type="button" id="crop-zoom-in" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;">+</button>' +				
-				'</div>' +
-				'<div style="display:flex;gap:0.5rem;margin-top:0.5rem;justify-content:center;">' +
-				'<button type="button" id="crop-confirm-btn" style="background:var(--red);color:white;border:none;padding:0.5rem 1.25rem;border-radius:8px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Ausschnitt übernehmen</button>' +
-				'<button type="button" id="crop-cancel-btn" style="background:white;color:var(--dark);border:1.5px solid var(--border);padding:0.5rem 1.25rem;border-radius:8px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Abbrechen</button>' +
+				'<div style="display:flex;gap:0.5rem;">' +
+				'<button type="button" id="crop-confirm-btn" style="background:var(--red);color:white;border:none;padding:0.5rem 1.25rem;border-radius:8px;font-weight:600;cursor:pointer;">Ausschnitt übernehmen</button>' +
+				'<button type="button" id="crop-cancel-btn" style="background:white;color:var(--dark);border:1.5px solid var(--border);padding:0.5rem 1.25rem;border-radius:8px;font-weight:600;cursor:pointer;">Abbrechen</button>' +
 				'</div></div>' +
 				'<div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">' +
-				'<input type="file" id="company-logo-upload" accept=".jpg,.jpeg,.png,.svg" style="box-sizing:border-box;">' +
+				'<input type="file" id="company-logo-upload" accept=".jpg,.jpeg,.png" style="box-sizing:border-box;">' +
 				'<p style="color:#666;font-size:0.9rem;margin:0;">Empfohlen: 200x200px, JPG oder PNG</p>' +
 				'</div></div></div>' +
 				// Unternehmensinformationen
@@ -10865,75 +10864,108 @@
 			modal.innerHTML = htmlContent;
 			document.body.appendChild(modal);
 			
-			let cropperInstance = null;
+			// ── Eigene Canvas-basierte Bild-Crop-Lösung ──
+			let logoImg = null;
+			let logoScale = 1;
+			let logoOffsetX = 0;
+			let logoOffsetY = 0;
+			let logoDragging = false;
+			let logoDragStartX = 0;
+			let logoDragStartY = 0;
+
+			function drawLogoCanvas() {
+				const canvas = document.getElementById('logo-canvas');
+				if (!canvas || !logoImg) return;
+				const ctx = canvas.getContext('2d');
+				const size = canvas.width;
+				ctx.clearRect(0, 0, size, size);
+				// Kreismaske
+				ctx.save();
+				ctx.beginPath();
+				ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+				ctx.clip();
+				// Hintergrund
+				ctx.fillStyle = '#f5f5f5';
+				ctx.fillRect(0, 0, size, size);
+				// Bild zentriert zeichnen
+				const drawW = logoImg.width * logoScale;
+				const drawH = logoImg.height * logoScale;
+				const x = size / 2 - drawW / 2 + logoOffsetX;
+				const y = size / 2 - drawH / 2 + logoOffsetY;
+				ctx.drawImage(logoImg, x, y, drawW, drawH);
+				ctx.restore();
+			}
 
 			document.getElementById('company-logo-upload').addEventListener('change', function(e) {
 				const file = e.target.files[0];
 				if (!file) return;
 				const reader = new FileReader();
 				reader.onload = function(event) {
-					const cropperContainer = document.getElementById('cropper-container');
-					const cropperImage = document.getElementById('cropper-image');
-					const preview = document.getElementById('company-logo-preview');
-					if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
-					cropperImage.src = event.target.result;
-					cropperContainer.style.display = 'block';
-					preview.style.display = 'none';
-					cropperInstance = new Cropper(cropperImage, {
-						aspectRatio: 1,
-						viewMode: 0,
-						dragMode: 'move',
-						autoCropArea: 0.8,
-						cropBoxResizable: true,
-						cropBoxMovable: true,
-						toggleDragModeOnDblclick: false,
-						zoomable: true,
-						wheelZoomRatio: 0.1,
-						ready: function() {
-							// Originalbild verstecken
-							const img = document.getElementById('cropper-image');
-							if (img) img.style.opacity = '0';
-							// Runden Ausschnitt per CSS
-							const cropBox = document.querySelector('.cropper-crop-box');
-							if (cropBox) {
-								cropBox.style.borderRadius = '50%';
-								const face = cropBox.querySelector('.cropper-face');
-								if (face) face.style.borderRadius = '50%';
-								const viewBoxes = cropBox.querySelectorAll('.cropper-view-box, .cropper-dashed');
-								viewBoxes.forEach(el => el.style.borderRadius = '50%');
-							}
-						}
-					});
+					logoImg = new Image();
+					logoImg.onload = function() {
+						const canvas = document.getElementById('logo-canvas');
+						const size = canvas.width;
+						// Automatische Anfangsgröße: Bild füllt den Kreis
+						const fit = Math.max(size / logoImg.width, size / logoImg.height);
+						logoScale = fit;
+						logoOffsetX = 0;
+						logoOffsetY = 0;
+						document.getElementById('logo-canvas-container').style.display = 'flex';
+						document.getElementById('company-logo-preview').style.display = 'none';
+						drawLogoCanvas();
+					};
+					logoImg.src = event.target.result;
 				};
 				reader.readAsDataURL(file);
 			});
 
+			// Drag per Maus
+			const canvas = document.getElementById('logo-canvas');
+			canvas.addEventListener('mousedown', function(e) {
+				logoDragging = true;
+				logoDragStartX = e.clientX - logoOffsetX;
+				logoDragStartY = e.clientY - logoOffsetY;
+			});
+			canvas.addEventListener('mousemove', function(e) {
+				if (!logoDragging) return;
+				logoOffsetX = e.clientX - logoDragStartX;
+				logoOffsetY = e.clientY - logoDragStartY;
+				drawLogoCanvas();
+			});
+			canvas.addEventListener('mouseup', function() { logoDragging = false; });
+			canvas.addEventListener('mouseleave', function() { logoDragging = false; });
+
+			// Zoom per Mausrad
+			canvas.addEventListener('wheel', function(e) {
+				e.preventDefault();
+				logoScale *= e.deltaY < 0 ? 1.05 : 0.95;
+				drawLogoCanvas();
+			}, { passive: false });
+
+			document.getElementById('crop-zoom-in').addEventListener('click', function() {
+				logoScale *= 1.1;
+				drawLogoCanvas();
+			});
+			document.getElementById('crop-zoom-out').addEventListener('click', function() {
+				logoScale *= 0.9;
+				drawLogoCanvas();
+			});
+
 			document.getElementById('crop-confirm-btn').addEventListener('click', function() {
-				if (!cropperInstance) return;
-				const canvas = cropperInstance.getCroppedCanvas({ width: 200, height: 200, imageSmoothingQuality: 'high' });
+				const canvas = document.getElementById('logo-canvas');
 				const preview = document.getElementById('company-logo-preview');
 				preview.src = canvas.toDataURL('image/jpeg', 0.9);
 				preview.style.display = 'block';
-				document.getElementById('cropper-container').style.display = 'none';
-				cropperInstance.destroy();
-				cropperInstance = null;
+				document.getElementById('logo-canvas-container').style.display = 'none';
+				document.getElementById('company-logo-upload').value = '';
+				logoImg = null;
 			});
 
 			document.getElementById('crop-cancel-btn').addEventListener('click', function() {
-				if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
-				document.getElementById('cropper-container').style.display = 'none';
+				document.getElementById('logo-canvas-container').style.display = 'none';
 				document.getElementById('company-logo-preview').style.display = 'block';
 				document.getElementById('company-logo-upload').value = '';
-			});
-
-			document.getElementById('crop-zoom-in').addEventListener('click', function() {
-				if (!cropperInstance) return;
-				cropperInstance.zoom(0.1);
-			});
-
-			document.getElementById('crop-zoom-out').addEventListener('click', function() {
-				if (!cropperInstance) return;
-				cropperInstance.zoom(-0.1);
+				logoImg = null;
 			});
 			
 			document.getElementById('company-edit-form').addEventListener('submit', async function(e) {
