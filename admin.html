@@ -2914,8 +2914,23 @@
 								<span class="detail-label">Bundesland:</span>
 								<span class="detail-value">${review.state}</span>
 								
+								${review.country ? `
+								<span class="detail-label">Land:</span>
+								<span class="detail-value">${review.country}</span>
+								` : ''}
+								
 								<span class="detail-label">Kategorie:</span>
 								<span class="detail-value">${review.category}</span>
+								
+								${review.area ? `
+								<span class="detail-label">Bereich:</span>
+								<span class="detail-value">${review.area}</span>
+								` : ''}
+								
+								${review.internship_year ? `
+								<span class="detail-label">Praktikumsjahr:</span>
+								<span class="detail-value">${review.internship_year}</span>
+								` : ''}
 							</div>
 						</div>
 						
@@ -2930,6 +2945,21 @@
 								
 								<span class="detail-label">Benefits:</span>
 								<span class="detail-value">${review.benefits || 'Keine angegeben'}</span>
+								
+								${review.specializations ? `
+								<span class="detail-label">Spezialisierungen:</span>
+								<span class="detail-value">${review.specializations}</span>
+								` : ''}
+								
+								${review.customer_type ? `
+								<span class="detail-label">Kundschaftstyp:</span>
+								<span class="detail-value">${review.customer_type}</span>
+								` : ''}
+								
+								${review.working_hours_data && review.working_hours_data.length > 0 ? `
+								<span class="detail-label">Arbeitszeiten:</span>
+								<span class="detail-value">${review.working_hours_data.map(w => w.start + ' – ' + w.end + (w.isSaturday ? ' (Sa)' : '')).join(', ')}</span>
+								` : ''}
 							</div>
 						</div>
 						
@@ -3094,6 +3124,41 @@
 								
 								<span class="detail-label">Kontakt-E-Mail:</span>
 								<span class="detail-value">${job.contact_email}</span>
+								
+								${job.saturday_work !== undefined ? `
+								<span class="detail-label">Samstagsarbeit:</span>
+								<span class="detail-value">${job.saturday_work}x pro Monat</span>
+								` : ''}
+								
+								${job.earliest_start ? `
+								<span class="detail-label">Frühester Beginn:</span>
+								<span class="detail-value">${job.earliest_start}</span>
+								` : ''}
+								
+								${job.benefits ? `
+								<span class="detail-label">Benefits:</span>
+								<span class="detail-value">${job.benefits}</span>
+								` : ''}
+								
+								${job.specializations ? `
+								<span class="detail-label">Spezialisierungen:</span>
+								<span class="detail-value">${job.specializations}</span>
+								` : ''}
+								
+								${job.customer_type ? `
+								<span class="detail-label">Kundschaftstyp:</span>
+								<span class="detail-value">${job.customer_type}</span>
+								` : ''}
+								
+								${job.area ? `
+								<span class="detail-label">Bereich:</span>
+								<span class="detail-value">${job.area}</span>
+								` : ''}
+								
+								${job.working_hours_data && job.working_hours_data.length > 0 ? `
+								<span class="detail-label">Arbeitszeiten:</span>
+								<span class="detail-value">${job.working_hours_data.map(w => w.start + ' – ' + w.end + (w.isSaturday ? ' (Sa)' : '')).join(', ')}</span>
+								` : ''}
 							</div>
 						</div>
 						
@@ -3101,6 +3166,13 @@
 							<h3>📝 Stellenbeschreibung</h3>
 							<p style="line-height: 1.6; white-space: pre-wrap;">${job.description}</p>
 						</div>
+						
+						${job.application_notes ? `
+						<div class="detail-section">
+							<h3>📬 Bewerbungshinweise</h3>
+							<p style="line-height: 1.6; white-space: pre-wrap;">${job.application_notes}</p>
+						</div>
+						` : ''}
 						
 						<div class="detail-section">
 							<h3>ℹ️ System-Informationen</h3>
