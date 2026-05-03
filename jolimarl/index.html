@@ -10546,6 +10546,9 @@
 			function waitForSupabaseAndLoad() {
 				if (typeof window.supabase !== 'undefined' && typeof loadVerifiedCompaniesCache === 'function') {
 					loadVerifiedCompaniesCache().then(() => {
+						renderReviews();
+						renderJobs();
+						filterAllCompanies();
 						
 						// Re-render Reviews komplett
 						const reviewsContainer = document.getElementById('reviews-container');
@@ -10776,23 +10779,6 @@
 			const logoUrl = company.company_logo_url || '';
 			const companyName = company.company_name || '';
 			const initial = companyName.charAt(0).toUpperCase();
-			
-			// Cropper.js laden falls noch nicht vorhanden
-			if (!window.Cropper) {
-				const cropperCss = document.createElement('link');
-				cropperCss.rel = 'stylesheet';
-				cropperCss.href = 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css';
-				document.head.appendChild(cropperCss);
-				const cropperOverride = document.createElement('style');
-				cropperOverride.textContent = '.cropper-dashed { display: none !important; } .cropper-line { display: none !important; } .cropper-point { display: none !important; }';
-				document.head.appendChild(cropperOverride);
-				await new Promise(resolve => {
-					const cropperJs = document.createElement('script');
-					cropperJs.src = 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js';
-					cropperJs.onload = resolve;
-					document.head.appendChild(cropperJs);
-				});
-			}
 
 			const htmlContent = 
 				'<div style="background:var(--bg);border-radius:16px;max-width:640px;width:95%;max-height:95vh;overflow-y:auto;margin:1rem auto;border:1px solid var(--border);box-shadow:0 20px 60px rgba(42,18,16,0.14);display:flex;flex-direction:column;">' +
