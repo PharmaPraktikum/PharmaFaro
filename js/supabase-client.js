@@ -11,5 +11,3 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // Erstelle Supabase Client
 export const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-
-console.log('✅ PharmaFaro – Supabase Client initialisiert');
