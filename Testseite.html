@@ -2,6 +2,9 @@
 <html lang="de">
 <head>
 	<meta charset="UTF-8">
+	<link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="512x512" href="./favicon-512.png">
+    <link rel="apple-touch-icon" href="./favicon-512.png">
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src https://*.supabase.co https://nominatim.openstreetmap.org; img-src 'self' data: https:;">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -10,7 +13,6 @@
 		import { supabase } from './js/supabase-client.js';
 		import * as api from './js/api.js';
 		
-		// Mache API global verfügbar
 		window.supabase = supabase;
 		window.api = api;
 	</script>	
@@ -2491,11 +2493,11 @@
 				<div class="container">
 					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
 						<h2>Praktikumsleitfaden</h2>
-						<button class="btn btn-primary" onclick="downloadGuidePDF()">PDF herunterladen</button>
+						<button class="btn btn-primary" onclick="downloadGuidePDF()">Leitfaden herunterladen</button>
 					</div>
 					<p style="color: #666; margin-bottom: 1rem;">Stand: 15. März 2024</p>
 					
-					<div style="background: var(--bg-card); padding: 3rem; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05); line-height: 1.6;">
+					<div id="guide-content-display" style="background: var(--bg-card); padding: 3rem; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05); line-height: 1.6;">
 						<h3>1. Allgemeine Bestimmungen</h3>
 						<p>Das Pharmaziepraktikum dauert zwölf Monate und gliedert sich in zwei Abschnitte von je sechs Monaten. Der erste Abschnitt ist in einer öffentlichen Apotheke, der zweite kann wahlweise in einer öffentlichen Apotheke, einer Krankenhausapotheke oder in der pharmazeutischen Industrie absolviert werden.</p>
 						
@@ -3453,7 +3455,6 @@
 	</div>
 
     <script>
-		// Globaler Tooltip für Salary Badges — verhindert Abschneiden
 		(function() {
 			const tip = document.createElement('div');
 			tip.id = 'global-salary-tooltip';
@@ -3514,18 +3515,15 @@
 				setTimeout(() => { tip.style.display = 'none'; }, 150);
 			});
 		})();
-        // Globale Variablen
         let currentSection = 'landing';
         let ratings = {};
 		let minRatingFilter = 0;
 		let activeAdvancedFilters = [];
         let activeJobAdvancedFilters = [];
 
-        // Simulated Database
         let reviewDatabase = [];
         let nextReviewId = 1;
 
-        // Job Database
         let jobDatabase = [];
         let nextJobId = 1;
 
@@ -3580,7 +3578,6 @@
 			return clean.startsWith('http') ? clean : 'https://' + clean;
 		}
         
-        // Simulate review submission
 		function collectReviewFormData() {
 			const workingTimeType = document.getElementById('working-time-type').value;
 			let workingHoursData = [];
@@ -3606,7 +3603,6 @@
 				});
 			}
 			
-			// Spezialisierungen sammeln
 			let specializations = '';
 			if (document.getElementById('company-category').value === 'offizin') {
 				const specBoxes = document.querySelectorAll('#specializations-field input[type="checkbox"]:checked');
@@ -3619,7 +3615,6 @@
 				specializations = specs.join(', ');
 			}
 			
-			// Kundschaft
 			let customerType = '';
 			if (document.getElementById('company-category').value === 'offizin') {
 				const customerValue = document.getElementById('customer-type-value').value;
@@ -3627,7 +3622,6 @@
 				customerType = customerTypes[parseInt(customerValue)];
 			}
 			
-			// Benefits sammeln
 			let benefits = '';
 			const benefitBoxes = document.querySelectorAll('#benefits-field input[type="checkbox"]:checked');
 			if (benefitBoxes.length > 0) {
@@ -3722,18 +3716,15 @@
 		};
         
 		async function submitReviewToDatabase(formData) {
-			// Prüfe ob Bescheinigung hochgeladen wurde
 			const certificateFile = document.getElementById('verification-file').files[0];
 			if (!certificateFile) {
 				showToast('Bitte laden Sie eine Praktikumsbescheinigung hoch. Dies ist verpflichtend zur Verifizierung.', 'warning');
 				return null;
 			}
 
-			// Prüfe auf Duplikat (gleiche E-Mail + gleiches Unternehmen)
 			const email = document.getElementById('reviewer-email').value.toLowerCase();
 			const companyName = document.getElementById('company-name').value;
 
-			// Backend-Check für Duplikate
 			try {
 				const { data: existingReviews } = await window.supabase
 					.from('reviews')
@@ -3750,7 +3741,6 @@
 				console.error('Fehler bei Duplikat-Prüfung:', error);
 			}
 			
-			// Erstelle Review im Backend
 			const result = await window.api.createReview(formData);
 			
 			if (!result.success) {
@@ -3758,11 +3748,9 @@
 				return null;
 			}			
 			
-			// Upload PDF
 			const uploadResult = await window.api.uploadCertificate(certificateFile, result.data.id);
 			
 			if (uploadResult.success) {
-				// Update Review mit PDF-URL
 				await window.supabase
 					.from('reviews')
 					.update({ 
@@ -3774,8 +3762,6 @@
 				console.error('❌ PDF-Upload fehlgeschlagen:', uploadResult.error);
 			}
 			
-			// Füge NICHT zu reviewDatabase hinzu - kommt erst nach Admin-Aktivierung
-			// Return ID für Success-Message
 			return result.data;
 		}
 
@@ -3865,7 +3851,6 @@
 
 			const category = document.getElementById('job-company-category')?.value || '';
 
-			// Area - je nach Kategorie
 			let area = '';
 			if (category === 'industrie') {
 				const val = document.getElementById('job-industry-area')?.value || '';
@@ -3874,7 +3859,6 @@
 				area = getAreaLabel(document.getElementById('job-university-area')?.value || '');
 			}
 
-			// Benefits - direkt über ID
 			const benefitsChecked = [];
 			const benefitsField = document.getElementById('job-benefits-field');
 			if (benefitsField) {
@@ -3884,14 +3868,12 @@
 					}
 				});
 			}
-			// Sonstige Benefits
 			const benefitsSonstige = document.getElementById('job-benefits-sonstige-input')?.value || '';
 			if (document.getElementById('job-benefits-sonstige')?.checked && benefitsSonstige) {
 				benefitsChecked.push(benefitsSonstige);
 			}
 			const benefits = benefitsChecked.map(b => b.charAt(0).toUpperCase() + b.slice(1)).join(', ');
 
-			// Specializations
 			const specializationsChecked = [];
 			document.querySelectorAll('#job-specializations-field input[type="checkbox"]:checked').forEach(cb => {
 				if (cb.id !== 'job-spec-sonstige') {
@@ -3904,7 +3886,6 @@
 			}
 			const specializations = specializationsChecked.map(s => getSpecializationLabel(s)).join(', ');
 
-			// Customer Type - Slider bei Offizin
 			let customerType = '';
 			if (category === 'offizin') {
 				const sliderValue = document.getElementById('job-customer-type-value')?.value || '1';
@@ -4006,14 +3987,12 @@
 			return match ? match[0] : '';
 		}
 
-		// Jahres-Dropdown beim ersten Laden befüllen
 		document.addEventListener('DOMContentLoaded', function() {
 			initJobStartYears();
 		});
         
 		async function submitJobToDatabase(formData) {
 			
-			// Backend-Check für Duplikate bei Stellenangeboten
 			try {
 				const { data: existingJobs } = await window.supabase
 					.from('jobs')
@@ -4063,7 +4042,7 @@
 		}
 
 		let addressValidationTimeout;
-		let jobAddressValidationTimeout; // Separate Variable für Jobs
+		let jobAddressValidationTimeout; 
 
 		async function validateAddress(address, targetId) {
 			clearTimeout(addressValidationTimeout);
@@ -4075,7 +4054,6 @@
 				return;
 			}
 			
-			// Hilfreicher Hinweis bei zu kurzen Eingaben
 			const hasNumber = /\d/.test(address);
 			const wordCount = address.split(/[\s,]+/).filter(w => w.length > 1).length;
 			
@@ -4088,10 +4066,8 @@
 			
 			addressValidationTimeout = setTimeout(async () => {
 				try {
-					// Füge "Deutschland" hinzu für bessere Ergebnisse
 					let searchQuery = address;
 					const parts = address.split(/[\s,]+/).filter(p => p.length > 0);
-					// Wenn weniger als 3 Teile (z.B. nur "straße ort"), füge Deutschland hinzu
 					if (parts.length < 3) {
 						searchQuery = address + ', Deutschland';
 					}
@@ -4116,7 +4092,6 @@
 						return;
 					}
 					
-					// Nur Straßenadressen
 					const validResults = data.filter(item => 
 						item.address && 
 						item.address.road && 
@@ -4128,7 +4103,6 @@
 						return;
 					}
 					
-					// User-Keywords extrahieren
 					const userKeywords = address
 						.toLowerCase()
 						.split(/[\s,]+/)
@@ -4147,23 +4121,20 @@
 						let score = 0;
 						let matchedKeywords = 0;
 						
-						// Score für jedes Keyword
 						for (const keyword of userKeywords) {
 							let keywordMatched = false;
 							
-							// STRASSE - mit Teilwort-Matching
 							if (road.includes(keyword)) {
 								if (road === keyword) {
-									score += 100; // Exakt
+									score += 100; 
 								} else if (road.startsWith(keyword)) {
-									score += 80; // Beginnt mit
+									score += 80; 
 								} else {
-									score += 50; // Enthält
+									score += 50; 
 								}
 								keywordMatched = true;
 							}
 							
-							// STADT - mit Teilwort-Matching
 							if (city === keyword || city.startsWith(keyword) || keyword.startsWith(city.substring(0, Math.min(keyword.length, city.length)))) {
 								if (city === keyword) {
 									score += 100;
@@ -4175,7 +4146,6 @@
 								keywordMatched = true;
 							}
 							
-							// PLZ - mit Teilwort-Matching
 							if (postcode.includes(keyword)) {
 								if (postcode === keyword) {
 									score += 90;
@@ -4187,7 +4157,6 @@
 								keywordMatched = true;
 							}
 							
-							// HAUSNUMMER
 							if (houseNum && houseNum === keyword) {
 								score += 60;
 								keywordMatched = true;
@@ -4198,9 +4167,7 @@
 							}
 						}
 						
-						// WICHTIG: Nur Adressen wo ALLE Keywords matchen
 						if (matchedKeywords === userKeywords.length) {
-							// Bonus: Vollständige Adresse
 							if (road && houseNum && city && postcode) {
 								score += 50;
 							}
@@ -4284,14 +4251,12 @@
 		}		
 
 		function switchCompanyTab(event, tabId) {
-			// Deaktiviere alle Tabs
 			const modal = event.target.closest('.modal-content');
 			if (!modal) return;
 			
 			modal.querySelectorAll('.company-tab').forEach(tab => tab.classList.remove('active'));
 			modal.querySelectorAll('.company-tab-content').forEach(content => content.classList.remove('active'));
 			
-			// Aktiviere gewählten Tab
 			event.target.classList.add('active');
 			const content = modal.querySelector('#' + tabId);
 			if (content) {
@@ -4299,7 +4264,6 @@
 			}
 		}
 
-		// Neue Hilfsfunktion hinzufügen:
 		function createCompanyPageHTML(company, customDescription) {
 			const tempCompany = {...company};
 			if (customDescription) {
@@ -4385,7 +4349,6 @@
 			const tempCompany = {...company};
 			tempCompany.description = customDescription;
 			
-			// Verwende die gleiche Struktur wie createCompanyPage, aber vereinfacht
 			return `
 				<div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
 					<img src="${tempCompany.profileImage}" style="width: 100px; height: 100px; border-radius: 50%;">
@@ -4424,7 +4387,6 @@
 				return;
 			}
 			
-			// Konvertiere Review für Anzeige (füge fehlende Felder hinzu)
 			const formattedHours = formatWorkingHoursForDisplay(review.workingHoursData || []);
 			
 			const reviewForDisplay = {
@@ -4481,8 +4443,6 @@
 		}
  
 		function viewCertificate(filename) {
-			// Simuliere das Öffnen der Datei
-			// In einer echten Implementierung würde hier die Datei vom Server geladen
 			
 			const modal = document.createElement('div');
 			modal.className = 'modal';
@@ -4635,7 +4595,6 @@
             return labels[value] || value;
         }
         
-        // User Token Generation
         function generateUserToken(reviewId) {
             return 'user_' + reviewId + '_' + Math.random().toString(36).substr(2, 9);
         }
@@ -4677,10 +4636,8 @@
 			return publicJob;
 		}
 		
-        // Beispiel-Bewertungsdaten
 		const reviewsData = [];
 
-        // Beispiel-Stellenangebote-Daten (gleiche Struktur wie reviewsData)
 		const jobsData = [];
 
         function displayActiveFilters() {
@@ -4718,8 +4675,6 @@
 				document.getElementById('radius-plz').value = '';
 				document.getElementById('radius-distance').value = '5';
 			}
-			// Kategorie-Filter bleibt beim Entfernen eines kategoriespezifischen Filters stehen
-			// (kein automatisches Entfernen von category-filter)
 			
 			displayActiveFilters();
 			updateResetButtonVisibility();
@@ -4791,7 +4746,6 @@
         }
 
         function resetAllJobFilters() {
-            // Grundfilter zurücksetzen
             document.getElementById('job-company-filter').value = '';
             document.getElementById('job-location-filter').value = '';
             document.getElementById('job-state-filter').value = '';
@@ -4799,16 +4753,13 @@
             document.getElementById('job-category-filter').value = '';
             document.getElementById('job-date-filter').value = '';
             
-            // Alle Jobs wieder anzeigen
             document.querySelectorAll('.job-card').forEach(job => {
                 job.style.display = 'block';
             });
             
-            // Erweiterte Filter zurücksetzen
             activeJobAdvancedFilters = [];
             displayJobActiveFilters();
 
-			// Alle Checkboxen im Job Advanced Modal zurücksetzen
 			document.querySelectorAll('#job-advanced-filters-modal input[type="checkbox"]').forEach(checkbox => {
 				checkbox.checked = false;
 			});
@@ -4821,14 +4772,11 @@
 			document.getElementById('job-filter-start-month').value = '';
 			document.getElementById('job-filter-start-year').value = '';		
 
-			// Keine Ergebnisse Meldung zurücksetzen
 			checkNoJobResults();
             
-            // Reset-Button verstecken und Filter anwenden
             updateJobResetButtonVisibility();
         }
 
-        // Sterne-Bewertung mit Hover-Effekt
 		document.addEventListener('mouseover', function(e) {
 			if (e.target && e.target.classList && e.target.classList.contains('star') && e.target.closest('.star-rating') && e.target.dataset.rating) {
 				const rating = parseInt(e.target.dataset.rating);
@@ -4869,7 +4817,6 @@
 			}
 		});
 
-        // Sterne-Bewertung Klick
 		document.addEventListener('click', function(e) {
 			if (e.target && e.target.classList && e.target.classList.contains('star') && e.target.dataset.rating) {
 				const rating = parseInt(e.target.dataset.rating);
@@ -4894,12 +4841,9 @@
 			}
 		});
 
-        // Modal-Funktionen
 		function showJobModal() {
-			// Formular komplett zurücksetzen
 			document.getElementById('job-form').reset();
 			
-			// Verstecke alle kategorie-spezifischen Felder
 			document.getElementById('job-specializations-field').style.display = 'none';
 			document.getElementById('job-industry-field').style.display = 'none';
 			document.getElementById('job-university-field').style.display = 'none';
@@ -4908,12 +4852,10 @@
 			document.getElementById('job-industry-sonstige-field').style.display = 'none';
 			document.getElementById('job-benefits-sonstige-field').style.display = 'none';
 			
-			// Entferne zusätzliche Arbeitszeitzeilen
 			const container = document.getElementById('job-fixed-hours-container');
 			container.querySelectorAll('.working-time-row').forEach((row, i) => {
 				if (i > 0) row.remove();
 			});
-			// Erste Zeile zurücksetzen
 			const firstRow = container.querySelector('.working-time-row');
 			if (firstRow) {
 				firstRow.querySelectorAll('input[type="text"]').forEach(inp => inp.value = '');
@@ -4922,16 +4864,13 @@
 
 			window.jobWorkingTimeRowCounter = 1;
 			
-			// Zeige Arbeitszeiten-Container
 			document.getElementById('job-fixed-hours-container').style.display = 'block';
 			
-			// Lösche Validierungsmeldungen
 			const addressValidation = document.getElementById('job-address-validation');
 			if (addressValidation) addressValidation.innerHTML = '';
 			
 			document.getElementById('job-modal').style.display = 'block';
 	
-			// Arbeitszeiten-Felder initial setzen
 			setTimeout(() => {
 				const jobWorkingTimeType = document.getElementById('job-working-time-type');
 				if (jobWorkingTimeType) {
@@ -4975,7 +4914,6 @@
             document.getElementById('report-form').reset();
         }
 
-		// Company Management System
 		let companiesData = {};
 
 		function createCompanyKey(companyName, address, state, country) {
@@ -5004,7 +4942,6 @@
 					createdAt: new Date().toISOString(),
 					status: 'active',
 					verified: false,
-					// Neue Felder für verifizierte Unternehmen
 					description: null,
 					contactPerson: null,
 					contactEmail: null,
@@ -5031,7 +4968,6 @@
 		}
 
 		function addReviewToCompany(reviewData) {
-			// Extrahiere Adressteile
 			const addressParts = reviewData.address.split(',');
 			const street = addressParts[0].trim();
 			const city = addressParts.length > 1 ? addressParts[1].trim() : '';
@@ -5039,7 +4975,7 @@
 			const company = getOrCreateCompany(
 				reviewData.companyName,
 				reviewData.address,
-				reviewData.state || '',  // ← reviewData.state direkt nutzen!
+				reviewData.state || '',  
 				reviewData.country || '',
 				reviewData.category
 			);
@@ -5052,7 +4988,6 @@
 		}
 
 		function addJobToCompany(jobData) {
-			// Extrahiere Adressteile
 			const addressParts = jobData.address.split(',');
 			const street = addressParts[0].trim();
 			const city = addressParts.length > 1 ? addressParts[1].trim() : '';
@@ -5060,14 +4995,13 @@
 			const company = getOrCreateCompany(
 				jobData.companyName,
 				jobData.address,
-				jobData.state || '',  // ← jobData.state direkt nutzen!
+				jobData.state || '',  
 				jobData.country || '',
 				jobData.category
 			);
 			
 			company.jobs.push(jobData);
 
-			// BPhD Award verlinken falls vorhanden
 			linkBphdAwardToCompany(company);
 		}
 
@@ -5148,28 +5082,22 @@
 				return;
 			}
 			
-			// Verstecke alle anderen Sektionen
 			document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
 			document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 			
-			// Markiere Wissenswert-Tab
 			const wissenswertsTab = document.getElementById('wissenswert-tab');
 			if (wissenswertsTab) {
 				wissenswertsTab.classList.add('active');
 			}
 
-			// Zeige Unternehmenssektion
 			const companySection = document.getElementById('company-section');
 			companySection.classList.add('active');
 			
-			// Generiere Inhalt
 			createCompanyPage(company);
 			
-			// Suchfeld leeren und verstecken
 			document.getElementById('company-search').value = '';
 			document.getElementById('search-suggestions').style.display = 'none';
 			
-			// Scroll zum Beginn der Unternehmensinfo
 			setTimeout(() => {
 				const hero = document.querySelector('.hero');
 				if (hero) {
@@ -5345,7 +5273,6 @@
 				return;
 			}
 			
-			// Baue Kontaktinformationen
 			let contactHTML = '<div style="background:#f8f9fa;padding:1.5rem;border-radius:10px;">';
 			contactHTML += '<h3 style="margin-top:0;color:#333;">Kontaktieren Sie ' + company.name + '</h3>';
 			
@@ -5447,7 +5374,6 @@
 			
 			showReviewsModal(`Alle Bewertungen für ${companyName}`, company.reviews);
 			
-			// Sortierung automatisch anwenden
 			setTimeout(() => {
 				const sortSelect = document.getElementById('reviews-modal-sort');
 				if (sortSelect) {
@@ -5462,7 +5388,6 @@
 			modal.className = 'modal';
 			modal.style.display = 'block';
 			
-			// Dynamische Grid-Spalten basierend auf Anzahl
 			const gridColumns = reviews.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(450px, 1fr))';
 			const modalWidth = reviews.length === 1 ? '800px' : '1400px';
 			
@@ -5543,7 +5468,6 @@
 			
 			document.body.appendChild(modal);
 			
-			// Sortierung automatisch anwenden
 			setTimeout(() => {
 				const sortSelect = document.getElementById('jobs-modal-sort');
 				if (sortSelect) {
@@ -5563,7 +5487,7 @@
 					case 'date-desc':
 						const daysA = parseInt(a.querySelector('.job-posted-date').textContent.match(/\d+/)[0]);
 						const daysB = parseInt(b.querySelector('.job-posted-date').textContent.match(/\d+/)[0]);
-						return daysA - daysB; // Aktueller (kleinere Zahl) zuerst
+						return daysA - daysB; 
 						
 					case 'salary-desc':
 						const salaryA = parseInt(a.querySelector('.salary-badge')?.textContent.replace(/\D/g, '') || '0');
@@ -5583,12 +5507,10 @@
 			jobs.forEach(job => container.appendChild(job));
 		}
 
-		// Company Search Functions
 		let searchTimeout;
 		function searchCompanies(query) {
 			clearTimeout(searchTimeout);
 			searchTimeout = setTimeout(() => {
-				// Trim query SOFORT
 				query = query.trim();
 				
 				if (query.length < 1) {
@@ -5605,7 +5527,6 @@
 						const addressParts = company.address.split(',');
 						const plzOrt = addressParts.length > 1 ? addressParts[1].trim() : '';
 						
-						// Hole vollständige Adresse für Ortsname-Extraktion
 						let fullAddress = company.address;
 						const review = reviewsData.find(r => r.companyName === company.name);
 						if (review && review.address) {
@@ -5617,7 +5538,6 @@
 							}
 						}
 						
-						// Extrahiere Ortsname aus vollständiger Adresse
 						let cityName = '';
 						let postalCode = '';
 						const fullAddressParts = fullAddress.split(',');
@@ -5636,13 +5556,11 @@
 						const companyNameLower = company.name.toLowerCase();
 						const plzOrtLower = plzOrt.toLowerCase();
 						
-						// Prüfe ob ALLE Suchbegriffe im Namen ODER in PLZ/Ort vorkommen
 						const nameMatches = searchTerms.every(term => companyNameLower.includes(term));
 						const locationMatches = searchTerms.every(term => 
 							plzOrtLower.includes(term) || cityName.includes(term) || postalCode.includes(term)
 						);
 						
-						// Kombinierte Suche: Name + Ort
 						const combinedMatches = searchTerms.every(term => 
 							companyNameLower.includes(term) || plzOrtLower.includes(term) || 
 							cityName.includes(term) || postalCode.includes(term)
@@ -5675,15 +5593,12 @@
 					})
 					.filter(item => item.score > 0)
 					.sort((a, b) => {
-						// Erst nach Score sortieren
 						if (b.score !== a.score) {
 							return b.score - a.score;
 						}
-						// Bei gleichem Score nach Bewertung
 						if (b.company.averageRating !== a.company.averageRating) {
 							return b.company.averageRating - a.company.averageRating;
 						}
-						// Bei gleicher Bewertung alphabetisch
 						return a.company.name.localeCompare(b.company.name);
 					});
 				showSearchResults(suggestions);
@@ -5694,7 +5609,6 @@
 			const input = document.getElementById('company-search');
 			input.placeholder = '';
 			
-			// Nur Vorschläge zeigen wenn bereits Text eingegeben wurde
 			if (input.value.trim().length > 0) {
 				searchCompanies(input.value);
 			}
@@ -5715,7 +5629,6 @@
 			const background = document.getElementById('search-suggestions-bg');
 			container.innerHTML = '';
 			
-			// Mobile: container aus Hero herauslösen und an body hängen
 			if (window.innerWidth <= 600) {
 				const input = document.getElementById('company-search');
 				const rect = input.getBoundingClientRect();
@@ -5740,17 +5653,14 @@
 					const borderStyle = index < displaySuggestions.length - 1 ? 'border-bottom: 1px solid #eee;' : '';
 					div.style.cssText = `padding: 0; height: 60px; box-sizing: border-box; ${borderStyle} cursor: pointer; background: white; color: #333 !important; font-size: 14px; transition: background-color 0.2s; display: flex; align-items: center; gap: 0.75rem; padding-left: 1rem; padding-right: 1rem;`;
 					
-					// Profilbild erstellen
 					const img = document.createElement('img');
 					img.src = item.company.profileImage;
 					img.style.cssText = 'width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; object-fit: cover;';
 					img.onerror = function() { this.style.display = 'none'; };
 					
-					// Text-Span erstellen
 					const textSpan = document.createElement('span');
 					textSpan.style.cssText = 'flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
 					
-					// Vollständige Adresse extrahieren
 					let fullAddress = '';
 					const review = reviewsData.find(r => r.companyName === item.company.name);
 					if (review && review.address) {
@@ -5803,11 +5713,9 @@
 
 					textSpan.replaceWith(contentDiv);
 					
-					// Elemente zusammenfügen
 					div.appendChild(img);
 					div.appendChild(contentDiv);
 					
-					// Hover-Effekte
 					div.addEventListener('mouseenter', function() {
 						this.style.backgroundColor = '#f8f9fa';
 					});
@@ -5839,7 +5747,6 @@
 			if (input.value.length >= 2) {
 				searchCompanies(input.value);
 			} else if (input.value.length === 0) {
-				// Zeige alle Unternehmen wenn leer
 				const allCompanies = Object.values(companiesData).slice(0, 5);
 				if (allCompanies.length > 0) {
 					showSearchResults(allCompanies);
@@ -5942,7 +5849,6 @@
                 distanceOption.style.display = 'block';
             } else {
                 distanceOption.style.display = 'none';
-                // Reset auf andere Sortierung wenn Entfernung ausgewählt war
                 const sortSelect = document.getElementById('sort-select');
                 if (sortSelect.value === 'distance-asc') {
                     sortSelect.value = 'rating-desc';
@@ -5951,29 +5857,24 @@
         }
 
         function resetAllFilters() {
-            // Grundfilter zurücksetzen
             document.getElementById('company-name-filter').value = '';
 			document.getElementById('location-filter').value = '';
 			document.getElementById('state-filter').value = '';
 
-			// Umkreissuche zurücksetzen
 			document.getElementById('radius-plz').value = '';
 			document.getElementById('radius-distance').value = '5';
 			document.getElementById('radius-plz-error').style.display = 'none';
             document.getElementById('salary-filter').value = '';
             document.getElementById('category-filter').value = '';
             
-            // Mindestbewertung zurücksetzen
             minRatingFilter = 0;
             document.querySelectorAll('#min-rating-filter .star').forEach(star => {
                 star.classList.remove('filled');
             });
             
-            // Erweiterte Filter zurücksetzen
             activeAdvancedFilters = [];
             displayActiveFilters();
             
-            // Alle Checkboxen im Advanced Modal zurücksetzen
             document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]').forEach(checkbox => {
                 checkbox.checked = false;
             });
@@ -5984,15 +5885,12 @@
 			document.getElementById('undertariff-salary-filter').checked = false;
 			document.getElementById('time-model-filter').value = '';			
             
-            // Alle Bewertungen wieder anzeigen
             document.querySelectorAll('.review-card').forEach(review => {
                 review.style.display = 'block';
             });
 
-			// Keine Ergebnisse Meldung zurücksetzen
 			checkNoResults();
             
-            // Reset-Button verstecken
             updateResetButtonVisibility();
             toggleDistanceSorting();
         }
@@ -6011,7 +5909,6 @@
         }
 
 
-        // Filter-Funktionen
         function applyFilters() {
             toggleDistanceSorting();
             updateResetButtonVisibility();			
@@ -6026,13 +5923,11 @@
             reviews.forEach(review => {
                 let showReview = true;
                 
-                // Mindestbewertung prüfen
 				if (minRatingFilter > 0) {
 					const ratingElement = review.querySelector('.rating-number');
 					if (ratingElement) {
 						const rating = parseFloat(ratingElement.textContent);
 						
-						// Berechne Mindest-Rating: Bei 5 Sternen Filter ab 4.5, bei 4 Sternen ab 3.5, etc.
 						const minRequiredRating = minRatingFilter - 0.5;
 
 						if (rating < minRequiredRating) {
@@ -6046,13 +5941,11 @@
 				'Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft',
 				'Sonstige Benefits'];
 
-				// Erweiterte Filter prüfen
 				activeAdvancedFilters.forEach(filter => {
-					// Diese Filter werden separat behandelt
 					if (['Bezahlung über Tarif', 'Angemessenes Gehalt', 'Tarifliches Mindestgehalt', 'Untertarifliche Bezahlung',
 						 'Ausgezeichnet vom BPhD', 'Verifiziertes Unternehmen', 'Feste Arbeitszeiten', 'Gleitzeit'].includes(filter)) return;
 					if (filter.startsWith('Im Umkreis von') || filter.startsWith('Bereich: ')) return;
-					if (catSpecificFilters.includes(filter)) return; // Kundschaft/Spezialisierung separat unten
+					if (catSpecificFilters.includes(filter)) return; 
 
 					const reviewText = review.textContent.toLowerCase();
 					const filterLower = filter.toLowerCase();
@@ -6062,7 +5955,6 @@
 					}
 				});
 
-				// Spezialisierungs-Filter (inkl. Sonstige)
 				const activeSpecFilters = activeAdvancedFilters.filter(f =>
 					['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung',
 					 'Klinikversorgung','Homöopathie','Ernährungsberatung'].includes(f)
@@ -6073,10 +5965,8 @@
 					if (!allMatch) showReview = false;
 				}
 				if (activeAdvancedFilters.includes('Sonstige Spezialisierung')) {
-					// Prüfe ob die Bewertung eine Spezialisierung hat, die NICHT in der Standardliste ist
 					const specEl = review.querySelector('.company-info p');
 					let hasSonstige = false;
-					// Alle p-Elemente in company-info durchsuchen
 					review.querySelectorAll('.company-info p').forEach(p => {
 						if (p.textContent.startsWith('Spezialisierungen:')) {
 							const specText = p.textContent.replace('Spezialisierungen:', '').trim();
@@ -6089,7 +5979,6 @@
 					if (!hasSonstige) showReview = false;
 				}
 
-				// Kundschafts-Filter
 				const activeKundschaftFilters = activeAdvancedFilters.filter(f =>
 					['Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft'].includes(f)
 				);
@@ -6104,7 +5993,6 @@
 					if (!kundschaftMatch) showReview = false;
 				}
 
-				// Sonstige Benefits Filter
 				if (activeAdvancedFilters.includes('Sonstige Benefits')) {
 					const standardBenefits = ['wohnung','sonderzahlungen','fort- und weiterbildungsangebot',
 						'fort- und weiterbildung','kantine','diplomarbeit','homeoffice'];
@@ -6119,15 +6007,12 @@
 					if (!hasSonstigeBenefits) showReview = false;
 				}
                 
-				// Grundfilter prüfen
 				const companyNameInput = document.getElementById('company-name-filter').value.trim();
 				if (companyNameInput) {
 					const reviewCompanyName = review.querySelector('.company-info h3').textContent.toLowerCase();
 					
-					// Splitte bei Leerzeichen und entferne leere Strings
 					const searchTerms = companyNameInput.toLowerCase().trim().split(/\s+/);
 					
-					// Prüfe ob ALLE Begriffe vorkommen
 					const allTermsMatch = searchTerms.every(term => reviewCompanyName.includes(term));
 					
 					if (!allTermsMatch) {
@@ -6135,21 +6020,17 @@
 					}
 				}
                 
-				// Location/PLZ Filter
 				if (location) {
 					const addressElement = review.querySelector('.company-info p');
 					if (addressElement) {
 						const addressText = addressElement.textContent.toLowerCase();
 						
-						// PLZ Check: Wenn nur Ziffern eingegeben, Prefix-Match
 						if (/^\d+$/.test(location)) {
-							// Finde PLZ in Adresse (5-stellige Zahl)
 							const plzMatch = addressText.match(/\b(\d{5})\b/);
 							if (!plzMatch || !plzMatch[1].startsWith(location)) {
 								showReview = false;
 							}
 						} else {
-							// Ortsname: Simple Text-Match (normalisiert für Umlaute)
 							const normalizedAddress = addressText.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 							const normalizedLocation = location.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 							if (!normalizedAddress.includes(normalizedLocation)) {
@@ -6183,7 +6064,6 @@
                     }
                 }
 
-				// Umkreissuche Filter (async - mit Batch Processing)
 				if (activeAdvancedFilters.some(f => f.startsWith('Im Umkreis von'))) {
 					const radiusFilter = activeAdvancedFilters.find(f => f.startsWith('Im Umkreis von'));
 					const radiusKm = parseInt(radiusFilter.match(/\d+/)[0]);
@@ -6219,7 +6099,6 @@
 					}
 				}
 
-				// Gehalts-Filter (OR-Logik: mind. eine aktive Kategorie muss passen)
 				const salaryCategories = ['Bezahlung über Tarif', 'Angemessenes Gehalt', 'Tarifliches Mindestgehalt', 'Untertarifliche Bezahlung'];
 				const activeSalaryFilters = activeAdvancedFilters.filter(f => salaryCategories.includes(f));
 				if (activeSalaryFilters.length > 0) {
@@ -6238,17 +6117,14 @@
 					}
 				}
 
-				// BPhD-Filter
 				if (activeAdvancedFilters.includes('Ausgezeichnet vom BPhD')) {
 					const reviewCompanyName = (review.getAttribute('data-company-name') || '').toLowerCase().trim();
-					// Direkt aus bphdAwardsDatabase
 					let hasBphd = false;
 					if (bphdAwardsDatabase && Object.keys(bphdAwardsDatabase).length > 0) {
 						hasBphd = Object.values(bphdAwardsDatabase).some(yearAwards =>
 							yearAwards.some(a => (a.companyName || '').toLowerCase().trim() === reviewCompanyName)
 						);
 					}
-					// Fallback: companiesData
 					if (!hasBphd) {
 						const comp = Object.values(companiesData).find(c => c.name.toLowerCase() === reviewCompanyName);
 						hasBphd = !!(comp && comp.bphdAwards && comp.bphdAwards.length > 0);
@@ -6256,15 +6132,12 @@
 					if (!hasBphd) showReview = false;
 				}
 
-				// Verifiziert-Filter
 				if (activeAdvancedFilters.includes('Verifiziertes Unternehmen')) {
 					const reviewCompanyName = (review.getAttribute('data-company-name') || '').toLowerCase().trim();
 					let isVerified = false;
-					// Direkt aus verifiedCompaniesCache
 					if (verifiedCompaniesCache && verifiedCompaniesCache.size > 0) {
 						isVerified = verifiedCompaniesCache.has(reviewCompanyName);
 					}
-					// Fallback: companiesData
 					if (!isVerified) {
 						const comp = Object.values(companiesData).find(c => c.name.toLowerCase() === reviewCompanyName);
 						isVerified = !!(comp && comp.verified);
@@ -6272,7 +6145,6 @@
 					if (!isVerified) showReview = false;
 				}
 
-				// Bereich-Filter (Industrie/Universität)
 				const bereichFilter = activeAdvancedFilters.find(f => f.startsWith('Bereich: '));
 				if (bereichFilter) {
 					const bereichValue = bereichFilter.replace('Bereich: ', '');
@@ -6281,7 +6153,6 @@
 					}
 				}
 
-				// Zeitmodell Filter
 				if (activeAdvancedFilters.includes('Feste Arbeitszeiten')) {
 					const reviewText = review.textContent.toLowerCase();
 					if (reviewText.includes('gleitzeit')) {
@@ -6296,7 +6167,7 @@
 				}
                 
 				if (showReview) {
-					review.style.display = 'block'; // Zeige alle gefilterten Reviews
+					review.style.display = 'block'; 
 					reviewsToSort.push(review);
 				} else {
 					review.style.display = 'none';
@@ -6305,7 +6176,6 @@
             
 			reviewsToSort.forEach(item => item.style.display = 'block');
 
-			// Warte auf alle Radius-Checks parallel
 			if (window.radiusPromises && window.radiusPromises.length > 0) {
 				Promise.all(window.radiusPromises).then(() => {
 					window.radiusPromises = [];
@@ -6364,16 +6234,14 @@
 			}
 		}		
 
-		// Geocoding-Cache für Performance (erweitert mit Timestamp)
 		let geocodeCache = {};
 
 		async function getCoordinates(location) {
-			// Cache-Check mit 24h Gültigkeit
 			const cacheKey = location.toLowerCase().trim();
 			if (geocodeCache[cacheKey]) {
 				const cached = geocodeCache[cacheKey];
 				const age = Date.now() - cached.timestamp;
-				if (age < 86400000) { // 24 Stunden
+				if (age < 86400000) { 
 					return cached.coords;
 				}
 			}
@@ -6404,7 +6272,7 @@
         }
 
         function calculateDistance(lat1, lng1, lat2, lng2) {
-            const R = 6371; // Erdradius in km
+            const R = 6371; 
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLng = (lng2 - lng1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -6419,7 +6287,6 @@
             const reviewCoords = await getCoordinates(reviewLocation);
             
             if (!searchCoords || !reviewCoords) {
-                // Fallback auf Text-Suche wenn Geocoding fehlschlägt
                 return reviewLocation.toLowerCase().includes(searchLocation.toLowerCase());
             }
             
@@ -6449,10 +6316,8 @@
 		}
 		
 		function showAdvancedFilters() {
-			// Modal-State synchronisieren
 			document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]').forEach(cb => cb.checked = false);
 			document.querySelectorAll('#advanced-filters-modal select').forEach(sel => sel.value = '');
-			// Alle ausklappbaren Abschnitte zuklappen
 			['offizin-content','industrie-content','universitaet-content'].forEach(id => {
 				const el = document.getElementById(id);
 				if (el) el.style.display = 'none';
@@ -6479,7 +6344,6 @@
 				'Überwiegend Laufkundschaft': 'laufkundschaft'
 			};
 			
-			// Bereich-Filter wiederherstellen
 			const bereichFilter = activeAdvancedFilters.find(f => f.startsWith('Bereich: '));
 			if (bereichFilter) {
 				const bereichVal = bereichFilter.replace('Bereich: ', '');
@@ -6526,7 +6390,6 @@
 				}
 			});
 
-			// Abschnitte aufklappen wenn aktive Filter vorhanden
 			const offizinActive = activeAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige','Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft'].includes(f));
 			const industrieActive = activeAdvancedFilters.some(f => f.startsWith('Bereich: ') && ['Qualitätskontrolle','Qualitätssicherung','Produktion','Zulassung','Forschung'].some(b => f.includes(b)));
 			const universitaetActive = activeAdvancedFilters.some(f => f.startsWith('Bereich: ') && ['Pharmazeutische','Medizinische','Pharmakologie','Pharmaziegeschichte'].some(b => f.includes(b)));
@@ -6536,13 +6399,11 @@
 			
 			const modal = document.getElementById('advanced-filters-modal');
 			modal.style.display = 'block';
-			// Scroll nach oben
 			const modalContent = modal.querySelector('.modal-content') || modal;
 			const modalBody = modal.querySelector('.modal-body') || modalContent;
 			modalContent.scrollTop = 0;
 			modalBody.scrollTop = 0;
 			modal.scrollTop = 0;
-			// Radius-Dropdown: aktiven Wert wiederherstellen oder auf 5 defaulten
 			const activeRadiusFilter = activeAdvancedFilters.find(f => f.startsWith('Im Umkreis von'));
 			if (activeRadiusFilter) {
 				const activeKm = activeRadiusFilter.match(/\d+/)[0];
@@ -7220,7 +7081,7 @@
                     <button class="report-btn" onclick="showReportModal('${reviewData.adminId || reviewData.id}')" title="Bewertung melden">!</button>
                     <div class="review-header">
                         <div class="company-info">
-							<div onclick="showCompanyPage('${escapeAttr(reviewData.companyName)}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark); line-height: 1.4;">${formatNameWithBadge(reviewData.companyName, getCompanyVerifiedBadge(reviewData.companyName))}</div>							
+							<div onclick="showCompanyPage('${escapeAttr(reviewData.companyName)}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; color: var(--dark); line-height: 1.4;">${formatNameWithBadge(escapeHtml(reviewData.companyName), getCompanyVerifiedBadge(reviewData.companyName))}</div>							
                             <p>${safeAddress}</p>
 							<div class="company-badges" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
                                 <div class="category-badge" style="padding: 0.35rem 1.25rem;">${escapeHtml(reviewData.category)}</div>
@@ -7297,7 +7158,7 @@
                     <div class="job-header">
                         <div class="job-info">
 							<div style="display: flex; align-items: center; gap: 0.5rem;">
-								<div onclick="showCompanyPage('${escapeAttr(jobData.companyName)}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; line-height: 1.4;">${formatNameWithBadge(jobData.companyName, getCompanyVerifiedBadge(jobData.companyName))}</div>
+								<div onclick="showCompanyPage('${escapeAttr(jobData.companyName)}')" style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; cursor: pointer; line-height: 1.4;">${formatNameWithBadge(escapeHtml(jobData.companyName), getCompanyVerifiedBadge(jobData.companyName))}</div>
 							</div>
                             <p>${safeAddress}</p>
 							<div class="company-badges" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
@@ -7802,7 +7663,6 @@
 					companyName: formData.companyName,
 					id: typeof reviewId === 'string' ? reviewId.substring(0, 8) : reviewId,
 					deleteToken: reviewResult?.delete_token || '',
-					editToken: reviewResult?.edit_token || '',
 				});
 
 				// Zeige schönes Success-Modal mit Konfetti
@@ -9765,8 +9625,14 @@
 					.eq('key', 'guide_content')
 					.single();
 				if (data && data.value) {
-					const contentDiv = document.querySelector('#internship-guide-section .container div[style*="background: white; padding: 3rem"]');
-					if (contentDiv) contentDiv.innerHTML = data.value;
+					const contentDiv = document.getElementById('guide-content-display');
+					if (contentDiv) {
+						const temp = document.createElement('div');
+						temp.innerHTML = data.value;
+						// Script-Tags entfernen
+						temp.querySelectorAll('script').forEach(s => s.remove());
+						contentDiv.innerHTML = temp.innerHTML;
+					}
 					const ta = document.getElementById('guide-content');
 					if (ta) ta.value = data.value;
 				}
@@ -9850,7 +9716,13 @@
 					.single();
 				if (data && data.value) {
 					const contentDiv = document.querySelector('#internship-tips-section .container div[style*="display: grid"]');
-					if (contentDiv) contentDiv.innerHTML = data.value;
+					if (contentDiv) {
+						const temp = document.createElement('div');
+						temp.innerHTML = data.value;
+						// Script-Tags entfernen
+						temp.querySelectorAll('script').forEach(s => s.remove());
+						contentDiv.innerHTML = temp.innerHTML;
+					}
 					const ta = document.getElementById('tips-content');
 					if (ta) ta.value = data.value;
 				}
@@ -10109,7 +9981,7 @@
 						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
 					</div>
 					<div class="modal-body" style="overflow-y: auto;">
-						<div style="background: white; padding: 3rem; border-radius: 10px; line-height: 1.6;">
+						<div id="guide-content-display" style="background: white; padding: 3rem; border-radius: 10px; line-height: 1.6;">
 							${content}
 						</div>
 					</div>
@@ -10304,7 +10176,6 @@
 				}
 			}
 
-			// Lade Verifizierungs- und Status-Daten aus companies-Tabelle
 			async function loadCompanyMetadata() {
 				try {
 					const { data, error } = await window.supabase
@@ -10314,7 +10185,6 @@
 					if (error || !data) return;
 					
 					data.forEach(c => {
-						// Finde passendes Unternehmen in companiesData
 						const match = Object.values(companiesData).find(comp => 
 							comp.name.toLowerCase().trim() === c.name.toLowerCase().trim() &&
 							comp.address.toLowerCase().trim().startsWith(c.address.toLowerCase().trim().substring(0, 10))
@@ -10330,7 +10200,6 @@
 			}
 			loadCompanyMetadata();
 
-			// BPhD Awards aus Supabase laden
 			async function loadBphdAwards() {
 				try {
 					const { data, error } = await window.supabase
@@ -10347,7 +10216,6 @@
 							companyAddress: award.company_address || '',
 							reason: award.reason
 						});
-						// BPhD Award auch im companiesData setzen
 						const company = Object.values(companiesData).find(c => 
 							c.name.toLowerCase().trim() === award.company_name.toLowerCase().trim()
 						);
@@ -10360,9 +10228,7 @@
 						}
 					});
 					
-					// Warte kurz bis loadReviewsFromBackend und loadJobsFromBackend fertig sind, dann rendern
 					setTimeout(() => {
-						// Nochmal alle companiesData durchsuchen und bphdAwards nachtragen
 						Object.keys(bphdAwardsDatabase).forEach(year => {
 							bphdAwardsDatabase[year].forEach(award => {
 								const company = Object.values(companiesData).find(c => 
@@ -10386,22 +10252,20 @@
 			}
 			loadBphdAwards();
 
-			// Alte Beispieldaten (erstmal behalten)
 			jobsData.forEach(job => {
 				addJobToCompany(job);
 			});
 
-			// Lade neue Jobs vom Backend
 			loadJobsFromBackend();		
 
 			function showConfirmModal(title, message, onConfirm) {
 				const existing = document.getElementById('pf-confirm-overlay');
 				if (existing) existing.remove();
 				const modal = document.createElement('div');
-				modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;';
+				modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:flex-start;justify-content:center;z-index:9000;overflow-y:auto;padding:1rem;box-sizing:border-box;';
 				modal.id = 'pf-confirm-overlay';
 				modal.innerHTML = '<div style="background:white;padding:2rem;border-radius:16px;max-width:500px;width:90%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.2);">' +
-					'<div style="width:60px;height:60px;background:#ffc107;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.8rem;color:#333;">&#9888;</div>' +
+					'<div style="width:60px;height:60px;background:#ffc107;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 30,28 2,28" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="14.5" y="13" width="3" height="7" rx="1.5" fill="#ffc107"/><circle cx="16" cy="24" r="1.5" fill="#ffc107"/></svg></div>' +
 					'<h2 style="margin:0 0 1rem;color:#333;font-size:1.5rem;">' + title + '</h2>' +
 					'<p style="margin:0 0 2rem;color:#666;line-height:1.6;">' + message + '</p>' +
 					'<div style="display:flex;gap:1rem;justify-content:center;">' +
@@ -10418,11 +10282,9 @@
 				});
 			}
 
-			// ========== JOB DEAKTIVIERUNG PRÜFEN ==========
 			(async function checkJobDeactivation() {
 				const urlParams = new URLSearchParams(window.location.search);
 
-				// ── Bewertung löschen via Token ──
 				const deleteReviewToken = urlParams.get('delete_review');
 				if (deleteReviewToken) {
 					history.replaceState({}, '', window.location.pathname);
@@ -10495,7 +10357,6 @@
 				}
 			})();
 
-			// ========== UNTERNEHMENSBEARBEITUNG PRÜFEN ==========
 			(async function checkCompanyEdit() {
 				const urlParams = new URLSearchParams(window.location.search);
 				const editToken = urlParams.get('edit_company');
@@ -10529,7 +10390,6 @@
 			landingReviewsLoaded = false;
 			loadLandingHighlightReviews();			
 
-			// Standard-Sortierung SOFORT anwenden - NACH dem Rendering
 			const sortSelect = document.getElementById('sort-select');
 			if (sortSelect) {
 				sortSelect.value = 'rating-desc';
@@ -10542,24 +10402,23 @@
 				applyJobSorting();
 			}
 
-			// Lade Verifizierungen für Badges - warte auf Supabase
 			function waitForSupabaseAndLoad() {
 				if (typeof window.supabase !== 'undefined' && typeof loadVerifiedCompaniesCache === 'function') {
 					loadVerifiedCompaniesCache().then(() => {
+						renderReviews();
+						renderJobs();
+						filterAllCompanies();
 						
-						// Re-render Reviews komplett
 						const reviewsContainer = document.getElementById('reviews-container');
 						if (reviewsContainer && typeof reviewsData !== 'undefined') {
 							reviewsContainer.innerHTML = reviewsData.map(r => createReviewCard(r)).join('');
 						}
 						
-						// Re-render Jobs komplett
 						const jobsContainer = document.getElementById('jobs-container');
 						if (jobsContainer && typeof jobsData !== 'undefined') {
 							jobsContainer.innerHTML = jobsData.map(j => createJobCard(j)).join('');
 						}
 						
-						// Jetzt sortieren
 						applySorting();
 						applyJobSorting();
 					});
@@ -10569,21 +10428,18 @@
 			}
 			waitForSupabaseAndLoad();
 
-			// Klick-Handler für Suchvorschläge verstecken
 			document.addEventListener('click', function(event) {
 				if (event.target && event.target.closest && !event.target.closest('#company-search') && !event.target.closest('#search-suggestions')) {
 					hideSearchSuggestions();
 				}
 			});	
 
-			// Stelle sicher, dass alle Reviews saturdayWork haben
 			reviewsData.forEach(review => {
 				if (review.saturdayWork === undefined) {
 					review.saturdayWork = 0;
 				}
 			});	
 
-			// Füge diesen Event Listener INNERHALB von DOMContentLoaded hinzu:
 			document.addEventListener('input', function(e) {
 				if (e.target.classList.contains('working-hours-start') || 
 					e.target.classList.contains('working-hours-end')) {
@@ -10594,16 +10450,13 @@
 			document.addEventListener('blur', function(e) {
 				if (e.target && e.target.classList && (e.target.classList.contains('working-hours-start') ||
 					e.target.classList.contains('working-hours-end'))) {
-					// Finales Check beim Verlassen
 					let value = e.target.value.trim();
 					
-					// Wenn nur 2 Ziffern, ergänze zu HH:00
 					if (value.length === 2 && !value.includes(':')) {
 						value = value + ':00';
 						e.target.value = value;
 					}
 					
-					// Validiere die finale Zeit
 					if (value.length === 5 && value.includes(':')) {
 						const parts = value.split(':');
 						const hours = parseInt(parts[0], 10);
@@ -10620,7 +10473,6 @@
 				}
 			}, true);
 			
-			// Event Listener für Adressvalidierung
 			const companyAddressInput = document.getElementById('company-address');
 			if (companyAddressInput) {
 				companyAddressInput.addEventListener('input', function() {
@@ -10635,15 +10487,12 @@
 				});
 			}	
 
-			// Ausgezeichnete Unternehmen rendern
 			renderAwardedYearTabs();	
 
-			// Populate Jahr-Select
 			populateYearSelect();	
 			
 			populateInternshipYearDropdown();
 
-			// Initiale Awards-Liste laden
 			setTimeout(() => {
 				const yearSelect = document.getElementById('award-year-select');
 				if (yearSelect && yearSelect.value) {
@@ -10651,10 +10500,8 @@
 				}
 			}, 100);
 		
-			// Setup Autocomplete für BPhD Awards
 			setupCompanyAutocomplete('award-company-name', 'company-suggestions');
 
-			// Sonstige-Felder sicherheitshalber beim Start verstecken
 			['benefits-sonstige-field', 'job-benefits-sonstige-field',
 			 'spec-sonstige-field', 'job-spec-sonstige-field'].forEach(id => {
 				const el = document.getElementById(id);
@@ -10665,8 +10512,6 @@
 				if (cb) cb.checked = false;
 			});
 
-			// ── Startseite initialisieren ──
-			// Warte auf Supabase, dann Daten laden
 			function waitForSupabaseAndLoadLanding() {
 				if (typeof window.supabase !== 'undefined') {
 					loadLandingStats();
@@ -10677,7 +10522,6 @@
 			}
 			waitForSupabaseAndLoadLanding();
 
-			// URL-Parameter: ?section=write etc. überschreibt Landing
 			const initParams = new URLSearchParams(window.location.search);
 			const initSection = initParams.get('section');
 			if (initSection) {
@@ -10699,7 +10543,6 @@
 			}
 		}
 
-		// Verstecke Vorschläge beim Klick außerhalb
 		document.addEventListener('mousedown', function(event) {
 			const searchField = document.getElementById('company-search');
 			const suggestions = document.getElementById('search-suggestions');
@@ -10712,7 +10555,6 @@
 			}
 		});
 		
-		// Event Listeners für Verifizierung und Kontakt
 		document.getElementById('verification-form').addEventListener('submit', async function(e) {
 			e.preventDefault();
 			
@@ -10725,7 +10567,6 @@
 			submitBtn.textContent = 'Wird eingereicht...';
 			
 			try {
-				// Nutze die neue API-Funktion
 				const result = await window.api.createVerificationRequest({
 					email: contactEmail,
 					contactPerson: contactPerson,
@@ -10736,7 +10577,6 @@
 					throw new Error(result.error || 'Fehler beim Einreichen');
 				}
 
-				// Sende Bestätigungs-E-Mail
 				await window.sendConfirmationEmail('verification_requested', {
 					email: contactEmail,
 					companyName: companyName,
@@ -10762,7 +10602,6 @@
 			}
 		});	
 
-		// ========== UNTERNEHMENSBEARBEITUNGS-MODAL ==========
 		async function showCompanyEditModal(company, editToken) {
 			const modal = document.createElement('div');
 			modal.id = 'company-edit-modal';
@@ -10776,27 +10615,9 @@
 			const logoUrl = company.company_logo_url || '';
 			const companyName = company.company_name || '';
 			const initial = companyName.charAt(0).toUpperCase();
-			
-			// Cropper.js laden falls noch nicht vorhanden
-			if (!window.Cropper) {
-				const cropperCss = document.createElement('link');
-				cropperCss.rel = 'stylesheet';
-				cropperCss.href = 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css';
-				document.head.appendChild(cropperCss);
-				const cropperOverride = document.createElement('style');
-				cropperOverride.textContent = '.cropper-dashed { display: none !important; } .cropper-line { display: none !important; } .cropper-point { display: none !important; }';
-				document.head.appendChild(cropperOverride);
-				await new Promise(resolve => {
-					const cropperJs = document.createElement('script');
-					cropperJs.src = 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js';
-					cropperJs.onload = resolve;
-					document.head.appendChild(cropperJs);
-				});
-			}
 
 			const htmlContent = 
 				'<div style="background:var(--bg);border-radius:16px;max-width:640px;width:95%;max-height:95vh;overflow-y:auto;margin:1rem auto;border:1px solid var(--border);box-shadow:0 20px 60px rgba(42,18,16,0.14);display:flex;flex-direction:column;">' +
-				// Header braun - sticky
 				'<div style="background:linear-gradient(135deg,var(--dark),#3d1a17);border-radius:16px 16px 0 0;padding:1.5rem 2rem;border-bottom:3px solid var(--red);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">' +
 				'<h2 style="margin:0;font-family:\'Fraunces\',serif;color:white;letter-spacing:-0.02em;font-size:1.3rem;">Unternehmensseite bearbeiten</h2>' +
 				'<button onclick="closeCompanyEditModal()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;opacity:0.7;line-height:1;padding:0;">&times;</button>' +
@@ -10804,26 +10625,24 @@
 				'<div style="padding:1.5rem;">' +
 				'<p style="margin:0 0 1.5rem;font-family:\'DM Sans\',sans-serif;font-size:1.3rem;font-weight:700;color:var(--dark);">' + companyName + '</p>' +
 				'<form id="company-edit-form">' +
-				// Profilbild — mobile: untereinander
 				'<div style="background:white;padding:1.5rem;border-radius:10px;margin-bottom:1.5rem;border:1px solid var(--border);">' +
 				'<h3 style="margin-top:0;font-family:\'DM Sans\',sans-serif;font-weight:600;color:var(--dark);">Profilbild</h3>' +
 				'<div style="display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;">' +
-				'<img id="company-logo-preview" src="' + (logoUrl || 'https://via.placeholder.com/100/28a745/ffffff?text=' + initial) + '" style="width:100px;height:100px;border-radius:50%;object-fit:cover;flex-shrink:0;">' +
-				'<div id="cropper-container" style="display:none;width:100%;max-width:300px;">' +
-				'<img id="cropper-image" style="max-width:100%;display:block;">' +
-				'<div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:center;align-items:center;">' +
-				'<button type="button" id="crop-zoom-out" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;">−</button>' +
-				'<button type="button" id="crop-zoom-in" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;">+</button>' +				
+				'<img id="company-logo-preview" src="' + (logoUrl || '') + '" style="width:100px;height:100px;border-radius:50%;object-fit:cover;' + (logoUrl ? '' : 'display:none;') + '">' +
+				'<div id="logo-canvas-container" style="display:none;flex-direction:column;align-items:center;gap:0.75rem;">' +
+				'<canvas id="logo-canvas" width="280" height="280" style="border-radius:50%;border:2px solid var(--border);cursor:move;touch-action:none;"></canvas>' +
+				'<div style="display:flex;gap:0.5rem;">' +
+				'<button type="button" id="crop-zoom-out" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;font-weight:600;">−</button>' +
+				'<button type="button" id="crop-zoom-in" style="background:white;color:var(--dark);border:1.5px solid var(--border);width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;font-weight:600;">+</button>' +
 				'</div>' +
-				'<div style="display:flex;gap:0.5rem;margin-top:0.5rem;justify-content:center;">' +
-				'<button type="button" id="crop-confirm-btn" style="background:var(--red);color:white;border:none;padding:0.5rem 1.25rem;border-radius:8px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Ausschnitt übernehmen</button>' +
-				'<button type="button" id="crop-cancel-btn" style="background:white;color:var(--dark);border:1.5px solid var(--border);padding:0.5rem 1.25rem;border-radius:8px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Abbrechen</button>' +
+				'<div style="display:flex;gap:0.5rem;">' +
+				'<button type="button" id="crop-confirm-btn" style="background:var(--red);color:white;border:none;padding:0.5rem 1.25rem;border-radius:8px;font-weight:600;cursor:pointer;">Ausschnitt übernehmen</button>' +
+				'<button type="button" id="crop-cancel-btn" style="background:white;color:var(--dark);border:1.5px solid var(--border);padding:0.5rem 1.25rem;border-radius:8px;font-weight:600;cursor:pointer;">Abbrechen</button>' +
 				'</div></div>' +
 				'<div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">' +
-				'<input type="file" id="company-logo-upload" accept=".jpg,.jpeg,.png,.svg" style="box-sizing:border-box;">' +
+				'<input type="file" id="company-logo-upload" accept=".jpg,.jpeg,.png" style="box-sizing:border-box;">' +
 				'<p style="color:#666;font-size:0.9rem;margin:0;">Empfohlen: 200x200px, JPG oder PNG</p>' +
 				'</div></div></div>' +
-				// Unternehmensinformationen
 				'<div style="background:white;padding:1.5rem;border-radius:10px;margin-bottom:1.5rem;border:1px solid var(--border);">' +
 				'<h3 style="margin-top:0;font-family:\'DM Sans\',sans-serif;font-weight:600;color:var(--dark);">Unternehmensinformationen</h3>' +
 				'<div style="margin-bottom:1rem;">' +
@@ -10839,7 +10658,6 @@
 				'<input type="text" id="company-website" value="' + website + '" placeholder="www.beispiel.de" style="width:100%;padding:0.75rem;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">' +
 				'<p style="color:#666;font-size:0.85rem;margin:0.5rem 0 0 0;">Hinweis: "http://" ist nicht erforderlich</p>' +
 				'</div></div>' +
-				// Kontaktinformationen — mobile: untereinander
 				'<div style="background:white;padding:1.5rem;border-radius:10px;margin-bottom:1.5rem;border:1px solid var(--border);">' +
 				'<h3 style="margin-top:0;font-family:\'DM Sans\',sans-serif;font-weight:600;color:var(--dark);">Kontaktinformationen</h3>' +
 				'<div style="display:flex;flex-direction:column;gap:1rem;">' +
@@ -10855,7 +10673,6 @@
 				'<label style="display:block;margin-bottom:0.5rem;font-weight:600;">Telefon</label>' +
 				'<input type="tel" id="company-contact-phone" value="' + phone + '" placeholder="030/12345678" style="width:100%;padding:0.75rem;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">' +
 				'</div></div></div>' +
-				// Buttons
 				'<div style="display:flex;flex-direction:column;gap:0.75rem;">' +
 				'<button type="submit" style="width:100%;background:var(--red);color:white;padding:0.875rem;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:1rem;font-family:\'DM Sans\',sans-serif;box-shadow:0 3px 12px rgba(184,50,40,0.25);">Änderungen speichern</button>' +
 				'<button type="button" onclick="closeCompanyEditModal()" style="width:100%;background:white;color:var(--dark);padding:0.875rem;border:1.5px solid var(--border);border-radius:10px;font-weight:600;cursor:pointer;font-size:1rem;font-family:\'DM Sans\',sans-serif;">Abbrechen</button>' +
@@ -10864,70 +10681,106 @@
 			modal.innerHTML = htmlContent;
 			document.body.appendChild(modal);
 			
-			let cropperInstance = null;
+			let logoImg = null;
+			let logoScale = 1;
+			let logoOffsetX = 0;
+			let logoOffsetY = 0;
+			let logoDragging = false;
+			let logoDragStartX = 0;
+			let logoDragStartY = 0;
+
+			function drawLogoCanvas() {
+				const canvas = document.getElementById('logo-canvas');
+				if (!canvas || !logoImg) return;
+				const ctx = canvas.getContext('2d');
+				const size = canvas.width;
+				ctx.clearRect(0, 0, size, size);
+				ctx.save();
+				ctx.beginPath();
+				ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+				ctx.clip();
+				ctx.fillStyle = '#f5f5f5';
+				ctx.fillRect(0, 0, size, size);
+				const drawW = logoImg.width * logoScale;
+				const drawH = logoImg.height * logoScale;
+				const x = size / 2 - drawW / 2 + logoOffsetX;
+				const y = size / 2 - drawH / 2 + logoOffsetY;
+				ctx.drawImage(logoImg, x, y, drawW, drawH);
+				ctx.restore();
+			}
 
 			document.getElementById('company-logo-upload').addEventListener('change', function(e) {
 				const file = e.target.files[0];
 				if (!file) return;
 				const reader = new FileReader();
 				reader.onload = function(event) {
-					const cropperContainer = document.getElementById('cropper-container');
-					const cropperImage = document.getElementById('cropper-image');
-					const preview = document.getElementById('company-logo-preview');
-					if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
-					cropperImage.src = event.target.result;
-					cropperContainer.style.display = 'block';
-					preview.style.display = 'none';
-					cropperInstance = new Cropper(cropperImage, {
-						aspectRatio: 1,
-						viewMode: 1,
-						dragMode: 'move',
-						autoCropArea: 1,
-						cropBoxResizable: false,
-						cropBoxMovable: false,
-						toggleDragModeOnDblclick: false,
-						ready: function() {
-							// Runden Ausschnitt per CSS
-							const cropBox = document.querySelector('.cropper-crop-box');
-							if (cropBox) {
-								cropBox.style.borderRadius = '50%';
-								const face = cropBox.querySelector('.cropper-face');
-								if (face) face.style.borderRadius = '50%';
-								const viewBoxes = cropBox.querySelectorAll('.cropper-view-box, .cropper-dashed');
-								viewBoxes.forEach(el => el.style.borderRadius = '50%');
-							}
-						}
-					});
+					logoImg = new Image();
+					logoImg.onload = function() {
+						const canvas = document.getElementById('logo-canvas');
+						const size = canvas.width;
+						const fit = Math.max(size / logoImg.width, size / logoImg.height);
+						logoScale = fit;
+						logoOffsetX = 0;
+						logoOffsetY = 0;
+						document.getElementById('logo-canvas-container').style.display = 'flex';
+						document.getElementById('company-logo-preview').style.display = 'none';
+						drawLogoCanvas();
+					};
+					logoImg.src = event.target.result;
 				};
 				reader.readAsDataURL(file);
 			});
 
+			const canvas = document.getElementById('logo-canvas');
+			canvas.addEventListener('mousedown', function(e) {
+				logoDragging = true;
+				logoDragStartX = e.clientX - logoOffsetX;
+				logoDragStartY = e.clientY - logoOffsetY;
+			});
+			canvas.addEventListener('mousemove', function(e) {
+				if (!logoDragging) return;
+				logoOffsetX = e.clientX - logoDragStartX;
+				logoOffsetY = e.clientY - logoDragStartY;
+				drawLogoCanvas();
+			});
+			canvas.addEventListener('mouseup', function() { logoDragging = false; });
+			canvas.addEventListener('mouseleave', function() { logoDragging = false; });
+
+			canvas.addEventListener('wheel', function(e) {
+				e.preventDefault();
+				logoScale *= e.deltaY < 0 ? 1.05 : 0.95;
+				drawLogoCanvas();
+			}, { passive: false });
+
+			document.getElementById('crop-zoom-in').addEventListener('click', function() {
+				logoScale *= 1.1;
+				drawLogoCanvas();
+			});
+			document.getElementById('crop-zoom-out').addEventListener('click', function() {
+				logoScale *= 0.9;
+				drawLogoCanvas();
+			});
+
 			document.getElementById('crop-confirm-btn').addEventListener('click', function() {
-				if (!cropperInstance) return;
-				const canvas = cropperInstance.getCroppedCanvas({ width: 200, height: 200, imageSmoothingQuality: 'high' });
+				const canvas = document.getElementById('logo-canvas');
 				const preview = document.getElementById('company-logo-preview');
-				preview.src = canvas.toDataURL('image/jpeg', 0.9);
+				try {
+					preview.src = canvas.toDataURL('image/jpeg', 0.9);
+				} catch(e) {
+					showToast('Fehler beim Verarbeiten des Bildes. Bitte ein anderes Bild wählen.', 'error');
+					return;
+				}
 				preview.style.display = 'block';
-				document.getElementById('cropper-container').style.display = 'none';
-				cropperInstance.destroy();
-				cropperInstance = null;
+				document.getElementById('logo-canvas-container').style.display = 'none';
+				document.getElementById('company-logo-upload').value = '';
+				logoImg = null;
 			});
 
 			document.getElementById('crop-cancel-btn').addEventListener('click', function() {
-				if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
-				document.getElementById('cropper-container').style.display = 'none';
+				document.getElementById('logo-canvas-container').style.display = 'none';
 				document.getElementById('company-logo-preview').style.display = 'block';
 				document.getElementById('company-logo-upload').value = '';
-			});
-
-			document.getElementById('crop-zoom-in').addEventListener('click', function() {
-				if (!cropperInstance) return;
-				cropperInstance.zoom(0.1);
-			});
-
-			document.getElementById('crop-zoom-out').addEventListener('click', function() {
-				if (!cropperInstance) return;
-				cropperInstance.zoom(-0.1);
+				logoImg = null;
 			});
 			
 			document.getElementById('company-edit-form').addEventListener('submit', async function(e) {
@@ -10956,7 +10809,7 @@
 						);
 						setTimeout(() => {
 							closeCompanyEditModal();
-							window.location.reload(); // Reload um neue Daten zu zeigen
+							window.location.reload(); 
 						}, 2000);
 					} else {
 						showToast('Fehler: ' + result.error, 'error');
@@ -11015,9 +10868,7 @@
 			window.history.replaceState({}, document.title, window.location.pathname);
 		}
 
-		// ========== SUCCESS MODAL MIT KONFETTI ==========
 		function showSuccessModal(title, message, withConfetti = false) {
-			// Erstelle Modal
 			const modal = document.createElement('div');
 			modal.className = 'success-modal-overlay';
 			modal.style.cssText = `
@@ -11094,13 +10945,11 @@
 			
 			document.body.appendChild(modal);
 			
-			// Konfetti-Animation
 			if (withConfetti) {
 				createConfetti();
 			}
 		}
 		
-		// Konfetti-Funktion
 		function createConfetti() {
 			const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
 			const confettiCount = 50;
@@ -11122,12 +10971,10 @@
 				`;
 				document.body.appendChild(confetti);
 				
-				// Entferne nach Animation
 				setTimeout(() => confetti.remove(), 5000);
 			}
 		}
 
-		// CSS Animationen hinzufügen (einmalig)
 		if (!document.getElementById('success-modal-styles')) {
 			const style = document.createElement('style');
 			style.id = 'success-modal-styles';
@@ -11158,7 +11005,6 @@
 			document.head.appendChild(style);
 		}
 
-		// Vorladen von Datenschutz und AGB im Hintergrund
 		let privacyCache = null;
 		let agbCache = null;
 
@@ -11180,7 +11026,6 @@
 			} catch(e) {}
 		}
 
-		// Warte bis Supabase bereit ist, dann vorladen
 		function waitForSupabaseAndPreload() {
 			if (window.supabase) {
 				preloadPrivacyAndAgb();
@@ -11389,17 +11234,14 @@
 			}
 		});
 
-		// Initial check beim Laden
 		window.addEventListener('focus', function() {
 		});		
 
-		// Lausche auf Verifizierungs-Änderungen
 		window.addEventListener('storage', function(e) {
 			if (e.key === 'verification_updated') {
 			}
 		});
 
-		// Reload beim Fenster-Focus
 		window.addEventListener('focus', function() {
 			if (typeof loadVerifiedCompanies === 'function') {
 			}
