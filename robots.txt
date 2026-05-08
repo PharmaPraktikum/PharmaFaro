@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /pf-akw-Na242Cl.html
+Disallow: /admin/
