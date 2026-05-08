@@ -2,7 +2,14 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+	<link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="512x512" href="./favicon-512.png">
+    <link rel="apple-touch-icon" href="./favicon-512.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow">
+	<meta http-equiv="X-Content-Type-Options" content="nosniff">
+	<meta name="referrer" content="strict-origin-when-cross-origin">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src https://*.supabase.co; img-src 'self' data:;">
     <title>PharmaFaro – Admin</title>
     
 	<style>
@@ -1073,8 +1080,6 @@
 					throw new Error(result.error || 'E-Mail konnte nicht gesendet werden');
 				}
 				
-				console.log(`✅ E-Mail erfolgreich gesendet an ${data.email}`);
-				
 			} catch(e) {
 				console.error('❌ E-Mail-Fehler:', e.message);
 			}
@@ -1225,7 +1230,7 @@
 			else if (tabName === 'settings') loadSiteSettings();
 		};
 		
-		async function loadReviews() {
+		window.loadReviews = async function() {
 			try {
 				const result = await callAdminFunction('loadReviews');
 				allReviews = result.data;
@@ -1237,7 +1242,7 @@
 			}
 		}
 		
-		async function loadJobs() {
+		window.loadJobs = async function() {
 			try {
 				const result = await callAdminFunction('loadJobs');
 				allJobs = result.data;
@@ -1368,7 +1373,7 @@
 			`).join('');
 		}
 
-		async function loadSiteSettings() {
+		window.loadSiteSettings = async function() {
 			try {
 				const { data } = await supabase
 					.from('site_settings')
@@ -1565,7 +1570,7 @@
 		let allReviewsForCompanies = []; // Aus reviews-Tabelle für Aggregation
 		let allJobsForCompanies = [];    // Aus jobs-Tabelle für Aggregation
 
-		async function loadCompanies() {
+		window.loadCompanies = async function() {
 			const tbody = document.getElementById('companies-tbody');
 			tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:#666;">Lade...</td></tr>`;
 
@@ -1726,6 +1731,10 @@
 			document.getElementById('stat-companies-verified').textContent = allCompanies.filter(c => c.verified).length;
 		}
 
+		function esc(str) {
+			return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+		}
+
 		function renderCompaniesTable(companies) {
 			const tbody = document.getElementById('companies-tbody');
 
@@ -1738,10 +1747,10 @@
 				<tr style="border-bottom: 1px solid #f0f0f0; ${c.status === 'inactive' ? 'opacity: 0.6;' : ''}">
 					<td style="padding: 0.75rem;">${i + 1}</td>
 					<td style="padding: 0.75rem;">
-						<strong>${c.name}</strong>
+						<strong>${esc(c.name)}</strong>
 						${c.verified ? '<br><span style="color:#28a745;font-size:0.8rem;">✓ Verifiziert</span>' : ''}
 					</td>
-					<td style="padding: 0.75rem; font-size: 0.9rem; color: #555;">${c.address}${c.state ? ', ' + c.state : ''}</td>
+					<td style="padding: 0.75rem; font-size: 0.9rem; color: #555;">${esc(c.address)}${c.state ? ', ' + c.state : ''}</td>
 					<td style="padding: 0.75rem; font-size: 0.85rem; color: #888;">${c.createdAt ? formatDate(c.createdAt) : '–'}</td>
 					<td style="padding: 0.75rem; text-align:center;">
 						<span class="status-badge ${c.status === 'inactive' ? 'status-inactive' : 'status-active'}">
@@ -1809,7 +1818,7 @@
 
 		// ===================== VERIFIZIERUNGEN =====================
 
-		async function loadVerificationBadge() {
+		window.loadVerificationBadge = async function() {
 			try {
 				const { count } = await supabase
 					.from('verification_requests')
@@ -1828,7 +1837,8 @@
 			} catch(e) {}
 		}
 
-		async function loadReportsBadge() {
+		window.loadReportsBadge = async function() {
+
 			try {
 				const { count } = await supabase
 					.from('reports')
@@ -1922,7 +1932,7 @@
 			`).join('');
 		}
 
-		async function loadVerificationRequests() {
+		window.loadVerificationRequests = async function() {
 			const list = document.getElementById('verification-requests-list');
 			list.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Lade...</div>';
 			
@@ -2103,7 +2113,7 @@
 			renderReportsList();
 		};
 
-		async function loadReports() {
+		window.loadReports = async function() {
 			const list = document.getElementById('reports-list');
 			if (list) list.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Lade...</div>';
 			
@@ -2406,8 +2416,8 @@
 										'${c.name.replace(/'/g, "\\'")}',
 										'${c.address.replace(/'/g, "\\'")}'
 									 )">
-									<strong>${c.name}</strong><br>
-									<small style="color:#666;">${c.address}</small><br>
+									<strong>${esc(c.name)}</strong><br>
+									<small style="color:#666;">${esc(c.address)}</small><br>
 									<small style="color:#999;">${c.reviewCount} Bewertungen · ${c.activeJobCount} aktive Jobs</small>
 								</div>
 							`).join('')}
@@ -2561,8 +2571,7 @@
 
 		// ===================== BPHD AWARDS =====================
 		let allAwards = [];
-
-		async function loadAwards() {
+		window.loadAwards = async function() {
 			document.getElementById('awards-list-admin').innerHTML = '<p style="color:#666;">Lade...</p>';
 			
 			// Jahres-Dropdowns befüllen
@@ -2709,7 +2718,7 @@
 			}
 		};
 
-		window.filterAwardCompanySuggestions = function(query) {
+		window.filterAwardCompanySuggestions = async function(query) {
 			const container = document.getElementById('award-company-suggestions');
 			if (!container) return;
 			
@@ -2719,12 +2728,31 @@
 			}
 			
 			const q = query.toLowerCase().trim();
-			// Unternehmen aus allCompanies (Companies Tab) oder allReviewsForCompanies
-			const sources = typeof allCompanies !== 'undefined' ? allCompanies : [];
+			// Direkt aus Datenbank laden falls allCompanies nicht befüllt
+			let sources = typeof allCompanies !== 'undefined' && allCompanies.length > 0 ? allCompanies : [];
+			if (sources.length === 0) {
+				try {
+					const { data } = await supabase
+						.from('company_verifications')
+						.select('company_name, company_address:contact_email')
+						.eq('status', 'verified');
+					const { data: reviewData } = await supabase
+						.from('reviews')
+						.select('company_name, address')
+						.eq('status', 'active');
+					const seen = new Set();
+					sources = [];
+					(reviewData || []).forEach(r => {
+						if (!seen.has(r.company_name)) {
+							seen.add(r.company_name);
+							sources.push({ name: r.company_name, address: r.address || '' });
+						}
+					});
+				} catch(e) { sources = []; }
+			}
 			const matches = sources
-				.filter(c => c.name.toLowerCase().includes(q))
-				.slice(0, 8);
-			
+				.filter(c => c.name && c.name.toLowerCase().includes(q))
+				.slice(0, 8);			
 			if (matches.length === 0) {
 				container.style.display = 'none';
 				return;
@@ -2739,7 +2767,7 @@
 						document.getElementById('admin-award-address').value = '${c.address.replace(/'/g, "\\'")}';
 						document.getElementById('award-company-suggestions').style.display = 'none';
 					 ">
-					<strong>${c.name}</strong>
+					<strong>${esc(c.name)}</strong>
 					<span style="color:#888;margin-left:0.5rem;font-size:0.85rem;">${c.address || ''}</span>
 				</div>
 			`).join('');
