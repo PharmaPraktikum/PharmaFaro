@@ -13,6 +13,8 @@ import { supabase } from './supabase-client.js';
  */
 export async function createReview(reviewData) {
     try {
+        const deleteToken = crypto.randomUUID();
+
         const { data, error } = await supabase
             .from('reviews')
             .insert([{
@@ -34,7 +36,8 @@ export async function createReview(reviewData) {
 				area: reviewData.area || null,
                 working_hours_data: reviewData.workingHoursData,
 				internship_year: reviewData.internshipYear || null,
-                status: 'pending'
+                status: 'pending',
+                delete_token: deleteToken,
             }])
             .select()
             .single();
@@ -68,25 +71,6 @@ export async function getActiveReviews() {
     }
 }
 
-/**
- * Lade eine Review per Edit-Token
- */
-export async function getReviewByToken(token) {
-    try {
-        const { data, error } = await supabase
-            .from('reviews')
-            .select('*')
-            .eq('edit_token', token)
-            .single();
-
-        if (error) throw error;
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('❌ Review nicht gefunden:', error);
-        return { success: false, error: error.message };
-    }
-}
 
 // ============================================
 // PDF UPLOAD
