@@ -971,7 +971,6 @@
 	
 	<script type="module">
 		import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-		import * as api from './js/api.js';
 		import { supabase as anonSupabase } from './js/supabase-client.js';
 		const supabase = anonSupabase;
 
@@ -1045,10 +1044,9 @@
 			}
 		};
 
-		// ========== E-MAIL FUNKTION FÜR ADMIN ==========
 		window.sendConfirmationEmail = async function(type, data) {
 			try {
-				const baseUrl = window.location.origin; // Automatisch richtig!
+				const baseUrl = window.location.origin;
 				
 				const response = await fetch(`${window.SUPABASE_URL}/functions/v1/send-mail`, {
 					method: 'POST',
@@ -1089,14 +1087,11 @@
 		let allReviews = [];
 		let allJobs = [];
 		
-		// ALLES in DOMContentLoaded wrappen
 		document.addEventListener('DOMContentLoaded', initAdmin);
 		
 		async function initAdmin() {
-			// Check if already logged in
 			await checkAuth();
 			
-			// Login Form Handler
 			document.getElementById('login-form').addEventListener('submit', handleLogin);
 		}
 		
@@ -1171,7 +1166,6 @@
 			document.getElementById('login-screen').style.display = 'none';
 			document.getElementById('admin-dashboard').style.display = 'block';
 			document.body.classList.add('pf-dash');
-			// Show reviews stats bar by default
 			const sb = document.getElementById('pf-stats-bar');
 			if (sb) sb.style.display = 'block';
 			document.getElementById('user-email').textContent = currentUser.email;
@@ -1192,14 +1186,11 @@
 			if (btn) btn.classList.add('active');
 			if (content) content.classList.add('active');
 			
-			// Stats-Leiste: unter den Reitern zeigen/verstecken
 			const statsMap = { reviews:'reviews-stats-grid', jobs:'jobs-stats-grid', companies:'companies-stats-grid' };
-			// Hide all grids
 			['reviews-stats-grid','jobs-stats-grid','companies-stats-grid'].forEach(id => {
 				const el = document.getElementById(id);
 				if (el) el.style.display = 'none';
 			});
-			// Show stats bar only for tabs that have stats
 			const statsBar = document.getElementById('pf-stats-bar');
 			if (statsMap[tabName]) {
 				const el = document.getElementById(statsMap[tabName]);
@@ -1209,7 +1200,6 @@
 				if (statsBar) statsBar.style.display = 'none';
 			}
 			
-			// Nur spezifische Formular-Tabs leeren, nicht Settings/Tarif
 			const clearableTabs = ['reviews', 'jobs', 'companies', 'awards', 'verification', 'reports'];
 			clearableTabs.forEach(tabSel => {
 				const tab = document.querySelector(tabSel);
@@ -1220,7 +1210,6 @@
 				}
 			});
 			
-			// Alle Tabs neu laden
 			if (tabName === 'reviews') loadReviews();
 			else if (tabName === 'jobs') loadJobs();
 			else if (tabName === 'companies') loadCompanies();
@@ -1438,14 +1427,12 @@
 			if (error) { alert('Fehler: ' + error.message); return; }
 			
 			window.tariffSalary = parseInt(amount);
-			// Aktuellen Tarif in offene Historien-Einträge (to: null) übertragen
 			const openEntry = tariffHistoryData.find(e => e.to === null);
 			if (openEntry) {
 				openEntry.amount = parseInt(amount);
 			} else {
 				tariffHistoryData.push({ from: new Date().getFullYear(), to: null, amount: parseInt(amount) });
 			}
-			// Automatisch speichern
 			await supabase.from('site_settings')
 				.upsert({ key: 'tariff_history', value: JSON.stringify(tariffHistoryData) }, { onConflict: 'key' });			
 			const currentDiv = document.getElementById('tariff-salary-current');
@@ -1466,7 +1453,7 @@
 			}
 		};
 
-		let tariffHistoryData = []; // [{from: 2020, to: 2023, amount: 1000}, {from: 2024, to: null, amount: 1200}]
+		let tariffHistoryData = [];
 
 		function generateYearOptions(selectedYear, includeAktuell = false) {
 			const currentYear = new Date().getFullYear();
@@ -1565,30 +1552,26 @@
 		window.filterReviews = renderReviews;
 		window.filterJobs = renderJobs;
 		
-		// ===================== COMPANIES =====================
-		let allCompanies = [];      // Aus companies-Tabelle
-		let allReviewsForCompanies = []; // Aus reviews-Tabelle für Aggregation
-		let allJobsForCompanies = [];    // Aus jobs-Tabelle für Aggregation
+		let allCompanies = [];
+		let allReviewsForCompanies = [];
+		let allJobsForCompanies = [];
 
 		window.loadCompanies = async function() {
 			const tbody = document.getElementById('companies-tbody');
 			tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:#666;">Lade...</td></tr>`;
 
 			try {
-				// Companies-Tabelle laden (Verifizierung + Status)
 				const { data: companiesDb, error: ceErr } = await supabase
 					.from('companies')
 					.select('*')
 					.order('created_at', { ascending: false });
 				if (ceErr) throw ceErr;
 
-				// Reviews laden (für Aggregation)
 				const { data: reviewsDb, error: reErr } = await supabase
 					.from('reviews')
 					.select('id, company_name, address, state, status');
 				if (reErr) throw reErr;
 
-				// Jobs laden (für Aggregation)
 				const { data: jobsDb, error: jeErr } = await supabase
 					.from('jobs')
 					.select('id, company_name, address, state, status, created_at');
@@ -1597,10 +1580,8 @@
 				allReviewsForCompanies = reviewsDb || [];
 				allJobsForCompanies = jobsDb || [];
 
-				// Aggregiere Unternehmen aus reviews + jobs, ergänze mit companies-Tabellendaten
 				const companyMap = {};
 
-				// Aus Reviews
 				allReviewsForCompanies.forEach(r => {
 					const key = r.company_name.trim().toLowerCase() + '||' + (r.address || '').trim().toLowerCase();
 					if (!companyMap[key]) {
@@ -1620,7 +1601,6 @@
 					if (r.status === 'active') companyMap[key].reviewCount++;
 				});
 
-				// Aus Jobs
 				const thirtyDaysAgo = new Date();
 				thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 				allJobsForCompanies.forEach(j => {
@@ -1646,7 +1626,6 @@
 					}
 				});
 
-				// Lade Verifizierungen aus company_verifications
 				const { data: verificationsDb, error: veErr } = await supabase
 					.from('company_verifications')
 					.select('company_name, status, contact_email, contact_person')
@@ -1654,18 +1633,14 @@
 
 				if (veErr) console.error('Fehler beim Laden der Verifizierungen:', veErr);
 
-				// Erstelle Map für schnellen Lookup
 				const verifiedCompanies = new Set();
 				(verificationsDb || []).forEach(v => {
 					verifiedCompanies.add(v.company_name.trim().toLowerCase());
 				});
 
-				// Companies-Tabelle mergen (Verifizierung + Status)
 				(companiesDb || []).forEach(c => {
-					// Exakter Key-Match
 					const key = c.name.trim().toLowerCase() + '||' + (c.address || '').trim().toLowerCase();
 					
-					// Fallback: nur nach Name suchen falls Adresse abweicht
 					const keyByName = Object.keys(companyMap).find(k => 
 						k.startsWith(c.name.trim().toLowerCase() + '||')
 					);
@@ -1673,7 +1648,6 @@
 					const matchKey = companyMap[key] ? key : keyByName;
 					
 					if (matchKey && companyMap[matchKey]) {
-						// Vorhandenen Eintrag aktualisieren
 						const isVerified = verifiedCompanies.has(c.name.trim().toLowerCase());
 						companyMap[matchKey].verified = isVerified;
 						companyMap[matchKey].status = c.status || 'active';
@@ -1682,7 +1656,6 @@
 						companyMap[matchKey].contactEmail = c.contact_email || '';
 						companyMap[matchKey].contactPerson = c.contact_person || '';
 					} else {
-						// Unternehmen existiert NUR in companies-Tabelle
 						const isVerified = verifiedCompanies.has(c.name.trim().toLowerCase());
 						companyMap[key] = {
 							name: c.name,
@@ -1701,12 +1674,11 @@
 					}
 				});
 
-				// Kontaktdaten aus Verifizierungen übernehmen (company_verifications hat Vorrang)
 				(verificationsDb || []).forEach(v => {
 					Object.keys(companyMap).forEach(key => {
 						const company = companyMap[key];
 						if (company.name.trim().toLowerCase() === v.company_name.trim().toLowerCase()) {
-							company.verified = true;  // ← diese Zeile hinzufügen
+							company.verified = true;
 							if (v.contact_email) company.contactEmail = v.contact_email;
 							if (v.contact_person) company.contactPerson = v.contact_person;
 						}
@@ -1816,7 +1788,6 @@
 			renderCompaniesTable(filtered);
 		};
 
-		// ===================== VERIFIZIERUNGEN =====================
 
 		window.loadVerificationBadge = async function() {
 			try {
@@ -1859,7 +1830,6 @@
 		window.switchVerifTab = function(tab) {
 			currentVerifTab = tab;
 			
-			// Button-Styles
 			['pending', 'approved', 'rejected'].forEach(t => {
 				const btn = document.getElementById(`vtab-${t}`);
 				if (!btn) return;
@@ -1944,15 +1914,13 @@
 				if (error) throw error;
 				
 				verificationData.pending  = data.filter(r => r.status === 'pending');
-				verificationData.approved = data.filter(r => r.status === 'verified'); // Status heißt jetzt 'verified'
+				verificationData.approved = data.filter(r => r.status === 'verified');
 				verificationData.rejected = data.filter(r => r.status === 'rejected');
 				
-				// Zähler aktualisieren
 				document.getElementById('vtab-pending-count').textContent  = verificationData.pending.length;
 				document.getElementById('vtab-approved-count').textContent = verificationData.approved.length;
 				document.getElementById('vtab-rejected-count').textContent = verificationData.rejected.length;
 				
-				// Badge im Haupt-Tab
 				const badge = document.getElementById('verification-badge');
 				if (badge) {
 					badge.textContent = verificationData.pending.length;
@@ -1967,7 +1935,6 @@
 		}
 
 		window.approveVerification = async function(verificationId) {
-			// Lade erst die Verifizierungs-Daten
 			try {
 				const { data: verification, error: fetchError } = await supabase
 					.from('company_verifications')
@@ -1979,7 +1946,6 @@
 				
 				if (!confirm(`"${verification.company_name}" verifizieren und Antrag genehmigen?`)) return;
 				
-				// Nutze die neue API-Funktion
 				const result = await adminApi.approveVerification(verificationId);
 				
 				if (!result.success) {
@@ -1999,7 +1965,6 @@
 		};
 
 		window.rejectVerification = async function(verificationId) {
-			// Lade erst die Verifizierungs-Daten
 			try {
 				const { data: verification, error: fetchError } = await supabase
 					.from('company_verifications')
@@ -2010,9 +1975,8 @@
 				if (fetchError) throw fetchError;
 				
 				const reason = prompt(`Grund für Ablehnung von "${verification.company_name}" (optional, wird dem Antragsteller angezeigt):`);
-				if (reason === null) return; // Abbrechen gedrückt
+				if (reason === null) return;
 				
-				// Nutze die neue API-Funktion
 				const result = await adminApi.rejectVerification(verificationId, reason);
 				
 				if (!result.success) {
@@ -2029,7 +1993,6 @@
 
 		window.undoRejection = async function(verificationId) {
 			try {
-				// Lade erst die Daten
 				const { data: verification, error: fetchError } = await supabase
 					.from('company_verifications')
 					.select('*')
@@ -2040,7 +2003,6 @@
 				
 				if (!confirm(`Ablehnung für "${verification.company_name}" zurückziehen? Der Antrag wird wieder auf "Ausstehend" gesetzt.`)) return;
 				
-				// Status auf pending zurücksetzen
 				const { error } = await supabase
 					.from('company_verifications')
 					.update({ 
@@ -2093,7 +2055,6 @@
 			}
 		};
 
-		// ===================== REPORTS / MELDUNGEN =====================
 		let reportsData = { open: [], resolved: [] };
 		let currentReportsTab = 'open';
 
@@ -2206,7 +2167,6 @@
 			if (!confirm(`${label}?`)) return;
 			
 			try {
-				// Report-Status aktualisieren
 				await supabase.from('reports')
 					.update({ 
 						status: action, 
@@ -2215,13 +2175,11 @@
 					})
 					.eq('id', reportId);
 				
-				// Bei Deaktivierung: Bewertung inaktivieren
 				if (action === 'deactivated') {
 					await supabase.from('reviews')
 						.update({ status: 'inactive' })
 						.eq('id', reviewId);
 					
-					// Sync mit Bewertungen-Tab
 					const idx = allReviews.findIndex(r => r.id === reviewId);
 					if (idx > -1) allReviews[idx].status = 'inactive';
 					renderReviews();
@@ -2236,7 +2194,6 @@
 			}
 		};
 
-		// Verifizierung umschalten
 		window.toggleCompanyVerified = async function(name, address, currentVerified, companyId) {
 			const newVerified = !currentVerified;
 			const action = newVerified ? 'verifizieren' : 'Verifizierung entfernen';
@@ -2244,13 +2201,11 @@
 
 			try {
 				if (companyId) {
-					// Existierender Eintrag in companies-Tabelle
 					const { error } = await supabase.from('companies')
 						.update({ verified: newVerified, updated_at: new Date().toISOString() })
 						.eq('id', companyId);
 					if (error) throw error;
 				} else {
-					// Neuer Eintrag anlegen
 					const { error } = await supabase.from('companies')
 						.insert([{ name, address, verified: newVerified, status: 'active' }]);
 					if (error) throw error;
@@ -2262,7 +2217,6 @@
 			}
 		};
 
-		// Status (aktiv/inaktiv) umschalten
 		window.toggleCompanyStatusAdmin = async function(name, address, currentStatus, companyId) {
 			const newStatus = currentStatus === 'inactive' ? 'active' : 'inactive';
 			const action = newStatus === 'active' ? 'aktivieren' : 'deaktivieren';
@@ -2286,7 +2240,6 @@
 			}
 		};
 
-		// Reviews eines Unternehmens anzeigen
 		window.showCompanyReviews = function(name, address) {
 			const reviews = allReviewsForCompanies.filter(r => 
 				r.company_name === name && r.status === 'active'
@@ -2382,7 +2335,6 @@
 			modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
 		};
 
-		// Zusammenführen — Ziel auswählen
 		window.startMergeProcessAdmin = function(sourceName, sourceAddress, sourceId) {
 			const others = allCompanies.filter(c => !(c.name === sourceName && c.address === sourceAddress));
 
@@ -2494,12 +2446,9 @@
 
 		window.executeMergeAdmin = async function(sourceName, sourceAddress, targetName, targetAddress) {
 			try {
-				// Schritt 1: Alle state/country Felder des Targets ermitteln
 				const targetCompany = allCompanies.find(c => c.name === targetName);
 				const targetState = targetCompany?.state || '';
 				
-				// Schritt 2: Alle Reviews des Source-Unternehmens auf Target umschreiben
-				// Suche nach company_name (Adresse kann leicht abweichen → nur nach Name filtern)
 				const { data: sourceReviews, error: rFetchErr } = await supabase
 					.from('reviews')
 					.select('id')
@@ -2518,7 +2467,6 @@
 					if (rErr) throw rErr;
 				}
 				
-				// Schritt 3: Alle Jobs des Source-Unternehmens auf Target umschreiben
 				const { data: sourceJobs, error: jFetchErr } = await supabase
 					.from('jobs')
 					.select('id')
@@ -2537,17 +2485,14 @@
 					if (jErr) throw jErr;
 				}
 				
-				// Schritt 4: BPhD Awards umschreiben
 				await supabase.from('bphd_awards')
 					.update({ company_name: targetName, company_address: targetAddress })
 					.eq('company_name', sourceName);
 				
-				// Schritt 5: Source aus companies-Tabelle löschen (alle Varianten)
 				await supabase.from('companies')
 					.delete()
 					.eq('name', sourceName);
 				
-				// Schritt 6: Verification Requests umschreiben
 				await supabase.from('verification_requests')
 					.update({ company_name: targetName, company_address: targetAddress })
 					.eq('company_name', sourceName);
@@ -2569,12 +2514,10 @@
 			window.location.href = `mailto:${email}?subject=${subject}`;
 		};
 
-		// ===================== BPHD AWARDS =====================
 		let allAwards = [];
 		window.loadAwards = async function() {
 			document.getElementById('awards-list-admin').innerHTML = '<p style="color:#666;">Lade...</p>';
 			
-			// Jahres-Dropdowns befüllen
 			const yearSel = document.getElementById('admin-award-year');
 			const filterSel = document.getElementById('admin-award-filter-year');
 			if (yearSel && yearSel.options.length === 0) {
@@ -2616,7 +2559,6 @@
 				return;
 			}
 			
-			// Nach Jahr gruppieren
 			const byYear = {};
 			filtered.forEach(a => {
 				if (!byYear[a.year]) byYear[a.year] = [];
@@ -2671,7 +2613,6 @@
 					.insert([{ year, company_name: company, company_address: address || null, reason }]);
 				if (error) throw error;
 				
-				// Felder leeren
 				document.getElementById('admin-award-company').value = '';
 				document.getElementById('admin-award-address').value = '';
 				document.getElementById('admin-award-reason').value = '';
@@ -2697,10 +2638,8 @@
 			document.getElementById('admin-award-reason').value = award.reason;
 			document.getElementById('admin-award-year').value = award.year;
 			
-			// Alten Eintrag direkt löschen — Nutzer trägt neu ein
 			window.deleteAward(award.id, award.company_name, award.year, true);
 			
-			// Scroll nach oben zum Formular
 			document.getElementById('admin-award-company').scrollIntoView({ behavior: 'smooth' });
 			document.getElementById('admin-award-company').focus();
 		};
@@ -2728,7 +2667,6 @@
 			}
 			
 			const q = query.toLowerCase().trim();
-			// Direkt aus Datenbank laden falls allCompanies nicht befüllt
 			let sources = typeof allCompanies !== 'undefined' && allCompanies.length > 0 ? allCompanies : [];
 			if (sources.length === 0) {
 				try {
@@ -2783,14 +2721,12 @@
 				.upsert({ key: 'guide_content', value: content }, { onConflict: 'key' });
 			if (error) { alert('Fehler: ' + error.message); return; }
 
-			// Stand-Datum speichern
 			const today = new Date();
 			const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 			const dateStr = `${today.getDate()}. ${months[today.getMonth()]} ${today.getFullYear()}`;
 			await supabase.from('site_settings')
 				.upsert({ key: 'guide_updated_at', value: dateStr }, { onConflict: 'key' });
 			
-			// PDF hochladen falls ausgewählt
 			const pdfFile = document.getElementById('guide-pdf')?.files[0];
 			if (pdfFile) {
 				const pdfStatus = document.getElementById('guide-pdf-status');
@@ -2837,12 +2773,10 @@
 			const content = document.getElementById(type + '-guidelines-content').value;
 			if (!content.trim()) { alert('Kein Inhalt zum Speichern.'); return; }
 			
-			// Inhalt speichern
 			const { error } = await supabase.from('site_settings')
 				.upsert({ key, value: content }, { onConflict: 'key' });
 			if (error) { alert('Fehler: ' + error.message); return; }
 			
-			// Datum speichern
 			const today = new Date();
 			const months = ['Januar','Februar','März','April','Mai','Juni',
 							'Juli','August','September','Oktober','November','Dezember'];
@@ -2867,7 +2801,6 @@
 			const blob = new Blob([html], { type: 'text/html' });
 			const url = URL.createObjectURL(blob);
 			const w = window.open(url, '_blank');
-			// Aufräumen nach kurzer Verzögerung
 			setTimeout(() => URL.revokeObjectURL(url), 10000);
 		};
 
@@ -3089,7 +3022,6 @@
 		
 		window.viewPDF = async function(pdfPath) {
 			try {
-				console.log('📥 Lade PDF:', pdfPath);
 				
 				const { data, error } = await supabase.storage
 					.from('certificates')
@@ -3265,7 +3197,6 @@
 			
 			try {
 				if (newStatus === 'active') {
-					// Bei Aktivierung: Nutze die neue activateJob Funktion aus api.js
 					const result = await adminApi.activateJob(jobId);
 					
 					if (!result.success) {
@@ -3274,7 +3205,6 @@
 					
 					showSuccess('Stellenangebot erfolgreich aktiviert und E-Mail gesendet!');
 				} else {
-					// Bei Deaktivierung: Direkt Supabase nutzen
 					const result = await adminApi.deactivateJob(jobId);
 					
 					if (!result.success) {
@@ -3335,7 +3265,6 @@
 		}
 	</script>
 	<script>
-	// Tabs per Mausrad horizontal scrollen
 	document.addEventListener('DOMContentLoaded', function() {
 		const tabs = document.querySelector('.tabs');
 		if (tabs) {
