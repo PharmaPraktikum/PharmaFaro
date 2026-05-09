@@ -1,16 +1,5 @@
-// ============================================
-// PharmaFaro – API Functions für Backend-Kommunikation
-// ============================================
-
 import { supabase } from './supabase-client.js';
 
-// ============================================
-// REVIEWS
-// ============================================
-
-/**
- * Erstelle neue Bewertung
- */
 export async function createReview(reviewData) {
     try {
         const deleteToken = crypto.randomUUID();
@@ -51,13 +40,10 @@ export async function createReview(reviewData) {
     }
 }
 
-/**
- * Lade alle aktiven Bewertungen
- */
 export async function getActiveReviews() {
     try {
 		const { data, error } = await supabase
-			.from('public_reviews')  // statt 'reviews'
+			.from('public_reviews')
 			.select('*')
 			.eq('status', 'active')
 			.order('created_at', { ascending: false });
@@ -71,14 +57,6 @@ export async function getActiveReviews() {
     }
 }
 
-
-// ============================================
-// PDF UPLOAD
-// ============================================
-
-/**
- * Lade PDF hoch
- */
 export async function uploadCertificate(file, reviewId) {
     try {
         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
@@ -107,35 +85,9 @@ export async function uploadCertificate(file, reviewId) {
     }
 }
 
-/**
- * Hole PDF Download-URL
- */
-export async function getCertificateUrl(path) {
-    try {
-        const { data } = await supabase.storage
-            .from('certificates')
-            .createSignedUrl(path, 3600); // 1 Stunde gültig
-
-        if (!data.signedUrl) throw new Error('Keine URL erhalten');
-        
-        return { success: true, url: data.signedUrl };
-    } catch (error) {
-        console.error('❌ Fehler beim Erstellen der PDF-URL:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-// ============================================
-// JOBS
-// ============================================
-
-/**
- * Erstelle neues Stellenangebot
- */
 export async function createJob(jobData) {
 
     try {
-        // Generiere Deaktivierungs-Token
         const deactivateToken = crypto.randomUUID();
         
 		const insertData = {
@@ -175,9 +127,6 @@ export async function createJob(jobData) {
     }
 }
 
-/**
- * Lade alle aktiven Jobs
- */
 export async function getActiveJobs() {
     try {
         const { data, error } = await supabase
@@ -195,9 +144,6 @@ export async function getActiveJobs() {
     }
 }
 
-/**
- * Lade Job per Deaktivierungs-Token
- */
 export async function getJobByDeactivateToken(token) {
     try {
         const { data, error } = await supabase
@@ -215,9 +161,6 @@ export async function getJobByDeactivateToken(token) {
     }
 }
 
-/**
- * Deaktiviere Job per Token (vom Anbieter)
- */
 export async function deactivateJobByToken(token) {
     try {
         const { data, error } = await supabase
@@ -227,7 +170,7 @@ export async function deactivateJobByToken(token) {
                 deactivated_at: new Date().toISOString()
             })
             .eq('deactivate_token', token)
-            .eq('status', 'active') // Nur aktive Jobs können deaktiviert werden
+            .eq('status', 'active')
             .select()
             .single();
 
@@ -240,16 +183,8 @@ export async function deactivateJobByToken(token) {
     }
 }
 
-// ============================================
-// COMPANY PROFILES / VERIFICATIONS
-// ============================================
-
-/**
- * Erstelle Verifizierungsantrag
- */
 export async function createVerificationRequest(verificationData) {
     try {
-        // Generiere Edit-Token für spätere Unternehmensbearbeitung
         const editToken = crypto.randomUUID();
         
         const { data, error } = await supabase
@@ -273,16 +208,13 @@ export async function createVerificationRequest(verificationData) {
     }
 }
 
-/**
- * Lade Unternehmensprofil per Edit-Token
- */
 export async function getCompanyByEditToken(token) {
     try {
         const { data, error } = await supabase
             .from('company_verifications')
             .select('*')
             .eq('edit_token', token)
-            .eq('status', 'verified') // Nur verifizierte Unternehmen können bearbeitet werden
+            .eq('status', 'verified')
             .single();
 
         if (error) throw error;
@@ -294,9 +226,6 @@ export async function getCompanyByEditToken(token) {
     }
 }
 
-/**
- * Aktualisiere Unternehmensprofil
- */
 export async function updateCompanyProfile(token, profileData) {
     try {
         const { data, error } = await supabase
@@ -320,183 +249,6 @@ export async function updateCompanyProfile(token, profileData) {
         return { success: true, data };
     } catch (error) {
         console.error('❌ Fehler beim Aktualisieren:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-// ============================================
-// ADMIN FUNCTIONS
-// ============================================
-
-/**
- * Aktiviere eine Review (Admin)
- */
-export async function activateReview(reviewId) {
-    try {
-        const { data, error } = await supabase
-            .from('reviews')
-            .update({ 
-                status: 'active',
-                activated_at: new Date().toISOString()
-            })
-            .eq('id', reviewId)
-            .select()
-            .single();
-
-        if (error) throw error;
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('❌ Fehler beim Aktivieren:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-/**
- * Deaktiviere eine Review (Admin)
- */
-export async function deactivateReview(reviewId) {
-    try {
-        const { data, error } = await supabase
-            .from('reviews')
-            .update({ status: 'inactive' })
-            .eq('id', reviewId)
-            .select()
-            .single();
-
-        if (error) throw error;
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('❌ Fehler beim Deaktivieren:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-/**
- * Aktiviere einen Job (Admin) und sende E-Mail
- */
-export async function activateJob(jobId) {
-    try {
-        const { data, error } = await supabase
-            .from('jobs')
-            .update({ 
-                status: 'active',
-                activated_at: new Date().toISOString(),
-                expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 3 Monate
-            })
-            .eq('id', jobId)
-            .select()
-            .single();
-
-        if (error) throw error;
-        
-        
-        // Sende E-Mail an Ansprechperson
-        if (data.contact_email && window.sendConfirmationEmail) {
-            await window.sendConfirmationEmail('job_activated', {
-                email: data.contact_email,
-                companyName: data.company_name,
-                contactPerson: data.contact_person,
-                id: typeof data.id === 'string' ? data.id.substring(0, 8) : data.id,
-                deactivateToken: data.deactivate_token
-            });
-        }
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('❌ Fehler beim Aktivieren:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-/**
- * Deaktiviere einen Job (Admin)
- */
-export async function deactivateJob(jobId) {
-    try {
-        const { data, error } = await supabase
-            .from('jobs')
-            .update({ status: 'inactive' })
-            .eq('id', jobId)
-            .select()
-            .single();
-
-        if (error) throw error;
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('❌ Fehler beim Deaktivieren:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-/**
- * Genehmige Verifizierung (Admin) und sende E-Mail
- */
-export async function approveVerification(verificationId) {
-    try {
-        const { data, error } = await supabase
-            .from('company_verifications')
-            .update({ 
-                status: 'verified',
-                verified_at: new Date().toISOString()
-            })
-            .eq('id', verificationId)
-            .select()
-            .single();
-
-        if (error) throw error;
-        
-        
-        // Sende E-Mail an Ansprechperson
-        if (data.contact_email && window.sendConfirmationEmail) {
-            await window.sendConfirmationEmail('verification_approved', {
-                email: data.contact_email,
-                companyName: data.company_name,
-                contactPerson: data.contact_person,
-                editToken: data.edit_token
-            });
-        }
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('❌ Fehler beim Genehmigen:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-/**
- * Lehne Verifizierung ab (Admin) und sende E-Mail
- */
-export async function rejectVerification(verificationId, reason) {
-    try {
-        const { data, error } = await supabase
-            .from('company_verifications')
-            .update({ 
-                status: 'rejected',
-                rejection_reason: reason || null
-            })
-            .eq('id', verificationId)
-            .select()
-            .single();
-
-        if (error) throw error;
-        
-        
-        // Sende E-Mail an Ansprechperson
-        if (data.contact_email && window.sendConfirmationEmail) {
-            await window.sendConfirmationEmail('verification_rejected', {
-                email: data.contact_email,
-                companyName: data.company_name,
-                contactPerson: data.contact_person,
-                reason: reason
-            });
-        }
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('❌ Fehler beim Ablehnen:', error);
         return { success: false, error: error.message };
     }
 }
