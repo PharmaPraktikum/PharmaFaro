@@ -2021,7 +2021,7 @@
 							<select required id="internship-year">
 								<!-- Wird per JS gefüllt -->
 							</select>
-							<p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">Dein Praktikumsbeginn wird nur zur Auswahl des zu dem Zeitpunkt geltenden Tarifgehalts verwendet und ist nicht öffentlich einsehbar.</p>
+							<div class="verification-note">Dein Praktikumsbeginn wird nur zur Auswahl des zu dem Zeitpunkt geltenden Tarifgehalts verwendet und ist nicht öffentlich einsehbar.</div>
 						</div>						
 
                         <div class="form-section">
@@ -3981,12 +3981,6 @@
 			}
 		}
 
-		function extractEmailFromContact(contactText) {
-			const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/;
-			const match = contactText.match(emailRegex);
-			return match ? match[0] : '';
-		}
-
 		document.addEventListener('DOMContentLoaded', function() {
 			initJobStartYears();
 		});
@@ -4263,108 +4257,6 @@
 				content.classList.add('active');
 			}
 		}
-
-		function createCompanyPageHTML(company, customDescription) {
-			const tempCompany = {...company};
-			if (customDescription) {
-				tempCompany.description = customDescription;
-			}
-			
-			const bestReview = company.reviews.length > 0 ? 
-				company.reviews.reduce((best, current) => 
-					calculateOverallRating(current.ratings) > calculateOverallRating(best.ratings) ? current : best
-				) : null;
-				
-			const worstReview = company.reviews.length > 1 ? 
-				company.reviews.reduce((worst, current) => 
-					calculateOverallRating(current.ratings) < calculateOverallRating(worst.ratings) ? current : worst
-				) : null;
-			
-			const ratingDistribution = calculateRatingDistribution(company.reviews);
-			const latestJobs = company.jobs.slice(-2).reverse();
-			
-			return `
-				<!-- Header -->
-				<div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
-					<img src="${tempCompany.profileImage}" style="width: 100px; height: 100px; border-radius: 50%;">
-					<div style="flex: 1;">
-						<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-							<h1 style="margin: 0; font-size: 2.5rem;">${tempCompany.name}</h1>
-							${tempCompany.verified ? '<div class="verified-badge"><svg width="38" height="38" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0;"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>' : ''}
-						</div>
-						<p style="margin: 0; color: #666; font-size: 1.1rem;">${tempCompany.address}, ${getStateLabel(tempCompany.state)}${tempCompany.country ? ', ' + tempCompany.country : ''}</p>
-						${tempCompany.website ? `<p style="margin: 0.5rem 0 0 0; color: var(--red); font-size: 1rem;"><a href="https://${tempCompany.website}" target="_blank" style="color: var(--red); text-decoration: none;">${tempCompany.website}</a></p>` : ''}
-						<div class="category-badge" style="margin-top: 0.5rem;">${getCategoryLabel(tempCompany.category)}</div>
-					</div>
-					<div style="text-align: center;">
-						<div class="stars" style="font-size: 1.5rem; margin-bottom: 0.5rem;">
-							${generateStarHTML(Math.round(tempCompany.averageRating))}
-						</div>
-						<div style="color: #666;">
-							${tempCompany.reviews.length} Bewertung${tempCompany.reviews.length !== 1 ? 'en' : ''}
-						</div>
-					</div>
-				</div>
-
-				${tempCompany.description ? `
-				<!-- Unternehmensbeschreibung -->
-				<div style="margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
-					<h3>Über uns</h3>
-					<p style="line-height: 1.6;">${tempCompany.description}</p>
-				</div>
-				` : ''}
-
-				<!-- Bewertungsbereich -->
-				<div style="margin-bottom: 3rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
-					<h3 style="margin-bottom: 2rem;">Bewertungen</h3>
-					
-					${company.reviews.length > 0 ? `
-					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
-						<div>
-							<h4 style="font-family: 'Fraunces', serif; color: #155724; margin-bottom: 1rem;">Beste Bewertung</h4>
-							${createReviewCard(bestReview)}
-						</div>
-						<div>
-							<h4 style="font-family: 'Fraunces', serif; color: var(--red); margin-bottom: 1rem;">Schlechteste Bewertung</h4>
-							${company.reviews.length > 1 ? createReviewCard(worstReview) : '<p style="color: #666;">Bisher nur eine Bewertung vorhanden.</p>'}
-						</div>
-					</div>
-					` : '<p style="color: #666;">Noch keine Bewertungen vorhanden.</p>'}
-				</div>
-
-				<!-- Stellenangebote -->
-				<div style="padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
-					<h3 style="margin-bottom: 2rem;">Stellenangebote</h3>
-					
-					${company.jobs.length > 0 ? `
-					<div style="margin-bottom: 2rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
-						${latestJobs.map(job => createJobCard(job)).join('')}
-					</div>
-					` : '<p style="color: #666;">Keine aktuellen Stellenangebote vorhanden.</p>'}
-				</div>
-			`;
-		}
-
-		function createCompanyPagePreview(company, customDescription) {
-			const tempCompany = {...company};
-			tempCompany.description = customDescription;
-			
-			return `
-				<div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
-					<img src="${tempCompany.profileImage}" style="width: 100px; height: 100px; border-radius: 50%;">
-					<div>
-						<h1 style="margin: 0 0 0.5rem 0;">${tempCompany.name}</h1>
-						<p style="color: #666;">${tempCompany.address}, ${tempCompany.state}</p>
-					</div>
-				</div>
-				${customDescription ? `
-				<div style="padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
-					<h3>Über uns</h3>
-					<p style="line-height: 1.6;">${customDescription}</p>
-				</div>
-				` : ''}
-			`;
-		}
 		      
         function getStatusText(status) {
             const statusTexts = {
@@ -4379,142 +4271,6 @@
             const date = new Date(dateString);
             return date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'});
         }
-        
-		function previewReview(reviewId) {
-			const review = reviewDatabase.find(r => r.id === reviewId);
-			if (!review) {
-				showToast('Bewertung nicht gefunden.', 'error');
-				return;
-			}
-			
-			const formattedHours = formatWorkingHoursForDisplay(review.workingHoursData || []);
-			
-			const reviewForDisplay = {
-				id: review.id,
-				adminId: review.id,
-				companyName: review.companyName,
-				address: review.address,
-				state: review.state,
-				category: getCategoryLabel(review.category),
-				specializations: review.specializations || '',
-				customerType: review.customerType || '',
-				salary: review.salary,
-				workingHours: formattedHours.regular || [],
-				saturdayHours: formattedHours.saturday || [],
-				saturdayWork: review.saturdayWork || 0,
-				vacationDays: review.vacationDays || 0,
-				verified: review.verified || false,
-				ratings: review.ratings || {},
-				tasks: review.tasks || '',
-				feedback: review.feedback || '',
-				highlights: review.highlights || '',
-				benefits: review.benefits || ''
-			};
-			
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 900px; width: 90%; max-height: 90vh;">
-					<div class="modal-header">
-						<h2>Vorschau: Bewertung #${reviewId}</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body" style="overflow-y: auto;">
-						${createReviewCard(reviewForDisplay)}
-						
-						<div style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px;">
-							<h3 style="margin-bottom: 1rem;">Praktikumsbescheinigung</h3>
-							<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-								<span style="color: var(--red); font-weight: 600;">✓ Bescheinigung vorhanden</span>
-								<span style="color: #666;">${review.verificationFile || 'Dateiname nicht verfügbar'}</span>
-							</div>
-							<button class="btn btn-primary" onclick="viewCertificate('${review.verificationFile || 'unknown.pdf'}')">Bescheinigung anzeigen</button>
-						</div>
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Schließen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-		}
- 
-		function viewCertificate(filename) {
-			
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			
-			const fileExtension = filename.split('.').pop().toLowerCase();
-			const isPDF = fileExtension === 'pdf';
-			const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension);
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 1200px; width: 95%; max-height: 95vh;">
-					<div class="modal-header">
-						<h2>Praktikumsbescheinigung: ${filename}</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body" style="overflow: auto; max-height: calc(95vh - 120px);">
-						${isPDF ? `
-							<div style="background: #f8f9fa; padding: 2rem; text-align: center; border-radius: 8px;">
-								<p style="margin-bottom: 1rem;">PDF-Datei: <strong>${filename}</strong></p>
-								<p style="color: #666; margin-bottom: 1.5rem;">
-									Hinweis: In der Entwicklungsumgebung können PDF-Dateien nicht direkt angezeigt werden.
-									In der Produktivumgebung würde hier die PDF-Datei eingebettet werden.
-								</p>
-								<div style="padding: 3rem; background: white; border: 2px dashed #dee2e6; border-radius: 8px; margin: 1rem 0;">
-									<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2" style="margin-bottom: 1rem;">
-										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-										<polyline points="14 2 14 8 20 8"></polyline>
-										<line x1="16" y1="13" x2="8" y2="13"></line>
-										<line x1="16" y1="17" x2="8" y2="17"></line>
-										<polyline points="10 9 9 9 8 9"></polyline>
-									</svg>
-									<p style="font-size: 1.2rem; color: #333; margin: 0;">PDF Vorschau-Platzhalter</p>
-								</div>
-								<button class="btn btn-primary" onclick="alert('Download-Funktion würde hier die Datei herunterladen')">
-									Datei herunterladen
-								</button>
-							</div>
-						` : isImage ? `
-							<div style="text-align: center;">
-								<p style="margin-bottom: 1rem;">Bild-Datei: <strong>${filename}</strong></p>
-								<div style="padding: 2rem; background: #f8f9fa; border-radius: 8px;">
-									<p style="color: #666; margin-bottom: 1rem;">
-										Hinweis: In der Entwicklungsumgebung kann das hochgeladene Bild nicht angezeigt werden.
-										In der Produktivumgebung würde hier das Bild erscheinen.
-									</p>
-									<div style="min-height: 400px; background: white; border: 2px dashed #dee2e6; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-										<div style="text-align: center; color: #999;">
-											<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem;">
-												<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-												<circle cx="8.5" cy="8.5" r="1.5"></circle>
-												<polyline points="21 15 16 10 5 21"></polyline>
-											</svg>
-											<p>Bild Vorschau-Platzhalter</p>
-										</div>
-									</div>
-								</div>
-							</div>
-						` : `
-							<div style="background: #fff3cd; padding: 2rem; text-align: center; border-radius: 8px; border-left: 4px solid #ffc107;">
-								<p>Dateiformat nicht unterstützt: <strong>${fileExtension.toUpperCase()}</strong></p>
-								<p style="color: #666; margin-top: 0.5rem;">Diese Datei kann nicht in der Vorschau angezeigt werden.</p>
-							</div>
-						`}
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Schließen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-		}
         
         function getSpecializationLabel(value) {
             const labels = {
@@ -4594,47 +4350,6 @@
             };
             return labels[value] || value;
         }
-        
-        function generateUserToken(reviewId) {
-            return 'user_' + reviewId + '_' + Math.random().toString(36).substr(2, 9);
-        }
-        
-		function convertToPublicJob(adminJob) {
-			const workingHours = formatWorkingHoursForDisplay(adminJob.workingHoursData || []);
-			
-			addJobToCompany({
-				...adminJob,
-				companyName: adminJob.companyName,
-				address: adminJob.address,
-				category: getCategoryLabel(adminJob.category),
-				workingHours: workingHours
-			});
-			
-			const publicJob = {
-				id: jobsData.length + 1,
-				adminId: adminJob.id,
-				companyName: adminJob.companyName,
-				address: adminJob.address + (adminJob.country ? `, ${adminJob.country}` : ''),
-				category: getCategoryLabel(adminJob.category),
-				specializations: adminJob.specializations || '',
-				area: adminJob.area || '',
-				salary: adminJob.salary,
-				workingHours: workingHours.regular,
-				saturdayHours: workingHours.saturday,
-				saturdayWork: adminJob.saturdayWork,
-				vacationDays: adminJob.vacationDays,
-				verified: false,
-				benefits: adminJob.benefits || '',
-				description: adminJob.description,
-				contactPerson: adminJob.contactPerson,
-				contactEmail: adminJob.contactEmail,
-				applicationNotes: adminJob.applicationNotes,
-				earliestStart: adminJob.earliest_start || adminJob.earliestStart || '',
-				postedDays: Math.floor((new Date() - new Date(adminJob.submittedAt)) / (1000 * 60 * 60 * 24))
-			};
-			
-			return publicJob;
-		}
 		
 		const reviewsData = [];
 
@@ -4983,7 +4698,6 @@
 			company.reviews.push(reviewData);
 			updateCompanyAverageRating(company);
 
-			// BPhD Award verlinken falls vorhanden
 			linkBphdAwardToCompany(company);
 		}
 
@@ -5022,28 +4736,6 @@
 					}
 				}
 			});
-		}
-
-		function extractStateFromAddress(address) {
-			const states = ['Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen', 
-						   'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
-						   'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen',
-						   'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen'];
-			
-			for (const state of states) {
-				if (address.includes(state)) {
-					return state;
-				}
-			}
-			return '';
-		}
-
-		function extractCountryFromAddress(address) {
-			if (address.includes('Österreich') || address.includes('Schweiz')) {
-				const parts = address.split(',');
-				return parts[parts.length - 1].trim();
-			}
-			return '';
 		}
 
 		function updateCompanyAverageRating(company) {
@@ -5761,86 +5453,6 @@
 			showCompanyPage(companyName);
 		}
 
-		function showCompanyReviewIds(companyName) {
-			const company = Object.values(companiesData).find(c => c.name === companyName);
-			if (!company || !company.reviews || company.reviews.length === 0) {
-				showToast(`Keine Bewertungen für ${companyName} gefunden.`, 'info');
-				return;
-			}
-			
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 1400px; width: 95%; max-height: 90vh;">
-					<div class="modal-header">
-						<h2>Bewertungen für ${companyName}</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body" style="overflow-y: auto;">
-						<div style="margin-bottom: 1.5rem;">
-							<strong>Anzahl:</strong> ${company.reviews.length} Bewertung${company.reviews.length !== 1 ? 'en' : ''}
-						</div>
-						<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem;">
-							${company.reviews.slice().reverse().map(review => createReviewCard(review)).join('')}
-						</div>
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Schließen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-		}
-
-		function showCompanyJobIds(companyName, type) {
-			const company = Object.values(companiesData).find(c => c.name === companyName);
-			if (!company || !company.jobs) {
-				showToast(`Keine Stellenangebote für ${companyName} gefunden.`, 'info');
-				return;
-			}
-			
-			let jobs = company.jobs;
-			if (type === 'active') {
-				jobs = jobs.filter(j => j.postedDays <= 90);
-			} else {
-				jobs = jobs.filter(j => j.postedDays > 90);
-			}
-			
-			if (jobs.length === 0) {
-				showToast(`Keine ${type === 'active' ? 'aktiven' : 'abgelaufenen'} Stellenangebote für ${companyName} gefunden.`, 'info');
-				return;
-			}
-			
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 1400px; width: 95%; max-height: 90vh;">
-					<div class="modal-header">
-						<h2>${type === 'active' ? 'Aktive' : 'Abgelaufene'} Stellenangebote für ${companyName}</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body" style="overflow-y: auto;">
-						<div style="margin-bottom: 1.5rem;">
-							<strong>Anzahl:</strong> ${jobs.length} Stellenangebot${jobs.length !== 1 ? 'e' : ''}
-						</div>
-						<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem;">
-							${jobs.map(job => createJobCard(job)).join('')}
-						</div>
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Schließen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-		}
-
         function toggleDistanceSorting() {
             const locationFilter = document.getElementById('location-filter').value;
             const distanceOption = document.getElementById('distance-sort-option');
@@ -6416,7 +6028,6 @@
         function applyAdvancedFilters() {
             activeAdvancedFilters = [];
             
-            // Spezialisierungen sammeln
 			const specializations = document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]:checked');
 			specializations.forEach(checkbox => {
 				const specValues = ['sterilherstellung', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung', 'sonstige-spec'];
@@ -6435,12 +6046,10 @@
 				}
 			});
             
-			// Wenn Spezialisierungen ausgewählt, Offizin-Kategorie im Dropdown setzen
 			if (activeAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung'].includes(f))) {
 				document.getElementById('category-filter').value = 'offizin';
 			}
 
-            // Benefits sammeln
 			const benefitValues = ['wohnung', 'sonderzahlungen', 'fortbildung', 'kantine', 'diplomarbeit', 'homeoffice', 'sonstige-ben'];
 			document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]:checked').forEach(checkbox => {
 				if (benefitValues.includes(checkbox.value)) {
@@ -6457,7 +6066,6 @@
 				}
 			});
             
-			// Kundschaft
             const customerType = document.getElementById('customer-type-filter').value;
             if (customerType) {
                 const labels = {
@@ -6467,22 +6075,18 @@
                 };
                 if (labels[customerType]) {
                     activeAdvancedFilters.push(labels[customerType]);
-                    // Kategorie Offizin automatisch mitsetzen
                     document.getElementById('category-filter').value = 'offizin';
                 }
             }
             
-            // Hohe Bezahlung
             if (document.getElementById('high-salary-filter').checked) {
                 activeAdvancedFilters.push('Bezahlung über Tarif');
             }
 
-            // Tarifliches Mindestgehalt
             if (document.getElementById('tariff-salary-filter').checked) {
                 activeAdvancedFilters.push('Tarifliches Mindestgehalt');
             }
 
-			// Angemessenes Gehalt
 			if (document.getElementById('adequate-salary-filter').checked) {
 				activeAdvancedFilters.push('Angemessenes Gehalt');
 			}
@@ -6491,7 +6095,6 @@
 				activeAdvancedFilters.push('Untertarifliche Bezahlung');
 			}			
 
-			// Zeitmodell
 			const timeModel = document.getElementById('time-model-filter').value;
 			if (timeModel === 'fest') {
 				activeAdvancedFilters.push('Feste Arbeitszeiten');
@@ -6499,7 +6102,6 @@
 				activeAdvancedFilters.push('Gleitzeit');
 			}
 
-            // BPhD Auszeichnung
             if (document.getElementById('bphd-award-filter').checked) {
                 activeAdvancedFilters.push('Ausgezeichnet vom BPhD');
             }
@@ -6519,18 +6121,16 @@
 				document.getElementById('category-filter').value = 'universitaet';
 			}
 
-			// Umkreissuche
 			const radiusPlz = document.getElementById('radius-plz').value.trim();
 			const radiusDistance = document.getElementById('radius-distance').value;
 			if (radiusPlz) {
 				if (radiusPlz.length === 5 && /^\d{5}$/.test(radiusPlz)) {
 					activeAdvancedFilters.push(`Im Umkreis von ${radiusDistance} km`);
-					// Setze PLZ auch ins Hauptfilter
 					document.getElementById('location-filter').value = radiusPlz;
 					document.getElementById('radius-plz-error').style.display = 'none';
 				} else {
 					document.getElementById('radius-plz-error').style.display = 'block';
-					return; // Abbrechen
+					return;
 				}
 			}
             
@@ -6553,7 +6153,6 @@
 			ensureFilterYearsPopulated();
             document.querySelectorAll('#job-advanced-filters-modal input[type="checkbox"]').forEach(cb => cb.checked = false);
             document.querySelectorAll('#job-advanced-filters-modal select').forEach(sel => sel.value = '');
-			// Frühester Beginn wiederherstellen
 			const activeStartFilter = activeJobAdvancedFilters.find(f => f.startsWith('Frühester Beginn:'));
 			if (activeStartFilter) {
 				if (activeStartFilter === 'Frühester Beginn: Flexibel') {
@@ -6570,7 +6169,6 @@
 				}
 			}
 
-			// Ausklappbare Abschnitte zuklappen
 			['job-offizin-content','job-industrie-content','job-universitaet-content'].forEach(id => {
 				const el = document.getElementById(id);
 				if (el) el.style.display = 'none';
@@ -6604,7 +6202,6 @@
                 'Überwiegend Laufkundschaft': 'laufkundschaft'
             };
 
-			// Bereich-Filter wiederherstellen
 			const jobBereichFilter = activeJobAdvancedFilters.find(f => f.startsWith('Bereich: '));
 			if (jobBereichFilter) {
 				const bereichVal = jobBereichFilter.replace('Bereich: ', '');
@@ -6630,7 +6227,6 @@
                 }
             });
 
-			// Abschnitte aufklappen wenn aktive Filter
 			const jobOffizinActive = activeJobAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung','Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft'].includes(f));
 			const jobIndustrieActive = activeJobAdvancedFilters.some(f => f.startsWith('Bereich: ') && ['Qualitätskontrolle','Qualitätssicherung','Produktion','Zulassung','Forschung'].some(b => f.includes(b)));
 			const jobUniActive = activeJobAdvancedFilters.some(f => f.startsWith('Bereich: ') && ['Pharmazeutische','Medizinische','Pharmakologie','Pharmaziegeschichte'].some(b => f.includes(b)));
@@ -6642,7 +6238,6 @@
 		function applyJobAdvancedFilters() {
             activeJobAdvancedFilters = [];
 
-			// Frühester Beginn
 			const filterStartType = document.getElementById('job-filter-start-type')?.value;
 			if (filterStartType === 'flexible') {
 				activeJobAdvancedFilters.push('Frühester Beginn: Flexibel');
@@ -6654,7 +6249,6 @@
 				}
 			}
             
-			// Spezialisierungen sammeln
 			const specializations = document.querySelectorAll('#job-advanced-filters-modal input[type="checkbox"]:checked');
 			specializations.forEach(checkbox => {
 				const specValues = ['sterilherstellung', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung', 'sonstige-spec'];
@@ -6673,12 +6267,10 @@
 				}
 			});
 
-			// Wenn Spezialisierungen ausgewählt, Offizin-Kategorie im Dropdown setzen
 			if (activeJobAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung'].includes(f))) {
 				document.getElementById('job-category-filter').value = 'offizin';
 			}
             
-            // Benefits sammeln
 			const benefitValues = ['wohnung', 'sonderzahlungen', 'fortbildung', 'kantine', 'diplomarbeit', 'homeoffice', 'sonstige-ben'];
 			document.querySelectorAll('#job-advanced-filters-modal input[type="checkbox"]:checked').forEach(checkbox => {
 				if (benefitValues.includes(checkbox.value)) {
@@ -6695,7 +6287,6 @@
 				}
 			});
             
-			// Kundschaft
             const jobCustomerType = document.getElementById('job-customer-type-filter').value;
             if (jobCustomerType) {
                 const labels = {
@@ -6709,12 +6300,10 @@
                 }
             }
             
-            // Hohe Bezahlung
             if (document.getElementById('job-high-salary-filter').checked) {
                 activeJobAdvancedFilters.push('Bezahlung über Tarif');
             }
 
-            // Tarifliches Mindestgehalt
             if (document.getElementById('job-tariff-salary-filter').checked) {
                 activeJobAdvancedFilters.push('Tarifliches Mindestgehalt');
             }
@@ -6740,7 +6329,6 @@
 				activeJobAdvancedFilters.push('Verifiziertes Unternehmen');
 			}
 
-			// Angemessenes Gehalt
 			if (document.getElementById('job-adequate-salary-filter').checked) {
 				activeJobAdvancedFilters.push('Angemessenes Gehalt');
 			}
@@ -6749,7 +6337,6 @@
 				activeJobAdvancedFilters.push('Untertarifliche Bezahlung');
 			}			
 
-			// Zeitmodell
 			const timeModel = document.getElementById('job-time-model-filter').value;
 			if (timeModel === 'fest') {
 				activeJobAdvancedFilters.push('Feste Arbeitszeiten');
@@ -6757,7 +6344,6 @@
 				activeJobAdvancedFilters.push('Gleitzeit');
 			}
             
-			// Umkreissuche — exakt wie bei Bewertungen
 			const jobRadiusPlz = document.getElementById('job-radius-plz').value.trim();
 			const jobRadiusDistance = document.getElementById('job-radius-distance').value;
 			if (jobRadiusPlz) {
@@ -6827,13 +6413,12 @@
             const timeText = reviewCard.querySelector('.job-detail-row:nth-child(2) div').textContent;
             const match = timeText.match(/(\d{1,2}):(\d{2})/);
             if (match) {
-                return parseInt(match[1]) * 60 + parseInt(match[2]); // Convert to minutes
+                return parseInt(match[1]) * 60 + parseInt(match[2]);
             }
-            return 999999; // Default for sorting
+            return 999999;
         }
 
 		function getSaturdayWork(reviewCard) {
-			// Finde das Review-Objekt
 			const adminId = parseInt(reviewCard.getAttribute('data-admin-id'));
 			const reviewObj = reviewsData.find(r => r.adminId === adminId || r.id === adminId);
 			
@@ -6841,7 +6426,6 @@
 				return reviewObj.saturdayWork;
 			}
 			
-			// Fallback: Parse aus dem DOM
 			const detailRows = reviewCard.querySelectorAll('.job-detail-row');
 			for (let row of detailRows) {
 				const label = row.querySelector('.job-detail-label');
@@ -6876,8 +6460,6 @@
 						const daysA = parseInt(daysTextA.match(/\d+/)[0]);
 						const daysB = parseInt(daysTextB.match(/\d+/)[0]);						
 						
-						// Kleinere Zahl = aktueller = soll ZUERST kommen
-						// 2 - 7 = -5 (negativ) → A vor B ✓
 						return daysA - daysB;
 
 					case 'date-asc':
@@ -6932,15 +6514,13 @@
 
         function sortWorkingHours(hoursArray) {
             return hoursArray.sort((a, b) => {
-                // Extrahiere Startzeit (format: "HH:MM - HH:MM")
                 const timeA = a.split(' - ')[0];
                 const timeB = b.split(' - ')[0];
                 
-                // Konvertiere zu Minuten für Vergleich
                 const minutesA = timeToMinutes(timeA);
                 const minutesB = timeToMinutes(timeB);
                 
-                return minutesA - minutesB; // Aufsteigend sortieren (frühester zuerst)
+                return minutesA - minutesB;
             });
         }
 
@@ -6951,7 +6531,6 @@
 				value = value.substring(0, 4);
 			}
 			
-			// Auto-Formatierung während der Eingabe
 			if (value.length >= 3) {
 				const hours = value.substring(0, 2);
 				const minutes = value.substring(2, 4);
@@ -6960,7 +6539,6 @@
 			
 			input.value = value;
 			
-			// Keine Validierung während Eingabe
 			input.setCustomValidity('');
 			input.style.borderColor = '#e9ecef';
 		}
@@ -6971,25 +6549,20 @@
         }
 
 		function getTariffForYear(year) {
-			// Tarifhistorie: window.tariffHistory = [{from: 2020, to: 2022, amount: 1000}, ...]
-			// to: null bedeutet "Aktuell"
 			if (!year || !window.tariffHistory || window.tariffHistory.length === 0) {
 				return window.tariffSalary || 1040;
 			}
-			// Filtere alle Perioden die das Jahr abdecken
 			const matching = window.tariffHistory.filter(entry => {
 				const from = entry.from;
-				const to = entry.to; // null = aktuell
+				const to = entry.to;
 				return year >= from && (to === null || year <= to);
 			});
 			if (matching.length === 0) return window.tariffSalary || 1040;
-			// Wenn mehrere zutreffen: nimm den mit dem höchsten 'from' (späterer Zeitraum)
 			matching.sort((a, b) => b.from - a.from);
 			return matching[0].amount;
 		}
 
 		function getSalaryBadge(salary, internshipYear) {
-			// Jobs: kein internshipYear → immer aktueller Tarif
 			const tariff = internshipYear ? getTariffForYear(internshipYear) : (window.tariffSalary || 1040);
 			const note = internshipYear ? '\n(Zum Zeitpunkt des Praktikumsbeginns)' : '';
 
@@ -7062,7 +6635,6 @@
         }
 
 		function createReviewCard(reviewData) {
-            // Alle Nutzerdaten escapen
             const safeCompanyName = escapeHtml(reviewData.companyName);
             const safeAddress = escapeHtml(reviewData.address);
             const safeSpecializations = escapeHtml(reviewData.specializations);
@@ -7232,55 +6804,6 @@
                 container.innerHTML += createJobCard(jobData);
             });
         }
-
-        function generateJobDetails(reviewData) {
-            const workingHours = sortWorkingHours(reviewData.workingHours);
-            
-            let html = '<div class="job-details">';
-            html += `<div class="job-detail-row"><span class="job-detail-label">Bruttogehalt:</span><span>${reviewData.salary}€</span></div>`;
-            
-            html += '<div class="job-detail-row"><span class="job-detail-label">Arbeitszeiten:</span><div>';
-            workingHours.forEach(time => {
-                html += `<div>${time}</div>`;
-            });
-            html += '</div></div>';
-            
-            if (reviewData.saturdayWork > 0) {
-                html += '<div class="job-detail-row"><span class="job-detail-label">Samstagsarbeit:</span><div>';
-                html += `<div>${reviewData.saturdayWork}x pro Monat</div>`;
-                if (reviewData.saturdayHours) {
-                    html += `<div>${reviewData.saturdayHours}</div>`;
-                }
-                html += '</div></div>';
-            }
-            
-            html += '</div>';
-            
-            return html;
-        }
-
-        function generateCommentsSection(reviewData) {
-            let html = '<div class="comments-section">';
-            
-            if (reviewData.tasks) {
-                html += `<div class="comment-item"><div class="comment-label">Absolvierte Aufgaben:</div><div class="comment-text">${reviewData.tasks}</div></div>`;
-            }
-            
-            if (reviewData.feedback) {
-                html += `<div class="comment-item"><div class="comment-label">Lob/Kritik:</div><div class="comment-text">${reviewData.feedback}</div></div>`;
-            }
-            
-            if (reviewData.highlights) {
-                html += `<div class="comment-item"><div class="comment-label">Besonders Hervorzuheben:</div><div class="comment-text">${reviewData.highlights}</div></div>`;
-            }
-            
-            if (reviewData.benefits) {
-                html += `<div class="comment-item"><div class="comment-label">Benefits:</div><div class="comment-text">${safeBenefits}</div></div>`;
-            }
-            
-            html += '</div>';
-            return html;
-        }
 		
         function applyJobFilters() {
             updateJobResetButtonVisibility();
@@ -7293,13 +6816,11 @@
             jobs.forEach(job => {
                 let showJob = true;
                 
-                // Firmenname Filter
                 const companyName = document.getElementById('job-company-filter').value.toLowerCase();
                 if (companyName && !job.textContent.toLowerCase().includes(companyName)) {
                     showJob = false;
                 }
                 
-				// Location/PLZ Filter
 				const location = document.getElementById('job-location-filter').value.toLowerCase();
 				if (location) {
 					const addressElement = job.querySelector('.job-info p');
@@ -7320,7 +6841,6 @@
 					}
 				}
                 
-                // Bundesland Filter
 				const selectedState = document.getElementById('job-state-filter').value;
 				if (selectedState) {
 					if (selectedState === 'Ausland') {
@@ -7337,7 +6857,6 @@
 					}
 				}
                 
-                // Kategorie Filter
                 const selectedCategory = document.getElementById('job-category-filter').value;
                 if (selectedCategory) {
                     const categoryElement = job.querySelector('.category-badge');
@@ -7346,14 +6865,12 @@
                     }
                 }
 
-                // Aktualitäts Filter
                 const dateFilter = document.getElementById('job-date-filter').value;
                 if (dateFilter) {
-                    // Finde das Element mit "Veröffentlicht vor X Tagen"
                     const dateElement = job.querySelector('.job-posted-date');
                     if (dateElement) {
                         const daysText = dateElement.textContent;
-                        const days = parseInt(daysText.match(/\d+/)[0]); // Extrahiere Zahl
+                        const days = parseInt(daysText.match(/\d+/)[0]);
                         
                         const maxDays = parseInt(dateFilter);
                         if (days > maxDays) {
@@ -7362,7 +6879,6 @@
                     }
                 }
                 
-                // Gehalt Filter
                 const minSalary = document.getElementById('job-salary-filter').value;
                 if (minSalary) {
                     const salaryElement = job.querySelector('.salary-badge') || job.querySelector('[style*="font-size: 1.2rem"]');
@@ -7374,7 +6890,6 @@
                     }
                 }
 
-				// Erweiterte Filter prüfen
 				const jobCatSpecificFilters = ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung',
 					'Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung',
 					'Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft',
@@ -7395,7 +6910,6 @@
 					}
 				});
 
-				// Spezialisierungs-Filter (inkl. Sonstige)
 				const activeJobSpecFilters = activeJobAdvancedFilters.filter(f =>
 					['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung',
 					 'Klinikversorgung','Homöopathie','Ernährungsberatung'].includes(f)
@@ -7418,7 +6932,6 @@
 					if (!hasSonstige) showJob = false;
 				}
 
-				// Kundschafts-Filter
 				const activeJobKundschaftFilters = activeJobAdvancedFilters.filter(f =>
 					['Überwiegend Stammkundschaft','Gemischte Kundschaft','Überwiegend Laufkundschaft'].includes(f)
 				);
@@ -7433,7 +6946,6 @@
 					if (!kundschaftMatch) showJob = false;
 				}
 
-				// Sonstige Benefits Filter
 				if (activeJobAdvancedFilters.includes('Sonstige Benefits')) {
 					const standardBenefits = ['wohnung','sonderzahlungen','fort- und weiterbildungsangebot',
 						'fort- und weiterbildung','kantine','diplomarbeit','homeoffice'];
@@ -7448,7 +6960,6 @@
 					if (!hasSonstigeBenefits) showJob = false;
 				}
 
-				// BPhD-Filter für Jobs
 				if (activeJobAdvancedFilters.includes('Ausgezeichnet vom BPhD')) {
 					const jobCompanyName = (job.querySelector('.job-info [onclick]')?.textContent || '').toLowerCase().trim();
 					let hasBphd = false;
@@ -7464,7 +6975,6 @@
 					if (!hasBphd) showJob = false;
 				}
 
-				// Verifiziert-Filter für Jobs
 				if (activeJobAdvancedFilters.includes('Verifiziertes Unternehmen')) {
 					const jobCompanyName = (job.querySelector('.job-info [onclick]')?.textContent || '').toLowerCase().trim();
 					let isVerified = false;
@@ -7478,7 +6988,6 @@
 					if (!isVerified) showJob = false;
 				}
 
-				// Frühester Beginn Filter
 				const startFilter = activeJobAdvancedFilters.find(f => f.startsWith('Frühester Beginn:'));
 				if (startFilter) {
 					const jobStart = job.getAttribute('data-earliest-start') || '';
@@ -7503,14 +7012,12 @@
 					}
 				}
 
-				// Bereich-Filter
 				const jobBereichFilter = activeJobAdvancedFilters.find(f => f.startsWith('Bereich: '));
 				if (jobBereichFilter) {
 					const bereichValue = jobBereichFilter.replace('Bereich: ', '');
 					if (!job.textContent.includes(bereichValue)) showJob = false;
 				}
 
-				// Gehalts-Filter (OR-Logik)
 				const salaryCategories = ['Bezahlung über Tarif', 'Angemessenes Gehalt', 'Tarifliches Mindestgehalt', 'Untertarifliche Bezahlung'];
 				const activeSalaryFilters = activeJobAdvancedFilters.filter(f => salaryCategories.includes(f));
 				if (activeSalaryFilters.length > 0) {
@@ -7529,7 +7036,6 @@
 					}
 				}
 
-				// Zeitmodell Filter
 				if (activeJobAdvancedFilters.includes('Feste Arbeitszeiten')) {
 					const jobText = job.textContent.toLowerCase();
 					if (jobText.includes('gleitzeit')) {
@@ -7543,7 +7049,6 @@
 					}
 				}
 
-				// Umkreissuche Filter (async)
 				if (activeJobAdvancedFilters.some(f => f.startsWith('Im Umkreis von'))) {
 					const radiusFilter = activeJobAdvancedFilters.find(f => f.startsWith('Im Umkreis von'));
 					const radiusKm = parseInt(radiusFilter.match(/\d+/)[0]);
@@ -7571,7 +7076,6 @@
 				job.style.display = showJob ? 'block' : 'none';
             });
 
-			// Wenn Frühester-Beginn-Filter aktiv: sichtbare Jobs nach Startdatum sortieren
 			const activeStartFilter = activeJobAdvancedFilters.find(f => f.startsWith('Frühester Beginn: ab '));
 			if (activeStartFilter) {
 				const container = document.getElementById('jobs-container');
@@ -7587,11 +7091,9 @@
 					return getDate(a) - getDate(b);
 				});
 
-				// DOM-Reihenfolge neu setzen
 				visibleJobs.forEach(j => container.appendChild(j));
 			}
 
-			// Warte auf alle Radius-Checks parallel
 			if (window.jobRadiusPromises && window.jobRadiusPromises.length > 0) {
 				Promise.all(window.jobRadiusPromises).then(() => {
 					window.jobRadiusPromises = [];
@@ -7602,14 +7104,12 @@
 			}
         }
 
-        // Formulare
 		document.getElementById('review-form').addEventListener('submit', async function(e) {
 			e.preventDefault();
 			
 			const submitBtn = this.querySelector('button[type="submit"]');
 			const originalText = submitBtn ? submitBtn.textContent : '';
 			
-			// Validierung der Sterne-Bewertungen
 			const requiredRatings = ['betreuung', 'atmosphaere', 'team', 'arbeitszeiten', 'ausbildung', 'vorgesetzte', 'ausstattung', 'kommunikation'];
 			
 			for (let rating of requiredRatings) {
@@ -7619,13 +7119,11 @@
 				}
 			}
 			
-			// Aufgaben-Validierung
 			if (!document.getElementById('tasks').value.trim()) {
 				showToast('Bitte beschreiben Sie die im Praktikum absolvierten Aufgaben.', 'warning');
 				return;
 			}
 			
-			// Arbeitszeiten-Validierung nur bei festen Arbeitszeiten
 			const workingTimeType = document.getElementById('working-time-type').value;
 			if (workingTimeType === 'fixed') {
 				const hasValidWorkingHours = document.querySelectorAll('.working-time-row').length > 0 &&
@@ -7638,14 +7136,12 @@
 				}
 			}
 			
-			// Button auf Loading setzen
 			if (submitBtn) {
 				submitBtn.disabled = true;
 				submitBtn.textContent = 'Wird eingereicht...';
 			}
 			
 			try {
-				// Bewertungsdaten sammeln und verarbeiten
 				const formData = collectReviewFormData();
 				const reviewResult = await submitReviewToDatabase(formData);
 				const reviewId = reviewResult?.id;
@@ -7657,7 +7153,6 @@
 					return;
 				}
 
-				// Bestätigungsmail senden
 				await sendConfirmationEmail('review_submitted', {
 					email: formData.email,
 					companyName: formData.companyName,
@@ -7665,11 +7160,10 @@
 					deleteToken: reviewResult?.delete_token || '',
 				});
 
-				// Zeige schönes Success-Modal mit Konfetti
 				showSuccessModal(
 					'Bewertung eingereicht!',
 					`Vielen Dank! Sie erhalten in Kürze eine Bestätigungs-E-Mail an ${formData.email}.<br><br>Die Bewertung wird nach Prüfung durch den Seitenbetreiber freigeschaltet.`,
-					true // mit Konfetti
+					true
 				);
 
 				setTimeout(() => { showSection('search'); }, 2000);
@@ -7700,7 +7194,6 @@
 				const jobId = await submitJobToDatabase(jobFormData);
 				
 				if (jobId) {
-					// Bestätigungsmail senden
 					await sendConfirmationEmail('job_submitted', {
 						email: contactEmail,
 						companyName: jobFormData.companyName,
@@ -7708,11 +7201,10 @@
 						id: typeof jobId === 'string' ? jobId.substring(0, 8) : jobId
 					});
 					
-					// Zeige schönes Success-Modal mit Konfetti
 					showSuccessModal(
 						'Stellenangebot eingereicht!',
 						`Vielen Dank! Sie erhalten eine Bestätigungs-E-Mail an ${contactEmail}.<br><br>Nach Freischaltung erhalten Sie eine weitere Bestätigung.`,
-						true // mit Konfetti
+						true
 					);
 					
 					closeModal('job-modal');
@@ -7735,7 +7227,6 @@
 			const contactEmail = document.getElementById('report-email').value;
 			const reason = document.getElementById('report-reason').value;
 			
-			// Review-Daten für company_name/address holen
 			const reviewObj = Object.values(companiesData)
 				.flatMap(c => c.reviews || [])
 				.find(r => (r.adminId || r.id) == reviewId);
@@ -7768,7 +7259,6 @@
 			}
 		});
 
-        // Event Listener für Modals (außerhalb klicken zum Schließen)
         window.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
@@ -7778,7 +7268,6 @@
             }
         });
 
-        // Event Listener für automatisches Filtern
         document.getElementById('company-name-filter').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 applyFilters();
@@ -7789,7 +7278,6 @@
 			const hasRadiusFilter = activeAdvancedFilters.some(f => f.startsWith('Im Umkreis von'));
 			if (hasRadiusFilter) {
 				const val = this.value;
-				// Wenn Buchstaben eingegeben werden bei aktivem Umkreisfilter
 				if (/[a-zA-ZäöüÄÖÜß]/.test(val)) {
 					let hint = document.getElementById('radius-input-hint');
 					if (!hint) {
@@ -7829,7 +7317,6 @@
             applyFilters();
         });
 
-        // Event Listener für automatisches Filtern bei Stellenangeboten
         document.getElementById('job-company-filter').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 applyJobFilters();
@@ -7860,7 +7347,6 @@
             applyJobFilters();
         });
 		
-        // Event Listener für Bundesland-Änderung im Bewertungsformular
         document.getElementById('company-state').addEventListener('change', function() {
             const countryField = document.getElementById('country-field');
             const countryInput = document.getElementById('country-input');
@@ -7875,7 +7361,6 @@
             }
         });
 
-        // Event Listener für Bundesland-Änderung im Job-Modal
         document.getElementById('job-company-state').addEventListener('change', function() {
             const countryField = document.getElementById('job-country-field');
             const countryInput = document.getElementById('job-country-input');
@@ -7890,7 +7375,6 @@
             }
         });
 		
-        // Event Listener für Kategorie-Änderung im Bewertungsformular
         document.getElementById('company-category').addEventListener('change', function() {
 			const specializationsField = document.getElementById('specializations-field');
 			const customerTypeField = document.getElementById('customer-type-field');
@@ -7901,13 +7385,11 @@
             } else {
                 specializationsField.style.display = 'none';
                 customerTypeField.style.display = 'none';
-                // Alle Checkboxen zurücksetzen
                 document.querySelectorAll('#specializations-field input[type="checkbox"]').forEach(cb => cb.checked = false);
                 document.getElementById('spec-sonstige-input').value = '';
                 document.getElementById('spec-sonstige-field').style.display = 'none';
             }
             
-            // Industrie-Bereich anzeigen/verstecken
             const industryField = document.getElementById('industry-field');
             if (this.value === 'industrie') {
                 industryField.style.display = 'block';
@@ -7918,7 +7400,6 @@
                 document.getElementById('industry-area').value = '';
             }
 
-            // Universität-Bereich anzeigen/verstecken
             const universityField = document.getElementById('university-field');
             if (this.value === 'universitaet') {
                 universityField.style.display = 'block';
@@ -7930,10 +7411,8 @@
             }
         });
 
-		// Button Click für Bewertungen
 		document.querySelectorAll('#customer-type-buttons .customer-btn').forEach(btn => {
 			btn.addEventListener('click', function() {
-				// Remove active from all
 				document.querySelectorAll('#customer-type-buttons .customer-btn').forEach(b => {
 					b.style.borderColor = '#ddd';
 					b.style.color = '#333';
@@ -7941,21 +7420,17 @@
 					b.classList.remove('active');
 				});
 				
-				// Add active to clicked
 				this.style.borderColor = 'var(--red)';
 				this.style.color = 'var(--red)';
 				this.style.fontWeight = '600';
 				this.classList.add('active');
 				
-				// Set hidden value
 				document.getElementById('customer-type-value').value = this.dataset.value;
 			});
 		});
 
-		// Button Click für Jobs
 		document.querySelectorAll('#job-customer-type-buttons .job-customer-btn').forEach(btn => {
 			btn.addEventListener('click', function() {
-				// Remove active from all
 				document.querySelectorAll('#job-customer-type-buttons .job-customer-btn').forEach(b => {
 					b.style.borderColor = '#ddd';
 					b.style.color = '#333';
@@ -7963,24 +7438,20 @@
 					b.classList.remove('active');
 				});
 				
-				// Add active to clicked
 				this.style.borderColor = 'var(--red)';
 				this.style.color = 'var(--red)';
 				this.style.fontWeight = '600';
 				this.classList.add('active');
 				
-				// Set hidden value
 				document.getElementById('job-customer-type-value').value = this.dataset.value;
 			});
 		});
 
-        // Event Listener für Kategorie-Änderung im Job-Modal
         document.getElementById('job-company-category').addEventListener('change', function() {
             const specializationsField = document.getElementById('job-specializations-field');
             const industryField = document.getElementById('job-industry-field');
 			const customerTypeField = document.getElementById('job-customer-type-field');
             
-            // Spezialisierungen für Offizin
             if (this.value === 'offizin') {
                 specializationsField.style.display = 'block';
                 customerTypeField.style.display = 'block';				
@@ -7992,7 +7463,6 @@
                 document.getElementById('job-spec-sonstige-field').style.display = 'none';
             }
             
-            // Bereich für Industrie
             if (this.value === 'industrie') {
                 industryField.style.display = 'block';
                 document.getElementById('job-industry-area').required = true;
@@ -8003,7 +7473,6 @@
             }
         });
 
-		// Bereich für Universität
 		const universityField = document.getElementById('job-university-field');
 		if (this.value === 'universitaet') {
 			universityField.style.display = 'block';
@@ -8014,26 +7483,22 @@
 			document.getElementById('job-university-area').value = '';
 		}
 
-		// Neue Funktion für Job-Kategorie-Updates
 		function updateJobCategoryFields() {
 			const category = document.getElementById('job-company-category').value;
 			const specializationsField = document.getElementById('job-specializations-field');
 			const industryField = document.getElementById('job-industry-field');
 			const universityField = document.getElementById('job-university-field');
 			
-			// Alle verstecken
 			specializationsField.style.display = 'none';
 			document.getElementById('job-customer-type-field').style.display = 'none';
 			industryField.style.display = 'none';
 			universityField.style.display = 'none';
 			
-			// Spezialisierungen für Offizin
 			if (category === 'offizin') {
 				specializationsField.style.display = 'block';
 				document.getElementById('job-customer-type-field').style.display = 'block';
 			}
 			
-			// Bereich für Industrie
 			if (category === 'industrie') {
 				industryField.style.display = 'block';
 				document.getElementById('job-industry-area').required = true;
@@ -8041,7 +7506,6 @@
 				document.getElementById('job-industry-area').required = false;
 			}
 			
-			// Bereich für Universität
 			if (category === 'universitaet') {
 				universityField.style.display = 'block';
 				document.getElementById('job-university-area').required = true;
@@ -8059,100 +7523,80 @@
 			document.getElementById('job-customer-type-label').textContent = labels[value];
 		}
 		
-        // Event Listener für Arbeitszeit-Typ
 		document.getElementById('working-time-type').addEventListener('change', function() {
                 const fixedContainer = document.getElementById('fixed-hours-container');
                 
                 if (this.value === 'flexible') {
                     fixedContainer.style.display = 'none';
-                    // Entferne required von festen Arbeitszeiten
                     document.querySelectorAll('#fixed-hours-container .working-hours-start, #fixed-hours-container .working-hours-end').forEach(input => {
                         input.required = false;
                     });
                 } else {
                     fixedContainer.style.display = 'block';
-                    // Setze required für feste Arbeitszeiten
                     document.querySelectorAll('#fixed-hours-container .working-hours-start, #fixed-hours-container .working-hours-end').forEach(input => {
                         input.required = true;
                     });
                 }         
         });
 
-		// Zeitformat-Konvertierung
 		function normalizeTimeFormat(timeStr) {
 			if (!timeStr) return '';
 			
-			// Entferne "Uhr" und Whitespaces
 			timeStr = timeStr.replace(/uhr/gi, '').trim();
 			
-			// Ersetze Punkt durch Doppelpunkt
 			timeStr = timeStr.replace('.', ':');
 			
-			// Parse Zeit
 			let hours, minutes;
 			
 			if (timeStr.includes(':')) {
 				[hours, minutes] = timeStr.split(':').map(s => s.trim());
 			} else {
-				// Nur Stunden angegeben
 				hours = timeStr;
 				minutes = '00';
 			}
 			
-			// Padding mit Nullen
 			hours = hours.padStart(2, '0');
 			minutes = minutes.padStart(2, '0');
 			
 			return `${hours}:${minutes}`;
 		}
 
-		// Event Listener für Zeitvalidierung beim Verlassen
 		document.addEventListener('blur', function(e) {
 			if (e.target && e.target.classList && (e.target.classList.contains('working-hours-start') ||
 				e.target.classList.contains('working-hours-end'))) {
 				
 				let value = e.target.value.trim();
 				
-				// Wenn leer, nichts machen
 				if (!value) {
 					e.target.setCustomValidity('');
 					e.target.style.borderColor = '#e9ecef';
 					return;
 				}
 				
-				// Entferne alle Nicht-Ziffern
 				let digits = value.replace(/[^\d]/g, '');
 				
-				// Ergänze basierend auf Anzahl der Ziffern
 				let hours, minutes;
 				
 				if (digits.length === 1) {
-					// "5" → "05:00"
 					hours = '0' + digits;
 					minutes = '00';
 				} else if (digits.length === 2) {
-					// "15" → "15:00"
 					hours = digits;
 					minutes = '00';
 				} else if (digits.length === 3) {
-					// "830" → "08:30"
 					hours = '0' + digits.charAt(0);
 					minutes = digits.substring(1, 3);
 				} else if (digits.length === 4) {
-					// "1530" → "15:30"
 					hours = digits.substring(0, 2);
 					minutes = digits.substring(2, 4);
 				} else {
-					// Zu viele Ziffern
 					hours = digits.substring(0, 2);
 					minutes = digits.substring(2, 4);
 				}
 				
-				// Formatiere als HH:MM
 				const formattedTime = hours + ':' + minutes;
 				e.target.value = formattedTime;
 				
-				// Validiere
 				const h = parseInt(hours, 10);
 				const m = parseInt(minutes, 10);
 				
@@ -8166,26 +7610,22 @@
 			}
 		}, true);
 
-		// Event Listener für Job-Arbeitszeit-Typ
 		document.getElementById('job-working-time-type').addEventListener('change', function() {
 			const fixedContainer = document.getElementById('job-fixed-hours-container');
 			
 			if (this.value === 'flexible') {
 				fixedContainer.style.display = 'none';
-				// Entferne required
 				document.querySelectorAll('#job-fixed-hours-container .working-hours-start, #job-fixed-hours-container .working-hours-end').forEach(input => {
 					input.required = false;
 				});
 			} else {
 				fixedContainer.style.display = 'block';
-				// Setze required
 				document.querySelectorAll('#job-fixed-hours-container .working-hours-start, #job-fixed-hours-container .working-hours-end').forEach(input => {
 					input.required = true;
 				});
 			}
 		});
 
-		// Initial State beim Modal-Öffnen setzen
 		function initJobWorkingTimeFields() {
 			const jobWorkingTimeType = document.getElementById('job-working-time-type');
 			if (jobWorkingTimeType) {
@@ -8196,7 +7636,6 @@
 			}
 		}
 
-        // Funktionen für Arbeitszeiten-Management
 		let workingTimeRowCounter = 1;
 
 		function addWorkingTimeRow() {
@@ -8231,24 +7670,7 @@
 				row.remove();
 			}
 		}
-
-		function updateWorkingTimeDisplay(entryIndex) {
-			const row = document.querySelector(`[data-entry-index="${entryIndex}"]`);
-			const checkedBoxes = row.querySelectorAll('input[type="checkbox"]:checked');
-			
-			checkedBoxes.forEach(checkbox => {
-				checkbox.parentElement.style.borderColor = 'var(--red)';
-				checkbox.parentElement.style.background = '#f0f4ff';
-			});
-			
-			const uncheckedBoxes = row.querySelectorAll('input[type="checkbox"]:not(:checked)');
-			uncheckedBoxes.forEach(checkbox => {
-				checkbox.parentElement.style.borderColor = '#e9ecef';
-				checkbox.parentElement.style.background = 'white';
-			});
-		}
 		
-        // Event Listener für "Sonstige" Industrie-Bereich
         document.getElementById('industry-area').addEventListener('change', function() {
             const sonstigeField = document.getElementById('industry-sonstige-field');
             const sonstigeInput = document.getElementById('industry-sonstige-input');
@@ -8263,7 +7685,6 @@
             }
         });
 
-        // Event Listener für "Sonstige" Benefits
         document.getElementById('benefits-sonstige').addEventListener('change', function() {
             const sonstigeField = document.getElementById('benefits-sonstige-field');
             const sonstigeInput = document.getElementById('benefits-sonstige-input');
@@ -8276,7 +7697,6 @@
             }
         });
 
-        // Event Listener für "Sonstige" Benefits im Job-Modal
         document.getElementById('job-benefits-sonstige').addEventListener('change', function() {
             const sonstigeField = document.getElementById('job-benefits-sonstige-field');
             const sonstigeInput = document.getElementById('job-benefits-sonstige-input');
@@ -8289,7 +7709,6 @@
             }
         });
 
-        // Event Listener für "Sonstige" Spezialisierung
         document.getElementById('spec-sonstige').addEventListener('change', function() {
             const sonstigeField = document.getElementById('spec-sonstige-field');
             const sonstigeInput = document.getElementById('spec-sonstige-input');
@@ -8302,7 +7721,6 @@
             }
         });
 
-        // Event Listener für "Sonstige" Spezialisierung im Job-Modal
         document.getElementById('job-spec-sonstige').addEventListener('change', function() {
             const sonstigeField = document.getElementById('job-spec-sonstige-field');
             const sonstigeInput = document.getElementById('job-spec-sonstige-input');
@@ -8315,7 +7733,6 @@
             }
         });
 
-        // Event Listener für "Sonstige" Industrie-Bereich im Job-Modal
         document.getElementById('job-industry-area').addEventListener('change', function() {
             const sonstigeField = document.getElementById('job-industry-sonstige-field');
             const sonstigeInput = document.getElementById('job-industry-sonstige-input');
@@ -8330,7 +7747,6 @@
             }
         });
 
-		// File Upload Handler
 		document.getElementById('verification-file').addEventListener('change', function() {
 			const fileDisplay = document.getElementById('file-name-display');
 			const removeBtn = document.getElementById('remove-file-btn');
@@ -8339,11 +7755,9 @@
 				fileDisplay.textContent = this.files[0].name;
 				if (window.innerWidth <= 600) {
 					const removeBtn = document.getElementById('remove-file-btn');
-					// Dateiname in neue Zeile
 					fileDisplay.style.display = 'block';
 					fileDisplay.style.width = '100%';
 					fileDisplay.style.marginTop = '0.5rem';
-					// Wrapper auf flex setzen damit Name + Kreuz nebeneinander
 					const nameRow = document.createElement('div');
 					nameRow.style.cssText = 'display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem;';
 					fileDisplay.style.display = 'inline';
@@ -8352,7 +7766,6 @@
 						removeBtn.style.display = 'inline-flex';
 						removeBtn.style.marginLeft = '0';
 						removeBtn.style.marginTop = '0';
-						// fileDisplay und removeBtn in nameRow verschieben
 						const parent = fileDisplay.parentElement;
 						parent.insertBefore(nameRow, fileDisplay);
 						nameRow.appendChild(fileDisplay);
@@ -8373,7 +7786,6 @@
 			document.getElementById('remove-file-btn').style.display = 'none';
 		}
 
-		// Initialen History-State setzen
 		history.replaceState({ section: 'landing' }, '', '#landing');
 
 		let isPopState = false;
@@ -8389,9 +7801,7 @@
 			isPopState = false;
 		});
 		
-		// Basis-Funktionen für Navigation und Suche
 		function showSection(section) {
-			// Startseite: Scroll immer nach ganz oben, Daten laden
 			if (section === 'landing') {
 				document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
 				document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -8405,20 +7815,17 @@
 				loadLandingHighlightReviews();
 				return;
 			}
-			// Suchfeld zurücksetzen
 			const companySearch = document.getElementById('company-search');
 			if (companySearch && section !== 'company') {
 				companySearch.value = '';
-				companySearch.placeholder = 'Nach Unternehmen suchen'; // Diese Zeile hinzufügen
+				companySearch.placeholder = 'Nach Unternehmen suchen';
 				document.getElementById('search-suggestions').style.display = 'none';
 			}
 
-			// Speichere Scroll-Position VOR allen DOM-Änderungen
 			const hero = document.querySelector('.hero');
 			const heroHeight = hero ? hero.offsetHeight : 0;
 			const scrollBeforeChange = window.pageYOffset || document.documentElement.scrollTop;
 
-			// Formular zurücksetzen beim Verlassen der Write-Section
 			if (currentSection === 'write') {
 				const reviewForm = document.getElementById('review-form');
 				if (reviewForm) {
@@ -8454,33 +7861,26 @@
 					}
 				}
 				
-				// Reset Checkbox
 				const guidelinesCheckbox = document.getElementById('guidelines-checkbox');
 				if (guidelinesCheckbox) guidelinesCheckbox.checked = false;
 				
-				// Reset Adress-Validierung
 				const addressValidation = document.getElementById('address-validation');
 				if (addressValidation) addressValidation.innerHTML = '';
 				
 				const jobLocationValidation = document.getElementById('job-location-validation');
 				if (jobLocationValidation) jobLocationValidation.innerHTML = '';
 				
-				// Reset Arbeitszeiten-Typ auf "Feste Arbeitszeiten"
 				const workingTimeType = document.getElementById('working-time-type');
 				if (workingTimeType) workingTimeType.value = 'fixed';
 				
-				// Zeige fixed-hours-container, verstecke flexible (falls vorhanden)
 				const fixedHoursContainer = document.getElementById('fixed-hours-container');
 				if (fixedHoursContainer) fixedHoursContainer.style.display = 'block';
 				
-				// Reset ALLE Arbeitszeiten-Zeilen (nur im Bewertungsformular)
 				const workingTimeRows = document.querySelectorAll('#fixed-hours-container .working-time-row');
 				workingTimeRows.forEach((row, index) => {
 					if (index > 0) {
-						// Entferne alle außer der ersten Zeile
 						row.remove();
 					} else {
-						// Reset erste Zeile
 						const saturdayCheckbox = row.querySelector('.saturday-checkbox');
 						if (saturdayCheckbox) saturdayCheckbox.checked = false;
 						
@@ -8501,7 +7901,6 @@
 				});			
 			}
 			
-			// Filter zurücksetzen beim Betreten von Search
 			if (section === 'search') {
 				resetAllFilters();
 				const sortSelect = document.getElementById('sort-select');
@@ -8511,7 +7910,6 @@
 				}
 			}
 			
-			// Filter zurücksetzen beim Betreten von Jobs
 			if (section === 'jobs') {
 				resetAllJobFilters();
 				const jobSortSelect = document.getElementById('job-sort-select');
@@ -8528,7 +7926,6 @@
 			
 			document.getElementById(section + '-section').classList.add('active');
 			
-			// Navigation markieren
 			const navTabs = document.querySelectorAll('.nav-tab');
 			
 			if (section === 'search') {
@@ -8549,7 +7946,6 @@
 				navTabs[4].classList.add('active');
 			}
 
-			// Verified-Filter beim Verlassen von company-search zurücksetzen
 			if (currentSection === 'company-search' && section !== 'company-search') {
 				const cb = document.getElementById('verified-company-filter');
 				if (cb) cb.checked = false;
@@ -8598,22 +7994,18 @@
 			if (!isPopState) history.pushState({ section: section }, '', '#' + section);
 
 
-			// Scrolle Job-Formular nach oben
 			if (section === 'jobs') {
 				const jobsSection = document.getElementById('jobs-section');
 				if (jobsSection) jobsSection.scrollTop = 0;
 			}
 
-			// Reset Job-Formular beim Öffnen
 			if (section === 'jobs') {
 				const jobForm = document.getElementById('job-form');
 				if (jobForm) {
 					jobForm.reset();
-					// Stelle sicher dass job-fixed-hours-container sichtbar ist
 					const jobFixedContainer = document.getElementById('job-fixed-hours-container');
 					if (jobFixedContainer) {
 						jobFixedContainer.style.display = 'block';
-						// Entferne zusätzliche Zeilen außer der ersten
 						const rows = jobFixedContainer.querySelectorAll('.working-time-row');
 						rows.forEach((row, index) => {
 							if (index > 0) row.remove();
@@ -8625,35 +8017,29 @@
 							}
 						});
 					}
-					// Verstecke optionale Felder
 					['job-specializations-field', 'job-customer-type-field', 'job-industry-field', 
 					 'job-university-field', 'job-country-field'].forEach(id => {
 						const el = document.getElementById(id);
 						if (el) el.style.display = 'none';
 					});
-					// Reset Adress-Validierung
 					const val = document.getElementById('job-location-validation');
 					if (val) val.innerHTML = '';
 				}
 			}
 			
-			// Scroll-Logik: Immer zum Ende des Hero scrollen wenn nicht bereits dort
 			setTimeout(() => {
-				if (section === 'landing') return; // Landing scrollt sich selbst
+				if (section === 'landing') return;
 				const hero = document.querySelector('.hero');
 				if (hero) {
 					const heroHeight = hero.offsetHeight;
 					const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 					
-					// Scrollen wenn wir NICHT im idealen Bereich sind (direkt unter Hero)
-					// Ideal: currentScroll === heroHeight (±10px Toleranz)
 					if (Math.abs(currentScroll - heroHeight) > 10) {
 						window.scrollTo({ top: heroHeight, behavior: 'smooth' });
 					}
 				}
 			}, 100);			
 			
-			// Nutze die GESPEICHERTE Scroll-Position von VOR den DOM-Änderungen
 			if (scrollBeforeChange < heroHeight) {
 				setTimeout(() => {
 					window.scrollTo({ top: heroHeight, behavior: 'smooth' });
@@ -8665,9 +8051,6 @@
 			window.scrollTo({ top: 0, behavior: 'smooth' });
 		}
 
-		// ═══════════════════════════════════════════════════════════
-		// STARTSEITE – Live-Statistiken & Highlight-Bewertungen
-		// ═══════════════════════════════════════════════════════════
 
 		let landingStatsLoaded = false;
 		let landingReviewsLoaded = false;
@@ -8903,7 +8286,6 @@
 			document.querySelectorAll('.year-tab').forEach(tab => tab.classList.remove('active'));
 			document.querySelectorAll('.awarded-year-content').forEach(content => content.style.display = 'none');
 			
-			// Finde den entsprechenden Button
 			const buttons = document.querySelectorAll('.year-tab');
 			buttons.forEach(btn => {
 				if (btn.textContent.trim() === year.toString()) {
@@ -8920,11 +8302,10 @@
 			
 			if (!tabsContainer || !contentContainer) return;
 			
-			// Sammle alle Jahre mit Einträgen
 			const yearsWithAwards = Object.keys(bphdAwardsDatabase)
 				.filter(year => bphdAwardsDatabase[year] && bphdAwardsDatabase[year].length > 0)
 				.map(y => parseInt(y))
-				.sort((a, b) => b - a); // Neueste zuerst
+				.sort((a, b) => b - a);
 			
 			if (yearsWithAwards.length === 0) {
 				tabsContainer.innerHTML = '';
@@ -8932,12 +8313,10 @@
 				return;
 			}
 			
-			// Erstelle Tabs
 			tabsContainer.innerHTML = yearsWithAwards.map((year, index) => 
 				`<button class="btn btn-secondary year-tab ${index === 0 ? 'active' : ''}" onclick="showAwardedYear(${year})">${year}</button>`
 			).join('');
 			
-			// Erstelle Content-Container für jedes Jahr
 			contentContainer.innerHTML = yearsWithAwards.map((year, index) => `
 				<div id="awarded-${year}" class="awarded-year-content" style="display: ${index === 0 ? 'block' : 'none'};">
 					<h3>Ausgezeichnete Unternehmen ${year}</h3>
@@ -8947,7 +8326,6 @@
 				</div>
 			`).join('');
 			
-			// Rendere Awards für alle Jahre
 			yearsWithAwards.forEach(year => {
 				renderAwardedCompanies(year);
 			});
@@ -8958,7 +8336,6 @@
 			container.innerHTML = '';
 			
 			Object.values(companiesData).forEach(company => {
-				// Filter anwenden
 				if (nameFilter && !company.name.toLowerCase().includes(nameFilter)) return;
 				if (categoryFilter) {
 					const companyCategory = getCategoryLabel(company.category);
@@ -9003,7 +8380,6 @@
 				container.appendChild(noResults);
 				return;
 			}
-			// Standard-Sortierung nach dem Rendern anwenden
 			sortAllCompanies();
 		}
 
@@ -9086,21 +8462,18 @@
 		}
 
 		function showGuidelinesModal() {
-			// Modal SOFORT anzeigen
 			const modal = document.getElementById('guidelines-modal');
 			modal.style.display = 'block';
 			
 			const contentEl = document.getElementById('review-guidelines-content-display');
 			const dateEl = document.getElementById('review-guidelines-date');
 			
-			// Nutze Cache wenn vorhanden
 			if (guidelinesCache && guidelinesCache.content) {
 				contentEl.innerHTML = guidelinesCache.content;
 				if (dateEl && guidelinesCache.updated) {
 					dateEl.textContent = 'Stand: ' + guidelinesCache.updated;
 				}
 			} else {
-				// Fallback:Lade wenn Cache nicht verfügbar
 				contentEl.innerHTML = '<p style="color:#666;text-align:center;padding:2rem;">Lädt...</p>';
 				
 				window.supabase
@@ -9166,21 +8539,18 @@
 		}
 
 		function showJobTermsModal() {
-			// Modal SOFORT anzeigen
 			const modal = document.getElementById('job-terms-modal');
 			modal.style.display = 'block';
 			
 			const contentEl = document.getElementById('job-guidelines-content-display');
 			const dateEl = document.getElementById('job-guidelines-date');
 			
-			// Nutze Cache wenn vorhanden
 			if (jobGuidelinesCache && jobGuidelinesCache.content) {
 				contentEl.innerHTML = jobGuidelinesCache.content;
 				if (dateEl && jobGuidelinesCache.updated) {
 					dateEl.textContent = 'Stand: ' + jobGuidelinesCache.updated;
 				}
 			} else {
-				// Fallback: Lade wenn Cache nicht verfügbar
 				contentEl.innerHTML = '<p style="color:#666;text-align:center;padding:2rem;">Lädt...</p>';
 				
 				window.supabase
@@ -9211,11 +8581,9 @@
 		}
 
 		function hideDropdown() {
-			// Entferne Hover durch Maus-Simulation
 			const dropdown = document.querySelector('.nav-dropdown');
 			if (dropdown) {
 				const rect = dropdown.getBoundingClientRect();
-				// Simuliere Maus-Move außerhalb
 				document.elementFromPoint(rect.left - 10, rect.top);
 			}
 		}
@@ -9224,7 +8592,6 @@
 			document.getElementById(inputId).value = address;
 			document.getElementById(validationId).innerHTML = '';
 			
-			// Mapping für deutsche Bundesländer
 			const stateMapping = {
 				'Baden-Württemberg': 'Baden-Württemberg',
 				'Bayern': 'Bayern',
@@ -9246,7 +8613,6 @@
 			
 			let bundesland = stateMapping[state];
 			
-			// Falls nicht gefunden, versuche Teilstring-Match
 			if (!bundesland && state) {
 				for (const [key, value] of Object.entries(stateMapping)) {
 					if (state.includes(key) || key.includes(state)) {
@@ -9269,7 +8635,6 @@
 			}
 		}
 
-		// Cache für Verifizierungen
 		let verifiedCompaniesCache = null;
 		let verifiedCompaniesLoading = false;
 
@@ -9298,7 +8663,6 @@
 					verifiedCompaniesCache.set(key, v);
 				});
 				
-				// Update companiesData
 				Object.keys(companiesData).forEach(companyKey => {
 					const company = companiesData[companyKey];
 					const verData = verifiedCompaniesCache.get(company.name.toLowerCase());
@@ -9324,12 +8688,10 @@
 			return verifiedCompaniesCache;
 		}
 
-		// Richtlinien vorladen und cachen
 		let guidelinesCache = null;
 		let jobGuidelinesCache = null;
 
 		async function preloadGuidelines() {
-			// Mehrere Versuche falls Verbindung langsam ist
 			for (let i = 0; i < 3; i++) {
 				try {
 					const { data } = await window.supabase
@@ -9342,18 +8704,17 @@
 							content: data.find(d => d.key === 'review_guidelines')?.value || '',
 							updated: data.find(d => d.key === 'review_guidelines_updated_at')?.value || ''
 						};
-						return; // Erfolgreich, raus hier
+						return;
 					}
 				} catch(e) {
 					console.warn(`Versuch ${i + 1} fehlgeschlagen:`, e);
-					if (i < 2) await new Promise(resolve => setTimeout(resolve, 500)); // Warte 500ms vor erneutem Versuch
+					if (i < 2) await new Promise(resolve => setTimeout(resolve, 500));
 				}
 			}
 			console.error('❌ Richtlinien konnten nicht vorgeladen werden nach 3 Versuchen');
 		}
 
 		async function preloadJobGuidelines() {
-			// Mehrere Versuche falls Verbindung langsam ist
 			for (let i = 0; i < 3; i++) {
 				try {
 					const { data } = await window.supabase
@@ -9376,7 +8737,6 @@
 			console.error('❌ Job-Richtlinien konnten nicht vorgeladen werden nach 3 Versuchen');
 		}
 
-		// Beim Laden ausführen - mit Retry falls Supabase noch nicht bereit
 		function tryPreloadGuidelines() {
 			if (typeof window.supabase !== 'undefined') {
 				preloadGuidelines();
@@ -9395,7 +8755,6 @@
 		}
 		tryPreloadJobGuidelines();
 
-		// Dropdown: hover mit Verzögerung via .open-Klasse
 		const dropdown = document.querySelector('.nav-dropdown');
 		const dropdownContent = dropdown.querySelector('.dropdown-content');
 		let closeTimeout;
@@ -9426,7 +8785,6 @@
 			}, 250);
 		});
 
-		// Dropdown schließen beim Klick auf Links
 		dropdownContent.querySelectorAll('a').forEach(link => {
 			link.addEventListener('click', function() {
 				clearTimeout(closeTimeout);
@@ -9480,19 +8838,16 @@
 				return;
 			}
 			
-			// Prüfe ob Unternehmen existiert
 			let company = Object.values(companiesData).find(c => 
 				c.name.toLowerCase() === companyName.toLowerCase()
 			);
 			
-			// Wenn nicht, erstelle neue Unternehmensseite
 			if (!company) {
 				const addressParts = companyAddress.split(',');
 				const street = addressParts[0] ? addressParts[0].trim() : '';
 				const plzOrt = addressParts[1] ? addressParts[1].trim() : '';
 				
-				// Versuche Bundesland aus PLZ abzuleiten (vereinfacht)
-				let state = 'Berlin'; // Fallback
+				let state = 'Berlin';
 				if (plzOrt) {
 					const plzMatch = plzOrt.match(/(\d{5})/);
 					if (plzMatch) {
@@ -9501,7 +8856,6 @@
 						else if (plz >= 20000 && plz <= 21999) state = 'Hamburg';
 						else if (plz >= 30000 && plz <= 38999) state = 'Niedersachsen';
 						else if (plz >= 80000 && plz <= 87999) state = 'Bayern';
-						// etc. - erweitere nach Bedarf
 					}
 				}
 				
@@ -9509,7 +8863,6 @@
 				alert(`Neue Unternehmensseite für "${companyName}" wurde erstellt.`);
 			}
 			
-			// Füge BPhD Award zum Unternehmen hinzu
 			if (!company.bphdAwards) {
 				company.bphdAwards = [];
 			}
@@ -9518,7 +8871,6 @@
 				company.bphdAwards.sort((a, b) => b - a);
 			}
 			
-			// Füge zu Awards-Datenbank hinzu
 			if (!bphdAwardsDatabase[year]) {
 				bphdAwardsDatabase[year] = [];
 			}
@@ -9529,12 +8881,10 @@
 				reason 
 			});
 			
-			// Felder leeren
 			document.getElementById('award-company-name').value = '';
 			document.getElementById('award-company-address').value = '';
 			document.getElementById('award-reason').value = '';
 			
-			// UI KOMPLETT neu aufbauen
 			renderAwardedYearTabs();
 			refreshAwardsList();
 			
@@ -9580,7 +8930,6 @@
 			document.getElementById('award-company-address').value = award.companyAddress || '';
 			document.getElementById('award-reason').value = award.reason;
 			
-			// Entferne alte Version
 			removeBphdAward(year, index, true);
 			
 			alert('Auszeichnung wurde in das Formular geladen. Bearbeiten Sie die Felder und klicken Sie auf "Hinzufügen".');
@@ -9593,10 +8942,8 @@
 			
 			const award = bphdAwardsDatabase[year][index];
 			
-			// Entferne aus Datenbank
 			bphdAwardsDatabase[year].splice(index, 1);
 			
-			// Entferne Jahr aus Unternehmens-Awards
 			const company = Object.values(companiesData).find(c => 
 				c.name.toLowerCase() === award.companyName.toLowerCase()
 			);
@@ -9607,7 +8954,6 @@
 				}
 			}
 			
-			// UI aktualisieren
 			renderAwardedCompanies(year);
 			renderAwardedYearTabs();
 			refreshAwardsList();
@@ -9629,14 +8975,12 @@
 					if (contentDiv) {
 						const temp = document.createElement('div');
 						temp.innerHTML = data.value;
-						// Script-Tags entfernen
 						temp.querySelectorAll('script').forEach(s => s.remove());
 						contentDiv.innerHTML = temp.innerHTML;
 					}
 					const ta = document.getElementById('guide-content');
 					if (ta) ta.value = data.value;
 				}
-				// Stand-Datum aktualisieren
 				try {
 					const { data: dateData } = await window.supabase
 						.from('site_settings')
@@ -9676,7 +9020,6 @@
 				
 				if (error) throw error;
 				
-				// Aktualisiere Live-Anzeige
 				const contentDiv = document.querySelector('#internship-guide-section .container div[style*="background: white; padding: 3rem"]');
 				if (contentDiv) contentDiv.innerHTML = content;
 
@@ -9719,7 +9062,6 @@
 					if (contentDiv) {
 						const temp = document.createElement('div');
 						temp.innerHTML = data.value;
-						// Script-Tags entfernen
 						temp.querySelectorAll('script').forEach(s => s.remove());
 						contentDiv.innerHTML = temp.innerHTML;
 					}
@@ -9740,7 +9082,6 @@
 				if (data) {
 					const parsed = JSON.parse(data.value);
 					window.tariffSalary = parsed.amount;
-					// Lade auch Tarifhistorie
 					try {
 						const { data: histData } = await window.supabase
 							.from('site_settings')
@@ -9750,7 +9091,6 @@
 						if (histData) window.tariffHistory = JSON.parse(histData.value);
 					} catch(e) { window.tariffHistory = []; }					
 
-					// Nur wenn Admin-Elemente vorhanden
 					const input = document.getElementById('tariff-salary-input');
 					if (input) input.value = parsed.amount;
 					const currentDiv = document.getElementById('tariff-salary-current');
@@ -9760,7 +9100,7 @@
 					}
 				}
 			} catch (error) {
-				window.tariffSalary = 1040; // Fallback
+				window.tariffSalary = 1040;
 			}
 		}
 
@@ -9799,55 +9139,6 @@
 			}
 		}
 
-		// HTML-Formatter für bessere Lesbarkeit
-		function formatHTML(html) {
-			let formatted = '';
-			let indent = 0;
-			
-			// Entferne überflüssige Whitespaces
-			html = html.replace(/>\s+</g, '><').trim();
-			
-			const tags = html.match(/<[^>]+>/g) || [];
-			let lastIndex = 0;
-			
-			tags.forEach((tag, i) => {
-				const tagIndex = html.indexOf(tag, lastIndex);
-				const textBefore = html.substring(lastIndex, tagIndex).trim();
-				
-				if (textBefore) {
-					formatted += '  '.repeat(indent) + textBefore + '\n';
-				}
-				
-				// Closing tag
-				if (tag.startsWith('</')) {
-					indent = Math.max(0, indent - 1);
-					formatted += '  '.repeat(indent) + tag + '\n';
-				}
-				// Self-closing tag
-				else if (tag.endsWith('/>')) {
-					formatted += '  '.repeat(indent) + tag + '\n';
-				}
-				// Opening tag
-				else {
-					formatted += '  '.repeat(indent) + tag + '\n';
-					// Nur einrücken wenn kein Inline-Element
-					if (!tag.match(/<(span|a|strong|em|small|b|i)[>\s]/)) {
-						indent++;
-					}
-				}
-				
-				lastIndex = tagIndex + tag.length;
-			});
-			
-			// Rest-Text
-			const remaining = html.substring(lastIndex).trim();
-			if (remaining) {
-				formatted += '  '.repeat(indent) + remaining;
-			}
-			
-			return formatted;
-		}
-
 		let bphdAwardsDatabase = {};
 
 		function renderAwardedCompanies(year) {
@@ -9871,7 +9162,6 @@
 					c.name.toLowerCase().trim() === award.companyName.toLowerCase().trim()
 				);
 				
-				// Unternehmen existiert in companiesData → vollständige Karte mit Link
 				if (company) {
 					return `
 						<div class="awarded-company-card" style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06); cursor: pointer; transition: transform 0.2s;" 
@@ -9901,7 +9191,6 @@
 					`;
 				}
 				
-				// Kein Review/Job vorhanden → Fallback-Karte ohne Link zur Unternehmensseite
 				const profileImage = generateProfileImage(award.companyName);
 				return `
 					<div class="awarded-company-card" style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
@@ -9922,11 +9211,9 @@
 		}
 
 		function downloadPraktikumsleitfaden() {
-			// Prüfe ob PDF hinterlegt wurde
 			const pdfData = localStorage.getItem('internship-guide-pdf');
 			
 			if (pdfData) {
-				// Lade gespeichertes PDF
 				const link = document.createElement('a');
 				link.href = pdfData;
 				link.download = 'Praktikumsleitfaden.pdf';
@@ -9934,7 +9221,6 @@
 				link.click();
 				document.body.removeChild(link);
 			} else {
-				// Erstelle HTML-Version
 				const content = document.querySelector('#internship-guide-section .container > div').innerHTML;
 				
 				const pdfContent = `
@@ -10038,7 +9324,6 @@
 					return;
 				}
 				
-				// Filtere existierende Unternehmen
 				const matches = Object.values(companiesData)
 					.filter(company => 
 						company.name.toLowerCase().includes(query) ||
@@ -10063,7 +9348,6 @@
 				}
 			});
 			
-			// Schließe bei Klick außerhalb
 			document.addEventListener('click', function(e) {
 				if (e.target !== input && !suggestionsDiv.contains(e.target)) {
 					suggestionsDiv.style.display = 'none';
@@ -10077,19 +9361,15 @@
 			document.getElementById('company-suggestions').style.display = 'none';
 		}
 
-        // Initialisierung
 		document.addEventListener('DOMContentLoaded', function() {
 		
-			// Suchfeld leeren beim Laden
 			document.getElementById('company-search').value = '';					
 
-			// Lade Reviews vom Backend
 			async function loadReviewsFromBackend() {
 				
 				const result = await window.api.getActiveReviews();
 				
 				if (result.success) {					
-					// Konvertiere Backend-Format zu Frontend-Format
 					result.data.forEach(review => {
 						const formattedReview = {
 							id: reviewsData.length + 1,
@@ -10117,7 +9397,6 @@
 						
 						reviewsData.push(formattedReview);
 						
-						// Füge zu Company hinzu
 						addReviewToCompany(formattedReview);
 					});
 					
@@ -10127,15 +9406,12 @@
 				}
 			}
 
-			// Alte Beispieldaten laden (erstmal behalten als Fallback)
 			reviewsData.forEach(review => {
 				addReviewToCompany(review);
 			});
 
-			// Lade neue Reviews vom Backend
 			loadReviewsFromBackend();
 
-			// Lade Jobs vom Backend
 			async function loadJobsFromBackend() {
 				
 				const result = await window.api.getActiveJobs();
@@ -10587,7 +9863,7 @@
 				showSuccessModal(
 					'Verifizierungsantrag eingereicht!',
 					'Vielen Dank! Sie erhalten in Kürze eine Bestätigungs-E-Mail.<br><br>Sie werden benachrichtigt, sobald Ihr Antrag geprüft wurde.',
-					false // OHNE Konfetti
+					false
 				);
 				
 				closeModal('verification-modal');
