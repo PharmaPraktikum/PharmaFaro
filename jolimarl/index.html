@@ -5642,9 +5642,11 @@
 								showReview = false;
 							}
 						} else {
-							const normalizedAddress = addressText.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+							const cityMatch = addressText.match(/\d{5}\s+(.+)/);
+							const cityText = cityMatch ? cityMatch[1] : addressText;
+							const normalizedCity = cityText.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 							const normalizedLocation = location.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-							if (!normalizedAddress.includes(normalizedLocation)) {
+							if (!normalizedCity.includes(normalizedLocation)) {
 								showReview = false;
 							}
 						}
@@ -6831,9 +6833,11 @@
 								showJob = false;
 							}
 						} else {
-							const normalizedAddress = addressText.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+							const cityMatch = addressText.match(/\d{5}\s+(.+)/);
+							const cityText = cityMatch ? cityMatch[1] : addressText;
+							const normalizedCity = cityText.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 							const normalizedLocation = location.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-							if (!normalizedAddress.includes(normalizedLocation)) {
+							if (!normalizedCity.includes(normalizedLocation)) {
 								showJob = false;
 							}
 						}
