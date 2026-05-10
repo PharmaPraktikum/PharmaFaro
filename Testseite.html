@@ -221,21 +221,6 @@
 		.nav-dropdown.mobile-sub-open .dropdown-content { display: block; }
 	}
 
-	.hamburger {
-		display: none;
-		flex-direction: column;
-		gap: 5px;
-		background: none;
-		border: none;
-		cursor: pointer;
-		padding: 0.5rem;
-		z-index: 1001;
-	}
-	.hamburger span { display: block; width: 24px; height: 2px; background: var(--dark); border-radius: 2px; transition: all 0.3s; }
-	.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-	.hamburger.open span:nth-child(2) { opacity: 0; }
-	.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
     .nav-tab.active {
         background: var(--red);
         color: white;
@@ -2948,7 +2933,7 @@
 						</div>
 						<div class="form-group">
 							<label>Begründung der Meldung *</label>
-							<textarea required id="report-reason" placeholder="Bitte beschreiben Sie, warum Sie diese Bewertung melden möchten..." rows="4"></textarea>
+							<textarea required id="report-reason" maxlength="2000" placeholder="Bitte beschreiben Sie, warum Sie diese Bewertung melden möchten..." rows="4"></textarea>
 						</div>
 						<button type="submit" class="btn btn-primary" style="display: block; margin: 0 auto;">Meldung einreichen</button>
 					</form>
@@ -3540,7 +3525,7 @@
 			const toast = document.createElement('div');
 			toast.id = 'pf-toast';
 			toast.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);z-index:99999;background:${c.bg};border:1.5px solid ${c.border};border-radius:12px;padding:1rem 1.5rem;max-width:480px;width:90%;display:flex;align-items:flex-start;gap:0.75rem;box-shadow:0 8px 32px rgba(42,18,16,0.15);font-family:'DM Sans',sans-serif;animation:toastIn 0.25s ease;`;
-			toast.innerHTML = `<div style="width:24px;height:24px;border-radius:50%;background:${c.iconBg};color:${c.iconColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0;">${c.icon}</div><p style="margin:0;color:var(--dark);font-size:0.92rem;line-height:1.5;flex:1;">${message}</p><button onclick="this.closest('#pf-toast').remove()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--mid);padding:0;line-height:1;flex-shrink:0;">&times;</button>`;
+			toast.innerHTML = `<div style="width:24px;height:24px;border-radius:50%;background:${c.iconBg};color:${c.iconColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0;">${c.icon}</div><p style="margin:0;color:var(--dark);font-size:0.92rem;line-height:1.5;flex:1;">${escapeHtml(message)}</p><button onclick="this.closest('#pf-toast').remove()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--mid);padding:0;line-height:1;flex-shrink:0;">&times;</button>`;
 			if (!document.getElementById('pf-toast-style')) {
 				const style = document.createElement('style');
 				style.id = 'pf-toast-style';
@@ -3576,6 +3561,22 @@
 			const clean = url.trim();
 			if (/^(javascript|data|vbscript):/i.test(clean)) return '#';
 			return clean.startsWith('http') ? clean : 'https://' + clean;
+		}
+
+		function sanitizeAdminHTML(html) {
+			const temp = document.createElement('div');
+			temp.innerHTML = html;
+			temp.querySelectorAll('script, iframe, object, embed, form').forEach(el => el.remove());
+			temp.querySelectorAll('*').forEach(el => {
+				[...el.attributes].forEach(attr => {
+					if (attr.name.startsWith('on') ||
+						(attr.name === 'href' && /^javascript:/i.test(attr.value.trim())) ||
+						(attr.name === 'src' && /^javascript:/i.test(attr.value.trim()))) {
+						el.removeAttribute(attr.name);
+					}
+				});
+			});
+			return temp.innerHTML;
 		}
         
 		function collectReviewFormData() {
@@ -3998,9 +3999,7 @@
 					.eq('status', 'active');
 
 				if (existingJobs && existingJobs.length > 0) {
-					showToast('Für dieses Unternehmen existiert bereits ein identisches aktives Stellenangebot (gleicher Unternehmensname, gleiche Adresse, gleiches Gehalt und gleicher frühester Beginn). Bitte prüfen Sie, ob Ihr Angebot bereits veröffentlicht wurde.', 'warning', 7000);
-					submitBtn.disabled = false;
-					submitBtn.textContent = 'Stellenangebot einreichen';
+				showToast('Für dieses Unternehmen existiert bereits ein identisches aktives Stellenangebot (gleicher Unternehmensname, gleiche Adresse, gleiches Gehalt und gleicher frühester Beginn). Bitte prüfen Sie, ob Ihr Angebot bereits veröffentlicht wurde.', 'warning', 7000);
 					return;
 				}
 			} catch (dupError) {
@@ -4966,7 +4965,7 @@
 			}
 			
 			let contactHTML = '<div style="background:#f8f9fa;padding:1.5rem;border-radius:10px;">';
-			contactHTML += '<h3 style="margin-top:0;color:#333;">Kontaktieren Sie ' + company.name + '</h3>';
+			contactHTML += '<h3 style="margin-top:0;color:#333;">Kontaktieren Sie ' + escapeHtml(company.name) + '</h3>';
 			
 			if (company.contactPerson) {
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
@@ -5086,7 +5085,7 @@
 			modal.innerHTML = `
 				<div class="modal-content" style="max-width: ${modalWidth}; max-height: 90vh; overflow-y: auto; width: 90%;">
 					<div class="modal-header">
-						<h2>${title}</h2>
+						<h2>${escapeHtml(title)}</h2>
 						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
 					</div>
 					<div style="margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
@@ -5141,7 +5140,7 @@
 			modal.innerHTML = `
 				<div class="modal-content" style="max-width: ${modalWidth}; max-height: 90vh; overflow-y: auto; width: 90%;">
 					<div class="modal-header">
-						<h2>Alle Stellenangebote für ${companyName}</h2>
+						<h2>Alle Stellenangebote für ${escapeHtml(companyName)}</h2>
 						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
 					</div>
 					<div style="margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
@@ -5183,7 +5182,7 @@
 						
 					case 'salary-desc':
 						const salaryA = parseInt(a.querySelector('.salary-badge')?.textContent.replace(/\D/g, '') || '0');
-						const salaryB = parseInt(a.querySelector('.salary-badge')?.textContent.replace(/\D/g, '') || '0');
+						const salaryB = parseInt(b.querySelector('.salary-badge')?.textContent.replace(/\D/g, '') || '0');
 						return salaryB - salaryA;
 						
 					case 'salary-asc':
@@ -7849,6 +7848,15 @@
 				const universityField = document.getElementById('university-field');
 				if (universityField) universityField.style.display = 'none';
 				
+				const benefitsSonstigeField = document.getElementById('benefits-sonstige-field');
+				if (benefitsSonstigeField) benefitsSonstigeField.style.display = 'none';
+
+				const specSonstigeField = document.getElementById('spec-sonstige-field');
+				if (specSonstigeField) specSonstigeField.style.display = 'none';
+
+				const industrySonstigeField = document.getElementById('industry-sonstige-field');
+				if (industrySonstigeField) industrySonstigeField.style.display = 'none';
+				
 				if (typeof removeSelectedFile === 'function') {
 					removeSelectedFile();
 				}
@@ -8973,10 +8981,7 @@
 				if (data && data.value) {
 					const contentDiv = document.getElementById('guide-content-display');
 					if (contentDiv) {
-						const temp = document.createElement('div');
-						temp.innerHTML = data.value;
-						temp.querySelectorAll('script').forEach(s => s.remove());
-						contentDiv.innerHTML = temp.innerHTML;
+						contentDiv.innerHTML = sanitizeAdminHTML(data.value);
 					}
 					const ta = document.getElementById('guide-content');
 					if (ta) ta.value = data.value;
@@ -9060,10 +9065,7 @@
 				if (data && data.value) {
 					const contentDiv = document.querySelector('#internship-tips-section .container div[style*="display: grid"]');
 					if (contentDiv) {
-						const temp = document.createElement('div');
-						temp.innerHTML = data.value;
-						temp.querySelectorAll('script').forEach(s => s.remove());
-						contentDiv.innerHTML = temp.innerHTML;
+						contentDiv.innerHTML = sanitizeAdminHTML(data.value);
 					}
 					const ta = document.getElementById('tips-content');
 					if (ta) ta.value = data.value;
@@ -9573,8 +9575,7 @@
 									const { error } = await window.supabase
 										.from('reviews')
 										.update({ status: 'deleted' })
-										.eq('delete_token', deleteReviewToken)
-										.neq('status', 'deleted');
+										.eq('delete_token', deleteReviewToken);
 
 									if (!error) {
 										showToast('Ihre Bewertung wurde erfolgreich gelöscht.', 'success', 6000);
@@ -9656,12 +9657,13 @@
 				}
 			})();
 
-			loadTariffSalary();
 			loadGuideContent();
 			loadTipsContent();
-			
-			renderReviews();
-			renderJobs();
+
+			loadTariffSalary().then(() => {
+				renderReviews();
+				renderJobs();
+			});
 			
 			landingReviewsLoaded = false;
 			loadLandingHighlightReviews();			
@@ -10112,11 +10114,11 @@
 			const previewModal = document.createElement('div');
 			previewModal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10001;';
 			
-			const websiteLink = website ? '<p style="margin:0.25rem 0;color:var(--red);"><a href="' + (website.startsWith('http') ? website : 'https://' + website) + '" target="_blank">' + website + '</a></p>' : '';
-			const descBlock = description ? '<div style="background:#f8f9fa;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;"><h4 style="margin-top:0;">Über uns</h4><p style="margin:0;line-height:1.6;">' + description + '</p></div>' : '';
-			const cpBlock = contactPerson ? '<p style="margin:0.5rem 0;"><strong>Ansprechperson:</strong> ' + contactPerson + '</p>' : '';
-			const ceBlock = contactEmail ? '<p style="margin:0.5rem 0;"><strong>E-Mail:</strong> <a href="mailto:' + contactEmail + '">' + contactEmail + '</a></p>' : '';
-			const phBlock = phone ? '<p style="margin:0.5rem 0;"><strong>Telefon:</strong> ' + phone + '</p>' : '';
+			const websiteLink = website ? '<p style="margin:0.25rem 0;color:var(--red);"><a href="' + sanitizeUrl(website) + '" target="_blank">' + escapeHtml(website) + '</a></p>' : '';
+			const descBlock = description ? '<div style="background:#f8f9fa;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;"><h4 style="margin-top:0;">Über uns</h4><p style="margin:0;line-height:1.6;">' + escapeHtml(description) + '</p></div>' : '';
+			const cpBlock = contactPerson ? '<p style="margin:0.5rem 0;"><strong>Ansprechperson:</strong> ' + escapeHtml(contactPerson) + '</p>' : '';
+			const ceBlock = contactEmail ? '<p style="margin:0.5rem 0;"><strong>E-Mail:</strong> <a href="mailto:' + escapeHtml(contactEmail) + '">' + escapeHtml(contactEmail) + '</a></p>' : '';
+			const phBlock = phone ? '<p style="margin:0.5rem 0;"><strong>Telefon:</strong> ' + escapeHtml(phone) + '</p>' : '';
 			
 			const previewContent = '<div style="background:white;padding:2rem;border-radius:12px;max-width:800px;width:90%;max-height:80vh;overflow-y:auto;">' +
 				'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">' +
@@ -10127,7 +10129,7 @@
 				'<img src="' + logoUrl + '" style="width:100px;height:100px;border-radius:50%;object-fit:cover;">' +
 				'<div>' +
 				'<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">' +
-				'<h3 style="margin:0;">' + companyName + '</h3>' +
+				'<h3 style="margin:0;">' + escapeHtml(companyName) + '</h3>' +
 				'<span class="verified-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0;"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>' +
 				'</div>' + websiteLink + '</div></div>' + descBlock +
 				'<div style="background:#f8f9fa;padding:1.5rem;border-radius:8px;">' +
@@ -10503,15 +10505,7 @@
 				doc.text(`Seite ${i} von ${totalPages}  –  PharmaFaro.de`, pageWidth/2, pageHeight-10, { align: 'center' });
 			}
 			doc.save('PharmaFaro_Nutzungsbedingungen.pdf');
-		}
-
-		window.addEventListener('storage', function(e) {
-			if (e.key === 'verification_updated') {
-			}
-		});
-
-		window.addEventListener('focus', function() {
-		});		
+		}		
 
 		window.addEventListener('storage', function(e) {
 			if (e.key === 'verification_updated') {
