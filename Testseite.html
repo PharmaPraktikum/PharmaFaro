@@ -9572,6 +9572,22 @@
 							'Möchten Sie Ihre Bewertung wirklich unwiderruflich löschen?',
 							async function() {
 								try {
+									const { data: reviewCheck } = await window.supabase
+										.from('reviews')
+										.select('status')
+										.eq('delete_token', deleteReviewToken)
+										.single();
+
+									if (!reviewCheck) {
+										showToast('Bewertung nicht gefunden.', 'error');
+										return;
+									}
+
+									if (reviewCheck.status === 'pending') {
+										showToast('Ihre Bewertung wird noch geprüft und kann noch nicht gelöscht werden. Bitte wenden Sie sich an uns.', 'info', 8000);
+										return;
+									}
+
 									const { error } = await window.supabase
 										.from('reviews')
 										.update({ status: 'deleted' })
@@ -9580,7 +9596,7 @@
 									if (!error) {
 										showToast('Ihre Bewertung wurde erfolgreich gelöscht.', 'success', 6000);
 									} else {
-										showToast('Bewertung nicht gefunden oder bereits gelöscht.', 'error');
+										showToast('Fehler beim Löschen. Bitte versuchen Sie es erneut.', 'error');
 									}
 								} catch (e) {
 									showToast('Fehler beim Löschen der Bewertung.', 'error');
