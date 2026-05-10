@@ -965,6 +965,9 @@
 	</div>
 
 	<script>
+	if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    location.replace('https:' + location.href.substring(location.protocol.length));
+	}
 	  window.SUPABASE_URL = 'https://wotwmwcgbihlhlcwlvbm.supabase.co';
 	  window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvdHdtd2NnYmlobGhsY3dsdmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc4MDcsImV4cCI6MjA4NjA1MzgwN30.Zwt-clrOnntZQZ_NvpKJVB5xBCZTl_PgzrC9F_7F-uU';
 	</script>
@@ -1202,7 +1205,7 @@
 			
 			const clearableTabs = ['reviews', 'jobs', 'companies', 'awards', 'verification', 'reports'];
 			clearableTabs.forEach(tabSel => {
-				const tab = document.querySelector(tabSel);
+				const tab = document.getElementById(tabSel + '-content');
 				if (tab && !tab.classList.contains('active')) {
 					tab.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
 						el.value = '';
@@ -1280,7 +1283,7 @@
 			tbody.innerHTML = filteredReviews.map(review => `
 				<tr>
 					<td><strong>#${review.id.substring(0, 8)}</strong></td>
-					<td>${review.company_name}</td>
+					<td>${esc(review.company_name)}</td>
 					<td>
 						<span class="status-badge status-${review.status}">
 							${getStatusText(review.status)}
@@ -1332,13 +1335,13 @@
 			tbody.innerHTML = filteredJobs.map(job => `
 				<tr>
 					<td><strong>#${job.id.substring(0, 8)}</strong></td>
-					<td>${job.company_name}</td>
+					<td>${esc(job.company_name)}</td>
 					<td>
 						<span class="status-badge status-${job.status}">
 							${getStatusText(job.status)}
 						</span>
 					</td>
-					<td><strong>${job.salary}€</strong></td>
+					<td><strong>${esc(String(job.salary))}€</strong></td>
 					<td>${formatDate(job.created_at)}</td>
 					<td>
 						<div class="action-buttons">
@@ -1535,6 +1538,20 @@
 			}
 		};
 		
+		function getCategoryLabel(cat) {
+			const map = {
+				'offizin': 'Offizin',
+				'krankenhaus': 'Krankenhausapotheke',
+				'industrie': 'Industrie',
+				'universitaet': 'Universität',
+				'bundeswehr': 'Bundeswehr',
+				'pta-schule': 'PTA-Schule',
+				'behoerde': 'Behörde',
+				'sonstiges': 'Sonstiges'
+			};
+			return map[cat] || cat || '';
+		}
+
 		function getStatusText(status) {
 			const texts = {
 				'pending': 'Wartend',
@@ -1866,7 +1883,7 @@
 							box-shadow:0 2px 6px rgba(0,0,0,0.07);border-left:4px solid ${color};">
 					<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.75rem;">
 						<div>
-							<strong style="font-size:1.05rem;">${req.company_name}</strong><br>
+							<strong style="font-size:1.05rem;">${esc(req.company_name)}</strong><br>
 							<span style="color:#666;font-size:0.9rem;line-height:1.8;">
 								${req.company_address ? `📍 ${req.company_address}<br>` : ''}
 								👤 ${req.contact_person || '–'} &nbsp;|&nbsp;
@@ -2126,7 +2143,7 @@
 								border-left:4px solid ${currentReportsTab === 'open' ? '#dc3545' : '#6c757d'};">
 						<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.75rem;">
 							<div style="flex:1;">
-								<strong>${r.company_name || reviewInfo.company_name || 'Unbekannt'}</strong>
+								<strong>${esc(r.company_name || reviewInfo.company_name || 'Unbekannt')}</strong>
 								${r.company_address ? `<span style="color:#888;margin-left:0.5rem;font-size:0.9rem;">📍 ${r.company_address}</span>` : ''}
 								<br>
 								<small style="color:#888;">
@@ -2136,7 +2153,7 @@
 								</small>
 								<br>
 								<div style="margin-top:0.5rem;padding:0.5rem;background:#fff3cd;border-radius:6px;font-size:0.9rem;">
-									<strong>Grund:</strong> ${r.reason}
+									<strong>Grund:</strong> ${esc(r.reason)}
 								</div>
 								${statusLabel ? `<div style="margin-top:0.5rem;">${statusLabel}</div>` : ''}
 							</div>
@@ -2520,10 +2537,14 @@
 			
 			const yearSel = document.getElementById('admin-award-year');
 			const filterSel = document.getElementById('admin-award-filter-year');
+			const currentYear = new Date().getFullYear();
 			if (yearSel && yearSel.options.length === 0) {
-				const currentYear = new Date().getFullYear();
 				for (let y = currentYear; y >= 2000; y--) {
 					yearSel.add(new Option(y, y, y === currentYear, y === currentYear));
+				}
+			}
+			if (filterSel && filterSel.options.length <= 1) {
+				for (let y = currentYear; y >= 2000; y--) {
 					filterSel.add(new Option(y, y));
 				}
 			}
@@ -2881,7 +2902,7 @@
 								` : ''}
 								
 								<span class="detail-label">Kategorie:</span>
-								<span class="detail-value">${review.category}</span>
+								<span class="detail-value">${getCategoryLabel(review.category)}</span>
 								
 								${review.area ? `
 								<span class="detail-label">Bereich:</span>
@@ -2919,7 +2940,7 @@
 								
 								${review.working_hours_data && review.working_hours_data.length > 0 ? `
 								<span class="detail-label">Arbeitszeiten:</span>
-								<span class="detail-value">${review.working_hours_data.map(w => w.start + ' – ' + w.end + (w.isSaturday ? ' (Sa)' : '')).join(', ')}</span>
+								<span class="detail-value">${review.working_hours_data.map(w => w.type === 'flexible' ? 'Gleitzeit' : w.start + ' – ' + w.end + (w.isSaturday ? ' (Sa)' : '')).join(', ')}</span>
 								` : ''}
 							</div>
 						</div>
@@ -2942,21 +2963,21 @@
 							${review.tasks ? `
 								<div style="margin-bottom: 1.5rem;">
 									<strong style="color: #667eea;">Absolvierte Aufgaben:</strong>
-									<p style="margin-top: 0.5rem; line-height: 1.6;">${review.tasks}</p>
+									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.tasks)}</p>
 								</div>
 							` : ''}
 							
 							${review.feedback ? `
 								<div style="margin-bottom: 1.5rem;">
 									<strong style="color: #667eea;">Lob/Kritik:</strong>
-									<p style="margin-top: 0.5rem; line-height: 1.6;">${review.feedback}</p>
+									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.feedback)}</p>
 								</div>
 							` : ''}
 							
 							${review.highlights ? `
 								<div style="margin-bottom: 1.5rem;">
 									<strong style="color: #667eea;">Besonders hervorzuheben:</strong>
-									<p style="margin-top: 0.5rem; line-height: 1.6;">${review.highlights}</p>
+									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.highlights)}</p>
 								</div>
 							` : ''}
 						</div>
@@ -3117,20 +3138,20 @@
 								
 								${job.working_hours_data && job.working_hours_data.length > 0 ? `
 								<span class="detail-label">Arbeitszeiten:</span>
-								<span class="detail-value">${job.working_hours_data.map(w => w.start + ' – ' + w.end + (w.isSaturday ? ' (Sa)' : '')).join(', ')}</span>
+								<span class="detail-value">${job.working_hours_data.map(w => w.type === 'flexible' ? 'Gleitzeit' : w.start + ' – ' + w.end + (w.isSaturday ? ' (Sa)' : '')).join(', ')}</span>
 								` : ''}
 							</div>
 						</div>
 						
 						<div class="detail-section">
 							<h3>📝 Stellenbeschreibung</h3>
-							<p style="line-height: 1.6; white-space: pre-wrap;">${job.description}</p>
+							<p style="line-height: 1.6; white-space: pre-wrap;">${esc(job.description)}</p>
 						</div>
 						
 						${job.application_notes ? `
 						<div class="detail-section">
 							<h3>📬 Bewerbungshinweise</h3>
-							<p style="line-height: 1.6; white-space: pre-wrap;">${job.application_notes}</p>
+							<p style="line-height: 1.6; white-space: pre-wrap;">${esc(job.application_notes)}</p>
 						</div>
 						` : ''}
 						
