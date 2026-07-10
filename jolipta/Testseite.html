@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./favicon-512.png">
     <link rel="apple-touch-icon" href="./favicon-512.png">
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src https://*.supabase.co https://nominatim.openstreetmap.org; img-src 'self' data: https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src https://*.supabase.co; img-src 'self' data: https:;">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 	<!-- Supabase Backend Integration -->
 	<script type="module">
@@ -117,6 +117,63 @@
         --accent: #e8c4b8;
     }
 
+/* ── MODUS-SWITCHER ── */
+    .mode-switcher {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        margin-left: 0.5rem;
+    }
+    .mode-switcher-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.35rem 0.4rem;
+        display: flex;
+        align-items: center;
+        color: var(--mid);
+        border-radius: 6px;
+        transition: background 0.18s, color 0.18s;
+        line-height: 1;
+    }
+    .mode-switcher-btn:hover {
+        background: var(--red-light);
+        color: var(--red);
+    }
+    .mode-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        background: var(--bg-card);
+        min-width: 190px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        z-index: 1002;
+        box-shadow: 0 8px 30px rgba(42,18,16,0.1);
+        overflow: hidden;
+    }
+    .mode-switcher.open .mode-dropdown { display: block; }
+    .mode-dropdown-item {
+        padding: 0.85rem 1.25rem;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--dark);
+        cursor: pointer;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: 'DM Sans', sans-serif;
+    }
+    .mode-dropdown-item:last-child { border-bottom: none; }
+    .mode-dropdown-item:hover { background: var(--red-light); color: var(--red); }
+    .mode-dropdown-item.active { color: var(--red); font-weight: 700; cursor: default; }
+    @media (max-width: 768px) {
+        .mode-dropdown { left: auto; right: 0; }
+    }
+	
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
@@ -1755,7 +1812,18 @@
     <!-- Header -->
     <div class="header">
         <div class="nav">
-            <div class="logo" onclick="showSection('landing')" style="cursor: pointer;">PharmaFaro</div>
+			<div style="display:flex;align-items:center;">
+                <div class="logo" onclick="showSection('landing')" style="cursor: pointer;">PharmaFaro</div>
+                <div class="mode-switcher" id="mode-switcher">
+                    <button class="mode-switcher-btn" onclick="toggleModeSwitcher(event)" aria-label="Bereich wechseln" title="Bereich wechseln">
+                        <span style="display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;"></span>
+                    </button>
+                    <div class="mode-dropdown" id="mode-dropdown">
+                        <div class="mode-dropdown-item active" onclick="toggleModeSwitcher(event)">Pharmaziepraktika</div>
+                        <div class="mode-dropdown-item" onclick="selectPtaMode()">PTA-Praktika</div>
+                    </div>
+                </div>
+            </div>
 			<button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menü">
 				<span></span><span></span><span></span>
 			</button>
@@ -1873,7 +1941,7 @@
                 <!-- Highlight-Bewertungen -->
                 <div class="landing-reviews-section">
                     <div class="landing-section-header">
-                        <span class="landing-eyebrow-sm">Was Praktikanten sagen</span>
+                        <span class="landing-eyebrow-sm">Was Praktikant:innen sagen</span>
                         <h2 class="landing-section-title">Besonders <em>hervorragende</em> Erfahrungen</h2>
                     </div>
                     <div class="landing-reviews-grid" id="landing-highlight-reviews">
@@ -1993,7 +2061,8 @@
             <!-- Bewertung schreiben -->
             <div id="write-section" class="content-section">
                 <div class="form-container">
-					<h2>Bewertung schreiben</h2>					
+					<h2>Bewertung schreiben</h2>
+					<p style="font-size:0.85rem;color:var(--mid);margin-bottom:0.5rem;">* Pflichtfelder</p>
 					<form id="review-form">
                         <div class="form-group" style="margin-top: 1rem;">
                             <label>E-Mail-Adresse *</label>
@@ -2008,6 +2077,14 @@
 							</select>
 							<div class="verification-note">Dein Praktikumsbeginn wird nur zur Auswahl des zu dem Zeitpunkt geltenden Tarifgehalts verwendet und ist nicht öffentlich einsehbar.</div>
 						</div>						
+
+						<div class="form-group" style="margin-top: 0.75rem;">
+							<label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-weight: 500;">
+								<input type="checkbox" id="has-pta-degree" style="width: 1.1rem; height: 1.1rem; accent-color: var(--red); cursor: pointer;">
+								Abgeschlossene PTA-Ausbildung
+							</label>
+							<div class="verification-note" style="margin-top: 0.4rem;">Wenn du bereits eine PTA-Ausbildung abgeschlossen hast, wird dein Gehalt mit dem PTA-Tarif statt dem PJ-Tarif verglichen.</div>
+						</div>
 
                         <div class="form-section">
                             <h3>Basisangaben zum Praktikum</h3>
@@ -2064,7 +2141,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Bruttogehalt (€) *</label>
+                                    <label>Monatliches Bruttogehalt (€) *</label>
                                     <input type="number" required id="salary" placeholder="z.B. 1040" min="0">
                                 </div>								
                                 <div class="form-group">
@@ -2106,6 +2183,8 @@
 								<label>Spezialisierungen</label>
 								<div class="checkbox-group">
 									<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
+									<label><input type="checkbox" value="zytostatikaherstellung"> Zytostatikaherstellung</label>
+									<label><input type="checkbox" value="rezepturschwerpunkt"> Rezepturschwerpunkt</label>
 									<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
 									<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
 									<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
@@ -2296,7 +2375,7 @@
 
                             <div class="form-group">
                                 <label>Besonders Hervorzuheben</label>
-                                <textarea id="highlights" placeholder="Was sollten zukünftige Praktikanten unbedingt wissen?" maxlength="2000"></textarea>
+                                <textarea id="highlights" placeholder="Was sollten zukünftige Praktikant:innen unbedingt wissen?" maxlength="2000"></textarea>
                             </div>
 						</div>
 
@@ -2484,28 +2563,6 @@
 					
 					<div id="guide-content-display" style="background: var(--bg-card); padding: 3rem; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05); line-height: 1.6;">
 						<h3>1. Allgemeine Bestimmungen</h3>
-						<p>Das Pharmaziepraktikum dauert zwölf Monate und gliedert sich in zwei Abschnitte von je sechs Monaten. Der erste Abschnitt ist in einer öffentlichen Apotheke, der zweite kann wahlweise in einer öffentlichen Apotheke, einer Krankenhausapotheke oder in der pharmazeutischen Industrie absolviert werden.</p>
-						
-						<h3>2. Ziele des Praktikums</h3>
-						<p>Das Praktikum soll den angehenden Apotheker mit den Aufgaben des Apothekers vertraut machen und ihm die für die Ausübung des Apothekerberufs erforderlichen Kenntnisse und Fähigkeiten vermitteln.</p>
-						
-						<h3>3. Ausbildungsplan</h3>
-						<p>Der Praktikant erhält zu Beginn des Praktikums einen detaillierten Ausbildungsplan, der die verschiedenen Tätigkeitsbereiche und Lernziele auflistet. Dieser Plan wird regelmäßig überprüft und angepasst.</p>
-						
-						<h3>4. Praktikumsnachweis</h3>
-						<p>Über das Praktikum ist ein Nachweis zu führen, in dem die durchgeführten Tätigkeiten dokumentiert werden. Dieser wird vom Ausbildungsleiter regelmäßig kontrolliert und abgezeichnet.</p>
-						
-						<h3>5. Vergütung</h3>
-						<p>Der Praktikant erhält eine angemessene Vergütung. Die Höhe richtet sich nach den örtlichen Gegebenheiten und sollte mindestens den tariflichen Vereinbarungen entsprechen.</p>
-						
-						<h3>6. Arbeitszeiten und Urlaub</h3>
-						<p>Die Arbeitszeiten entsprechen den üblichen Arbeitszeiten des Betriebes. Dem Praktikanten steht Erholungsurlaub zu, dessen Dauer sich nach den gesetzlichen und tariflichen Bestimmungen richtet.</p>
-						
-						<h3>7. Betreuung</h3>
-						<p>Der Praktikant wird während der gesamten Ausbildungszeit von einem approbierten Apotheker betreut. Dieser ist für die ordnungsgemäße Ausbildung verantwortlich.</p>
-						
-						<h3>8. Bescheinigungen</h3>
-						<p>Nach erfolgreichem Abschluss der einzelnen Praktikumsabschnitte erhält der Praktikant eine Bescheinigung über die ordnungsgemäße Ableistung des Praktikums.</p>
 					</div>
 				</div>
 			</div>
@@ -2534,7 +2591,7 @@
 						
 						<div style="background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05);">
 							<h3 style="font-family: 'Fraunces', serif; color: var(--dark); margin-bottom: 1rem; letter-spacing: -0.01em;">🌟 Bewertungen nutzen</h3>
-							<p style="color: var(--mid); line-height: 1.7;">Informieren Sie sich über die Erfahrungen anderer Praktikanten. Unsere Bewertungsplattform hilft Ihnen dabei, den passenden Betrieb zu finden.</p>
+							<p style="color: var(--mid); line-height: 1.7;">Informieren Sie sich über die Erfahrungen anderer Praktikant:innen. Unsere Bewertungsplattform hilft Ihnen dabei, den passenden Betrieb zu finden.</p>
 						</div>
 						
 						<div style="background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(42,18,16,0.05);">
@@ -2706,7 +2763,7 @@
 								</select>
 							</div>
 							<div class="form-group">
-								<label>Bruttogehalt (€) *</label>
+								<label>Monatliches Bruttogehalt (€) *</label>
 								<input type="number" required id="job-salary" placeholder="z.B. 1040" min="0">
 							</div>
 							<div class="form-group">
@@ -2775,6 +2832,8 @@
 							<label>Spezialisierungen</label>
 							<div class="checkbox-group">
 								<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
+								<label><input type="checkbox" value="zytostatikaherstellung"> Zytostatikaherstellung</label>
+								<label><input type="checkbox" value="rezepturschwerpunkt"> Rezepturschwerpunkt</label>
 								<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
 								<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
 								<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
@@ -2979,8 +3038,8 @@
 		</div>
 	</div>
 	
-	<div id="guidelines-modal" class="modal">
-		<div class="modal-content">
+	<div id="guidelines-modal" class="modal" style="z-index: 2100;">
+		<div class="modal-content" style="max-width: 580px; max-height: 70vh;">
 			<div class="modal-header">
 				<h2>Richtlinien zum Verfassen von Bewertungen</h2>
 				<button class="close-btn" onclick="closeModal('guidelines-modal')">&times;</button>
@@ -2994,8 +3053,8 @@
 		</div>
 	</div>
 
-	<div id="job-terms-modal" class="modal">
-		<div class="modal-content">
+	<div id="job-terms-modal" class="modal" style="z-index: 2100;">
+		<div class="modal-content" style="max-width: 580px; max-height: 70vh;">
 			<div class="modal-header">
 				<h2>Richtlinien zum Einreichen von Stellenangeboten</h2>
 				<button class="close-btn" onclick="closeModal('job-terms-modal')">&times;</button>
@@ -3009,8 +3068,8 @@
 		</div>
 	</div>
 
-	<div id="privacy-modal" class="modal">
-		<div class="modal-content">
+	<div id="privacy-modal" class="modal" style="z-index: 2100;">
+		<div class="modal-content" style="max-width: 580px; max-height: 70vh;">
 			<div class="modal-header">
 				<h2>Datenschutzerklärung</h2>
 				<button class="close-btn" onclick="closeModal('privacy-modal')">&times;</button>
@@ -3027,8 +3086,8 @@
 		</div>
 	</div>
 
-	<div id="agb-modal" class="modal">
-		<div class="modal-content">
+	<div id="agb-modal" class="modal" style="z-index: 2100;">
+		<div class="modal-content" style="max-width: 580px; max-height: 70vh;">
 			<div class="modal-header">
 				<h2>Nutzungsbedingungen</h2>
 				<button class="close-btn" onclick="closeModal('agb-modal')">&times;</button>
@@ -3108,6 +3167,8 @@
 									<label style="font-weight:600;font-size:0.9rem;">Spezialisierung</label>
 									<div class="checkbox-group">
 										<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
+										<label><input type="checkbox" value="zytostatikaherstellung"> Zytostatikaherstellung</label>
+										<label><input type="checkbox" value="rezepturschwerpunkt"> Rezepturschwerpunkt</label>
 										<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
 										<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
 										<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
@@ -3285,6 +3346,8 @@
 									<label style="font-weight:600;font-size:0.9rem;">Spezialisierung</label>
 									<div class="checkbox-group">
 										<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
+										<label><input type="checkbox" value="zytostatikaherstellung"> Zytostatikaherstellung</label>
+										<label><input type="checkbox" value="rezepturschwerpunkt"> Rezepturschwerpunkt</label>
 										<label><input type="checkbox" value="verblisterung"> Verblisterung</label>
 										<label><input type="checkbox" value="versandhandel"> Versandhandel</label>
 										<label><input type="checkbox" value="heimversorgung"> Heimversorgung</label>
@@ -3421,11 +3484,11 @@
 			</div>
 			<!-- Mitte: Navigation -->
 			<nav class="footer-nav">
-				<a onclick="showSection('landing')">Startseite</a>
-				<a onclick="showSection('search')">Bewertungen</a>
+				<a onclick="showSection('search')">Bewertungen durchsuchen</a>
+				<a onclick="showSection('write')">Bewertung schreiben</a>
 				<a onclick="showSection('jobs')">Stellenangebote</a>
 				<a onclick="showSection('company-search')">Unternehmen</a>
-				<a onclick="showSection('write')">Bewertung schreiben</a>
+				<a onclick="window.location.href='../jolimarl/index.html'">Pharmaziepraktika</a>
 			</nav>
 			<!-- Rechts: Rechtliches -->
 			<div class="footer-legal">
@@ -3639,6 +3702,8 @@
 				id: nextReviewId,
 				email: document.getElementById('reviewer-email').value,
 				internshipYear: parseInt(document.getElementById('internship-year').value),
+				practiceType: 'Apo',
+				hasPtaDegree: document.getElementById('has-pta-degree')?.checked || false,
 				companyName: document.getElementById('company-name').value,
 				address: document.getElementById('company-address').value,
 				state: document.getElementById('company-state').value,
@@ -3933,7 +3998,8 @@
 				status: 'pending',
 				activatedAt: null,
 				deactivatedAt: null,
-				reportedAt: null
+				reportedAt: null,
+				practiceType: 'Apo'
 			};
 			
 			return formData;
@@ -4065,11 +4131,11 @@
 						searchQuery = address + ', Deutschland';
 					}
 
-					const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=de,at,ch&limit=30&addressdetails=1`;					
+					const url = `${window.SUPABASE_URL}/functions/v1/geocode?q=${encodeURIComponent(searchQuery)}&countrycodes=de,at,ch&limit=30`;
 					const response = await fetch(url, {
 						headers: {
-							'Accept': 'application/json',
-							'User-Agent': 'PharmaFaro/1.0 (info@pharmafaro.de)'
+							'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+							'apikey': window.SUPABASE_ANON_KEY
 						}
 					});
 					
@@ -4226,7 +4292,7 @@
 			
 			jobLocationTimeout = setTimeout(async () => {
 				try {
-					const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&countrycodes=de,at,ch&limit=1`, { headers: { 'User-Agent': 'PharmaFaro/1.0 (info@pharmafaro.de)' } });
+					const response = await fetch(`${window.SUPABASE_URL}/functions/v1/geocode?q=${encodeURIComponent(location)}&countrycodes=de,at,ch&limit=1`, { headers: { 'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`, 'apikey': window.SUPABASE_ANON_KEY } });
 					const data = await response.json();
 					
 					if (data && data.length > 0) {
@@ -4274,6 +4340,8 @@
         function getSpecializationLabel(value) {
             const labels = {
                 'sterilherstellung': 'Sterilherstellung',
+				'zytostatikaherstellung': 'Zytostatikaherstellung',
+				'rezepturschwerpunkt': 'Rezepturschwerpunkt',
                 'verblisterung': 'Verblisterung',
                 'versandhandel': 'Versandhandel',
                 'heimversorgung': 'Heimversorgung',
@@ -4556,8 +4624,6 @@
 		});
 
 		function showJobModal() {
-			document.getElementById('job-form').reset();
-			
 			document.getElementById('job-specializations-field').style.display = 'none';
 			document.getElementById('job-industry-field').style.display = 'none';
 			document.getElementById('job-university-field').style.display = 'none';
@@ -4598,11 +4664,7 @@
 
 		function closeModal(modalId) {
 			const modal = document.getElementById(modalId);
-			modal.style.display = 'none';
-			modal.scrollTop = 0;
-			if (modalId === 'report-modal') {
-				resetReportModal();
-			}
+			if (modal) modal.style.display = 'none';
 		}
 
 		function showReportModal(reviewId) {
@@ -4630,13 +4692,14 @@
 
 		let companiesData = {};
 
-		function createCompanyKey(companyName, address, state, country) {
+		function createCompanyKey(companyName, address, state, country, practiceType) {
 			const normalizedName = companyName.toLowerCase().trim();
 			const normalizedAddress = address.toLowerCase().trim();
 			const normalizedState = state.toLowerCase().trim();
 			const normalizedCountry = (country || '').toLowerCase().trim();
+			const normalizedType = (practiceType || 'Apo').trim();
 			
-			return `${normalizedName}|${normalizedAddress}|${normalizedState}|${normalizedCountry}`;
+			return `${normalizedName}|${normalizedAddress}|${normalizedState}|${normalizedCountry}|${normalizedType}`;
 		}
 
 		function getOrCreateCompany(companyName, address, state, country, category) {
@@ -5007,7 +5070,7 @@
 		}
 
 		function createMiniReviewCard(reviewData) {
-			const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear);
+			const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.hasPtaDegree, reviewData.state);
 			const overallRating = calculateOverallRating(reviewData.ratings);
 			
 			const miniSafeCompany = escapeHtml(reviewData.companyName);
@@ -5030,7 +5093,7 @@
 					</div>
 					<div class="job-details">
 						<div class="job-detail-row">
-							<span class="job-detail-label">Bruttogehalt:</span>
+							<span class="job-detail-label">Monatliches Bruttogehalt:</span>
 							<span class="salary-badge ${salaryBadge.class}">${reviewData.salary}€</span>
 						</div>
 					</div>
@@ -5620,14 +5683,13 @@
                 
 				const companyNameInput = document.getElementById('company-name-filter').value.trim();
 				if (companyNameInput) {
-					const reviewCompanyName = review.querySelector('.company-info h3').textContent.toLowerCase();
-					
-					const searchTerms = companyNameInput.toLowerCase().trim().split(/\s+/);
-					
-					const allTermsMatch = searchTerms.every(term => reviewCompanyName.includes(term));
-					
-					if (!allTermsMatch) {
-						showReview = false;
+					const h3 = review.querySelector('.company-info h3');
+					if (!h3) { showReview = false; }
+					else {
+						const reviewCompanyName = h3.textContent.toLowerCase();
+						const searchTerms = companyNameInput.toLowerCase().trim().split(/\s+/);
+						const allTermsMatch = searchTerms.every(term => reviewCompanyName.includes(term));
+						if (!allTermsMatch) showReview = false;
 					}
 				}
                 
@@ -5655,17 +5717,14 @@
                 
 				const selectedState = document.getElementById('state-filter').value;
 				if (selectedState) {
+					const reviewState = (review.dataset.state || '').trim();
 					if (selectedState === 'Ausland') {
 						const germanStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg',
 							'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen',
 							'Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen'];
-						const reviewText = review.textContent;
-						const isGerman = germanStates.some(state => reviewText.includes(state));
-						if (isGerman) showReview = false;
+						if (germanStates.includes(reviewState)) showReview = false;
 					} else {
-						if (!review.textContent.includes(selectedState)) {
-							showReview = false;
-						}
+						if (reviewState !== selectedState) showReview = false;
 					}
 				}
                 
@@ -5863,7 +5922,9 @@
             }
             
             try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&countrycodes=de&limit=1`, { headers: { 'User-Agent': 'PharmaFaro/1.0 (info@pharmafaro.de)' } });
+                const response = await fetch(`${window.SUPABASE_URL}/functions/v1/geocode?q=${encodeURIComponent(location)}&countrycodes=de&limit=1`, {
+                    headers: { 'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`, 'apikey': window.SUPABASE_ANON_KEY }
+                });
                 const data = await response.json();
                 
 				if (data && data.length > 0) {
@@ -5941,7 +6002,8 @@
 			});
 			
 			const filterMapping = {
-				'Sterilherstellung': 'sterilherstellung', 'Verblisterung': 'verblisterung',
+				'Sterilherstellung': 'sterilherstellung', 'Zytostatikaherstellung': 'zytostatikaherstellung',
+				'Rezepturschwerpunkt': 'rezepturschwerpunkt', 'Verblisterung': 'verblisterung',
 				'Versandhandel': 'versandhandel', 'Heimversorgung': 'heimversorgung',
 				'Klinikversorgung': 'klinikversorgung', 'Homöopathie': 'homoeopathie',
 				'Ernährungsberatung': 'ernaehrungsberatung', 'Sonstige Spezialisierung': 'sonstige-spec',
@@ -6031,10 +6093,12 @@
             
 			const specializations = document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]:checked');
 			specializations.forEach(checkbox => {
-				const specValues = ['sterilherstellung', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung', 'sonstige-spec'];
+				const specValues = ['sterilherstellung', 'zytostatikaherstellung', 'rezepturschwerpunkt', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung', 'sonstige-spec'];
 				if (specValues.includes(checkbox.value)) {
 					const labels = {
 						'sterilherstellung': 'Sterilherstellung',
+						'zytostatikaherstellung': 'Zytostatikaherstellung',
+						'rezepturschwerpunkt': 'Rezepturschwerpunkt',
 						'verblisterung': 'Verblisterung',
 						'versandhandel': 'Versandhandel',
 						'heimversorgung': 'Heimversorgung',
@@ -6047,7 +6111,7 @@
 				}
 			});
             
-			if (activeAdvancedFilters.some(f => ['Sterilherstellung','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung'].includes(f))) {
+			if (activeAdvancedFilters.some(f => ['Sterilherstellung','Zytostatikaherstellung','Rezepturschwerpunkt','Verblisterung','Versandhandel','Heimversorgung','Klinikversorgung','Homöopathie','Ernährungsberatung','Sonstige Spezialisierung'].includes(f))) {
 				document.getElementById('category-filter').value = 'offizin';
 			}
 
@@ -6189,7 +6253,8 @@
             }
 
             const filterMapping = {
-                'Sterilherstellung': 'sterilherstellung', 'Verblisterung': 'verblisterung',
+                'Sterilherstellung': 'sterilherstellung', 'Zytostatikaherstellung': 'zytostatikaherstellung',
+				'Rezepturschwerpunkt': 'rezepturschwerpunkt', 'Verblisterung': 'verblisterung',
                 'Versandhandel': 'versandhandel', 'Heimversorgung': 'heimversorgung',
                 'Klinikversorgung': 'klinikversorgung', 'Homöopathie': 'homoeopathie',
                 'Ernährungsberatung': 'ernaehrungsberatung', 'Sonstige Spezialisierung': 'sonstige-spec',
@@ -6252,10 +6317,12 @@
             
 			const specializations = document.querySelectorAll('#job-advanced-filters-modal input[type="checkbox"]:checked');
 			specializations.forEach(checkbox => {
-				const specValues = ['sterilherstellung', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung', 'sonstige-spec'];
+				const specValues = ['sterilherstellung', 'zytostatikaherstellung', 'rezepturschwerpunkt', 'verblisterung', 'versandhandel', 'heimversorgung', 'klinikversorgung', 'homoeopathie', 'ernaehrungsberatung', 'sonstige-spec'];
 				if (specValues.includes(checkbox.value)) {
 					const labels = {
 						'sterilherstellung': 'Sterilherstellung',
+						'zytostatikaherstellung': 'Zytostatikaherstellung',
+						'rezepturschwerpunkt': 'Rezepturschwerpunkt',
 						'verblisterung': 'Verblisterung',
 						'versandhandel': 'Versandhandel',
 						'heimversorgung': 'Heimversorgung',
@@ -6563,8 +6630,37 @@
 			return matching[0].amount;
 		}
 
-		function getSalaryBadge(salary, internshipYear) {
-			const tariff = internshipYear ? getTariffForYear(internshipYear) : (window.tariffSalary || 1040);
+		function getPtaEmployeeForState(state) {
+			const data = window.ptaEmployeeSalaryData || { default: window.ptaEmployeeSalary || 2200, states: [] };
+			if (state && data.states && data.states.length > 0) {
+				const match = data.states.find(sf => sf.states && sf.states.includes(state));
+				if (match) return match.amount;
+			}
+			return data.default || window.ptaEmployeeSalary || 2200;
+		}
+
+		function getPtaEmployeeTariffForYear(year, state) {
+			if (!year || !window.ptaEmployeeSalaryHistory || window.ptaEmployeeSalaryHistory.length === 0) {
+				return getPtaEmployeeForState(state);
+			}
+			const matching = window.ptaEmployeeSalaryHistory.filter(e => year >= e.from && (e.to === null || year <= e.to));
+			if (matching.length === 0) return getPtaEmployeeForState(state);
+			matching.sort((a, b) => b.from - a.from);
+			const entry = matching[0];
+			if (state && entry.states && entry.states.length > 0) {
+				const stateMatch = entry.states.find(sf => sf.states && sf.states.includes(state));
+				if (stateMatch) return stateMatch.amount;
+			}
+			return entry.default || entry.amount || getPtaEmployeeForState(state);
+		}
+
+		function getSalaryBadge(salary, internshipYear, hasPtaDegree, state) {
+			let tariff;
+			if (hasPtaDegree) {
+				tariff = internshipYear ? getPtaEmployeeTariffForYear(internshipYear, state) : getPtaEmployeeForState(state);
+			} else {
+				tariff = internshipYear ? getTariffForYear(internshipYear) : (window.tariffSalary || 1040);
+			}
 			const note = internshipYear ? '\n(Zum Zeitpunkt des Praktikumsbeginns)' : '';
 
 			if (salary < tariff) {
@@ -6645,12 +6741,12 @@
             const safeTasks = escapeHtml(reviewData.tasks);
             const safeFeedback = escapeHtml(reviewData.feedback);
             const safeHighlights = escapeHtml(reviewData.highlights);
-            const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear);
+            const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.hasPtaDegree, reviewData.state);
             const overallRating = calculateOverallRating(reviewData.ratings);
             const sortedWorkingHours = sortWorkingHours([...reviewData.workingHours]);
             
             return `
-                <div class="review-card" data-admin-id="${reviewData.adminId || reviewData.id}" data-company-name="${escapeHtml(reviewData.companyName)}">
+                <div class="review-card" data-admin-id="${reviewData.adminId || reviewData.id}" data-company-name="${escapeHtml(reviewData.companyName)}" data-state="${escapeHtml(reviewData.state || '')}">
                     <button class="report-btn" onclick="showReportModal('${reviewData.adminId || reviewData.id}')" title="Bewertung melden">!</button>
                     <div class="review-header">
                         <div class="company-info">
@@ -6676,7 +6772,7 @@
                     
 					<div class="job-details">
 						<div class="job-detail-row">
-							<span class="job-detail-label">Bruttogehalt:</span>
+							<span class="job-detail-label">Monatliches Bruttogehalt:</span>
 							<span class="salary-badge ${salaryBadge.class}" title="${salaryBadge.text}">${reviewData.salary}€</span>
 						</div>
 						<div class="job-detail-row">
@@ -6727,7 +6823,7 @@
             const sortedWorkingHours = sortWorkingHours([...jobData.workingHours]);
             
 			return `
-                <div class="job-card" data-earliest-start="${escapeHtml(jobData.earliestStart || '')}">	
+                <div class="job-card" data-earliest-start="${escapeHtml(jobData.earliestStart || '')}" data-state="${escapeHtml(jobData.state || '')}">	
                     <div class="job-header">
                         <div class="job-info">
 							<div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -6755,7 +6851,7 @@
                     
                     <div class="job-details">
                         <div class="job-detail-row">
-                            <span class="job-detail-label">Bruttogehalt:</span>
+                            <span class="job-detail-label">Monatliches Bruttogehalt:</span>
                             <span>${jobData.salary}€</span>
                         </div>
 						<div class="job-detail-row">
@@ -6846,17 +6942,14 @@
                 
 				const selectedState = document.getElementById('job-state-filter').value;
 				if (selectedState) {
+					const jobState = (job.dataset.state || '').trim();
 					if (selectedState === 'Ausland') {
 						const germanStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg',
 							'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen',
 							'Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen'];
-						const jobText = job.textContent;
-						const isGerman = germanStates.some(state => jobText.includes(state));
-						if (isGerman) showJob = false;
+						if (germanStates.includes(jobState)) showJob = false;
 					} else {
-						if (!job.textContent.includes(selectedState)) {
-							showJob = false;
-						}
+						if (jobState !== selectedState) showJob = false;
 					}
 				}
                 
@@ -7933,6 +8026,11 @@
 			
 			document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
 			document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+			// Job-Formular nur leeren wenn man den Jobs-Reiter verlässt
+			if (currentSection === 'jobs' && section !== 'jobs') {
+				const jobForm = document.getElementById('job-form');
+				if (jobForm) jobForm.reset();
+			}
 			document.querySelectorAll('.dropdown-content a').forEach(a => a.classList.remove('active'));
 			document.body.classList.toggle('write-active', section === 'write');
 			
@@ -8238,6 +8336,20 @@
 			}
 		}
 
+		function toggleModeSwitcher(e) {
+			e.stopPropagation();
+			document.getElementById('mode-switcher').classList.toggle('open');
+		}
+		function selectPtaMode() {
+			window.location.href = '../jolipta/';
+		}
+		document.addEventListener('click', function(e) {
+			const sw = document.getElementById('mode-switcher');
+			if (sw && !sw.contains(e.target)) {
+				sw.classList.remove('open');
+			}
+		});
+
 		function toggleMobileMenu() {
 			const btn = document.getElementById('hamburger-btn');
 			const tabs = document.getElementById('nav-tabs');
@@ -8289,7 +8401,7 @@
 			const container = document.getElementById('landing-highlight-reviews');
 			if (!container) return;
 			container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--mid);">
-				<p style="font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem;">Noch keine Bewertungen vorhanden – sei der Erste!</p>
+				<p style="font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem;">Noch keine Bewertungen vorhanden – sei der oder die Erste!</p>
 				<button class="btn btn-primary" onclick="showSection('write')" style="margin-top:1.5rem;">Jetzt Bewertung schreiben</button>
 			</div>`;
 		}
@@ -9110,6 +9222,25 @@
 			}
 		}
 
+		// PTA-Mitarbeiter-Gehalt laden
+		(async () => {
+			try {
+				const { data: salData } = await window.supabase
+					.from('site_settings').select('value').eq('key', 'pta_employee_salary').single();
+				if (salData) {
+					const parsed = JSON.parse(salData.value);
+					window.ptaEmployeeSalaryData = typeof parsed.default === 'number'
+						? parsed
+						: { default: parsed.amount || 2200, states: [] };
+					window.ptaEmployeeSalary = window.ptaEmployeeSalaryData.default;
+				}
+				const { data: histData } = await window.supabase
+					.from('site_settings').select('value').eq('key', 'pta_employee_salary_history').single();
+				if (histData) window.ptaEmployeeSalaryHistory = JSON.parse(histData.value);
+				else window.ptaEmployeeSalaryHistory = [];
+			} catch(e) { window.ptaEmployeeSalary = 2200; window.ptaEmployeeSalaryHistory = []; }
+		})();
+
 		async function saveTariffSalary() {
 			const amountInput = document.getElementById('tariff-salary-input');
 			if (!amountInput) return;
@@ -9398,7 +9529,8 @@
 							highlights: review.highlights || '',
 							area: review.area || '',
 							benefits: review.benefits || '',
-							internshipYear: review.internship_year || null
+							internshipYear: review.internship_year || null,
+							hasPtaDegree: review.has_pta_degree || false
 						};
 						
 						reviewsData.push(formattedReview);
@@ -9407,6 +9539,8 @@
 					});
 					
 					renderReviews();
+					verifiedCompaniesCache = null;
+					loadVerifiedCompaniesCache().then(() => renderReviews());
 				} else {
 					console.error('❌ Fehler beim Laden:', result.error);
 				}
@@ -9926,7 +10060,10 @@
 				'<div style="background:white;padding:1.5rem;border-radius:10px;margin-bottom:1.5rem;border:1px solid var(--border);">' +
 				'<h3 style="margin-top:0;font-family:\'DM Sans\',sans-serif;font-weight:600;color:var(--dark);">Profilbild</h3>' +
 				'<div style="display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;">' +
+				'<div style="position:relative;display:inline-block;">' +
 				'<img id="company-logo-preview" src="' + (logoUrl || '') + '" style="width:100px;height:100px;border-radius:50%;object-fit:cover;' + (logoUrl ? '' : 'display:none;') + '">' +
+				'<button type="button" id="remove-logo-btn" onclick="document.getElementById(\'company-logo-preview\').src=\'\';document.getElementById(\'company-logo-preview\').style.display=\'none\';this.style.display=\'none\';" style="' + (logoUrl ? '' : 'display:none;') + 'position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#dc3545;color:white;border:none;cursor:pointer;font-size:0.85rem;line-height:1;padding:0;">&times;</button>' +
+				'</div>' +
 				'<div id="logo-canvas-container" style="display:none;flex-direction:column;align-items:center;gap:0.75rem;">' +
 				'<canvas id="logo-canvas" width="280" height="280" style="border-radius:50%;border:2px solid var(--border);cursor:move;touch-action:none;"></canvas>' +
 				'<div style="display:flex;gap:0.5rem;">' +
@@ -10044,6 +10181,21 @@
 			canvas.addEventListener('mouseup', function() { logoDragging = false; });
 			canvas.addEventListener('mouseleave', function() { logoDragging = false; });
 
+			canvas.addEventListener('touchstart', function(e) {
+				e.preventDefault();
+				logoDragging = true;
+				logoDragStartX = e.touches[0].clientX - logoOffsetX;
+				logoDragStartY = e.touches[0].clientY - logoOffsetY;
+			}, { passive: false });
+			canvas.addEventListener('touchmove', function(e) {
+				e.preventDefault();
+				if (!logoDragging) return;
+				logoOffsetX = e.touches[0].clientX - logoDragStartX;
+				logoOffsetY = e.touches[0].clientY - logoDragStartY;
+				drawLogoCanvas();
+			}, { passive: false });
+			canvas.addEventListener('touchend', function() { logoDragging = false; });
+			
 			canvas.addEventListener('wheel', function(e) {
 				e.preventDefault();
 				logoScale *= e.deltaY < 0 ? 1.05 : 0.95;
@@ -10088,13 +10240,16 @@
 				submitBtn.textContent = 'Wird gespeichert...';
 				
 				try {
+					const previewEl = document.getElementById('company-logo-preview');
+					const rawSrc = previewEl.src || '';
+					const isValidLogo = rawSrc.startsWith('data:') || (rawSrc.startsWith('http') && rawSrc.includes('supabase'));
 					const profileData = {
 						description: document.getElementById('company-description').value,
 						website: document.getElementById('company-website').value,
 						contactPerson: document.getElementById('company-contact-person').value,
 						contactEmail: document.getElementById('company-contact-email').value,
 						phone: document.getElementById('company-contact-phone').value,
-						logoUrl: document.getElementById('company-logo-preview').src
+						logoUrl: isValidLogo ? rawSrc : null
 					};
 					
 					const result = await window.api.updateCompanyProfile(editToken, profileData);
