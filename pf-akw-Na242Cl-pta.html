@@ -1,0 +1,3827 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+	<link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="512x512" href="./favicon-512.png">
+    <link rel="apple-touch-icon" href="./favicon-512.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow">
+	<meta http-equiv="X-Content-Type-Options" content="nosniff">
+	<meta name="referrer" content="strict-origin-when-cross-origin">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src https://*.supabase.co; img-src 'self' data:;">
+    <title>PharmaFaro – Admin</title>
+    
+	<style>
+        @font-face {
+            font-family: 'Fraunces';
+            src: url('./fonts/fraunces-300.woff2') format('woff2');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Fraunces';
+            src: url('./fonts/fraunces-300-italic.woff2') format('woff2');
+            font-weight: 300;
+            font-style: italic;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Fraunces';
+            src: url('./fonts/fraunces-600.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Fraunces';
+            src: url('./fonts/fraunces-700.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Fraunces';
+            src: url('./fonts/fraunces-400-italic.woff2') format('woff2');
+            font-weight: 400;
+            font-style: italic;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'DM Sans';
+            src: url('./fonts/dm-sans-300.woff2') format('woff2');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'DM Sans';
+            src: url('./fonts/dm-sans-400.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'DM Sans';
+            src: url('./fonts/dm-sans-500.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'DM Sans';
+            src: url('./fonts/dm-sans-600.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+            font-display: swap;
+        }
+    </style>
+    <style>
+        :root {
+			--pf-red:    #6d28d9;
+            --pf-lite:   #f5f3ff;
+            --pf-dark:   #2d2040;
+            --pf-mid:    #6b6080;
+            --pf-bg:     #faf9fd;
+            --pf-card:   #ffffff;
+            --pf-border: rgba(45,32,64,0.12);
+            --pf-accent: #c4b5fd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--pf-bg); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: var(--pf-dark); }
+        body.pf-dash { display: block; background: var(--pf-bg); }
+        
+        /* Login Screen */
+        .login-container { background: var(--pf-card); padding: 3rem; border-radius: 16px; box-shadow: 0 20px 60px rgba(42,18,16,0.14); border: 1px solid var(--pf-border); width: 90%; max-width: 450px; }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+		.pf-logo {
+			font-family: 'Fraunces', serif;
+			font-size: 1.45rem;
+			font-weight: 700;
+			color: var(--dark);
+			letter-spacing: -0.02em;
+			display: flex;
+			align-items: center;
+			gap: 0.1em;
+		}
+ 
+		.pf-logo em { color: var(--pf-dark); font-style: italic; font-weight: 400; }
+        .login-header h1 { color: var(--pf-mid); font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; }
+        
+        .login-header p { color: var(--pf-mid); font-size: 0.85rem; }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--pf-dark); font-weight: 600; font-size: 0.85rem; }
+        
+        .form-group input { width:100%; padding:0.75rem 1rem; border:1.5px solid var(--pf-border); border-radius:8px; font-size:0.95rem; transition:border-color 0.2s,box-shadow 0.2s; font-family:'DM Sans',sans-serif; }
+        
+        .form-group input:focus { outline:none; border-color:var(--pf-red); box-shadow:0 0 0 3px rgba(109,40,217,0.1); }
+        
+        .btn { width:100%; padding:0.8rem; background:var(--pf-red); color:white; border:none; border-radius:10px; font-size:0.95rem; font-weight:600; cursor:pointer; transition:all 0.18s; font-family:'DM Sans',sans-serif; box-shadow:0 3px 12px rgba(109,40,217,0.25); }
+        
+        .btn:hover { background:#a02a21; transform:translateY(-1px); box-shadow:0 5px 18px rgba(184,50,40,0.35); }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .error-message { background:var(--pf-lite); border-left:3px solid var(--pf-red); color:var(--pf-red);
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .success-message { background:#eaf7ee; border-left:3px solid #2d8a4e; color:#1a5c34;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        /* Admin Dashboard */
+        .admin-dashboard { display:none; width:100%; min-height:100vh; background:var(--pf-bg); }
+        /* Sticky bar containing header + tabs */
+        .pf-sticky { position:sticky; top:0; z-index:100; background:var(--pf-card); box-shadow:0 2px 12px rgba(42,18,16,0.08); }
+        /* Stats bar between sticky and content */
+        .pf-stats-bar { background:var(--pf-card); border-bottom:1px solid var(--pf-border); padding:1rem 2rem; display:none; }
+        .pf-stats-bar .stats-grid { margin-bottom:0; }
+        
+        .dashboard-header { background:linear-gradient(160deg,var(--pf-dark) 0%,#1e1535 100%); color:white; padding:1.1rem 2rem; display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid var(--pf-red); }
+
+		.admin-mode-item { padding:0.85rem 1.25rem; font-size:0.88rem; font-weight:500; color:#333; cursor:pointer; border-bottom:1px solid #eee; transition:background 0.15s, color 0.15s; }
+        .admin-mode-item:last-child { border-bottom:none; }
+        .admin-mode-item:hover { background:#f3eeff; color:#6d28d9; }
+        .admin-mode-item.active { color:#6d28d9; font-weight:700; cursor:default; }
+        .admin-mode-item.active:hover { background:white; color:#6d28d9; }
+        
+        .dashboard-header .pf-logo { font-size:1.3rem; color:white; }
+        .dash-subtitle { font-size:0.82rem; font-weight:300; color:rgba(255,255,255,0.5); margin-top:2px; }
+        
+        .user-info { display:flex; align-items:center; gap:1rem; font-size:0.85rem; color:rgba(255,255,255,0.65); }
+        
+        .logout-btn { padding:0.45rem 0.9rem; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.3); color:white; border-radius:8px; cursor:pointer; transition:background 0.2s; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; }
+        .logout-btn:hover { background:rgba(255,255,255,0.22); }
+        
+        .dashboard-content { padding:2rem; }
+        
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:0; }
+        
+        .stat-card { padding:1.1rem 1.25rem; border-radius:10px; background:var(--pf-card); border:1px solid var(--pf-border); box-shadow:0 1px 6px rgba(42,18,16,0.05); }
+        
+        .stat-card h3 { font-size:0.72rem; color:var(--pf-mid); margin-bottom:0.35rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+        
+        .stat-card .number { font-family:'Fraunces',serif; font-size:2rem; font-weight:700; color:var(--pf-dark); letter-spacing:-0.02em; }
+        
+        .stat-card.pending { border-left:3px solid #d97706; background:#fffbeb; } .stat-card.pending h3 { color:#92400e; } .stat-card.pending .number { color:#78350f; }
+        
+        .stat-card.active { border-left:3px solid #2d8a4e; background:#f0fdf4; } .stat-card.active h3 { color:#166534; } .stat-card.active .number { color:#14532d; }
+        
+        .stat-card.inactive { border-left:3px solid var(--pf-red); background:var(--pf-lite); } .stat-card.inactive h3 { color:var(--pf-red); }
+        
+        .reviews-section {
+            margin-top: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .section-header h2 { color:var(--pf-dark); font-family:'Fraunces',serif; }
+        
+        .filter-select { padding:0.5rem 1rem; border:1.5px solid var(--pf-border); border-radius:8px; font-size:0.9rem; font-family:'DM Sans',sans-serif; }
+        
+        .reviews-table { width:100%; background:var(--pf-card); border-radius:12px; overflow:hidden; border:1px solid var(--pf-border); box-shadow:0 1px 6px rgba(42,18,16,0.05); }
+        
+        .reviews-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .reviews-table th { background:var(--pf-bg); padding:0.8rem 1rem; text-align:left; font-weight:600; font-size:0.78rem; color:var(--pf-mid); border-bottom:1.5px solid var(--pf-border); text-transform:uppercase; letter-spacing:0.04em; }
+        
+        .reviews-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .reviews-table tr:hover td { background:var(--pf-bg); }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pending { background:#fef3c7; color:#92400e; border:1px solid rgba(217,119,6,0.25); }
+        
+        .status-active { background:#dcfce7; color:#166534; border:1px solid rgba(45,138,78,0.25); }
+        
+        .status-inactive { background:var(--pf-lite); color:var(--pf-red); border:1px solid rgba(184,50,40,0.2); }
+
+		/* Tabs */
+		.tabs { display:flex; gap:0; margin-bottom:0; border-bottom:2px solid var(--pf-border); overflow-x:auto; overflow-y:visible; scrollbar-width:none; -ms-overflow-style:none; flex-wrap:nowrap; padding:0 0.5rem; }
+
+		.tabs::-webkit-scrollbar {
+			display: none;
+		}
+
+		.tab-btn {
+			padding: 0.85rem 1.25rem;
+			background: none;
+			border: none;
+			border-bottom: 3px solid transparent;
+			color: #666;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s;
+			white-space: nowrap;
+			flex-shrink: 0;
+		}
+
+		.tab-btn:hover { color:var(--pf-red); background:var(--pf-lite); border-radius:4px 4px 0 0; }
+
+		.tab-btn.active { color:var(--pf-red); border-bottom-color:var(--pf-red); }
+
+		.tab-content {
+			display: none;
+		}
+
+		.tab-content.active {
+			display: block;
+		}
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-view { background:var(--pf-dark); color:white; }
+        
+        .btn-activate { background:#2d8a4e; color:white; }
+        
+        .btn-deactivate { background:var(--pf-red); color:white; }
+        
+        .btn-contact { background:var(--pf-mid); color:white; }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top:3px solid var(--pf-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+		/* Review Detail Modal */
+		.modal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.5);
+			z-index: 9999;
+			overflow-y: auto;
+		}
+
+		.modal-content { background:var(--pf-card); margin:2rem auto; padding:0; max-width:900px; border-radius:16px; border:1px solid var(--pf-border); box-shadow:0 20px 60px rgba(42,18,16,0.18);
+			animation: slideIn 0.3s;
+		}
+
+		@keyframes slideIn {
+			from {
+				transform: translateY(-50px);
+				opacity: 0;
+			}
+			to {
+				transform: translateY(0);
+				opacity: 1;
+			}
+		}
+
+		.modal-header { padding:1.4rem 2rem; background:linear-gradient(160deg,var(--pf-dark) 0%,#3d1a17 100%); color:white; border-radius:16px 16px 0 0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.modal-header h2 {
+			margin: 0;
+		}
+
+		.close-btn {
+			background: rgba(255,255,255,0.2);
+			border: none;
+			color: white;
+			font-size: 1.5rem;
+			width: 35px;
+			height: 35px;
+			border-radius: 50%;
+			cursor: pointer;
+			transition: background 0.3s;
+		}
+
+		.close-btn:hover {
+			background: rgba(255,255,255,0.3);
+		}
+
+		.modal-body {
+			padding: 2rem;
+			max-height: 70vh;
+			overflow-y: auto;
+		}
+
+		.detail-section {
+			margin-bottom: 2rem;
+		}
+
+		.detail-section h3 { color:var(--pf-dark); margin-bottom:1rem; font-size:1rem; border-bottom:1px solid var(--pf-border);
+			padding-bottom: 0.5rem;
+		}
+
+		.detail-grid {
+			display: grid;
+			grid-template-columns: 200px 1fr;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.detail-label {
+			font-weight: 600;
+			color: #666;
+		}
+
+		.detail-value {
+			color: #333;
+		}
+
+		.rating-display {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+			margin-top: 1rem;
+		}
+
+		.rating-item {
+			padding: 1rem;
+			background: #f8f9fa;
+			border-radius: 8px;
+			text-align: center;
+		}
+
+		.rating-item .label {
+			color: #666;
+			font-size: 0.9rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.rating-item .stars {
+			color: #ffc107;
+			font-size: 1.2rem;
+		}
+
+		.pdf-preview {
+			padding: 1.5rem;
+			background: #f8f9fa;
+			border-radius: 8px;
+			text-align: center;
+		}
+
+		.pdf-preview button {
+			margin-top: 1rem;
+		}
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="login-screen">
+        <div class="login-header">
+            <div class="pf-logo">PharmaFaro</div>
+            <h1>Admin-Bereich</h1>
+        </div>
+        
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message"></div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label>E-Mail</label>
+                <input type="email" id="email" required placeholder="admin@beispiel.de">
+            </div>
+            
+            <div class="form-group">
+                <label>Passwort</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit" class="btn" id="login-btn">Anmelden</button>
+        </form>
+    </div>
+
+
+	<div class="admin-dashboard" id="admin-dashboard">
+
+		<!-- ① STICKY BAR: header + tabs — always same height -->
+		<div class="pf-sticky">
+			<div class="dashboard-header">
+				<div style="display:flex;align-items:center;gap:0.75rem;">
+					<div>
+						<div class="pf-logo">PharmaFaro</div>
+						<div class="dash-subtitle">Admin-Dashboard</div>
+					</div>
+					<div id="admin-mode-switcher" style="position:relative;display:inline-flex;align-items:center;">
+						<button id="admin-mode-btn" style="background:none;border:none;padding:0.3rem 0.4rem;cursor:pointer;color:rgba(255,255,255,0.7);display:flex;align-items:center;" title="Bereich wechseln">
+							<span style="display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;"></span>
+						</button>
+						<div id="admin-mode-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:white;min-width:190px;border:1px solid #ddd;border-radius:10px;z-index:1002;box-shadow:0 8px 30px rgba(0,0,0,0.15);overflow:hidden;">
+							<div id="admin-mode-apo" class="admin-mode-item">Pharmaziepraktika</div>
+							<div id="admin-mode-pta" class="admin-mode-item active">PTA-Praktika</div>
+						</div>
+					</div>
+				</div>
+				<div class="user-info">
+					<span id="user-email"></span>
+					<button class="logout-btn" onclick="logout()">Abmelden</button>
+				</div>
+			</div>
+			<div class="tabs">
+				<button class="tab-btn active" id="reviews-tab-btn" onclick="window.switchTab('reviews')">
+					📝 Bewertungen
+				</button>
+				<button class="tab-btn" id="jobs-tab-btn" onclick="window.switchTab('jobs')">
+					💼 Stellenangebote
+				</button>
+				<button class="tab-btn" id="companies-tab-btn" onclick="window.switchTab('companies')">
+					🏢 Unternehmen
+				</button>
+				<button class="tab-btn" id="awards-tab-btn" onclick="window.switchTab('awards')">
+					🏆 BPhD Awards
+				</button>				
+				<button class="tab-btn" id="verification-tab-btn" onclick="window.switchTab('verification')">
+					✅ Verifizierungen
+					<span id="verification-badge" style="display:none; background:#dc3545; color:white; border-radius:50%; padding:0.1rem 0.4rem; font-size:0.75rem; margin-left:0.3rem;"></span>
+				</button>	
+				<button class="tab-btn" id="reports-tab-btn" onclick="window.switchTab('reports')">
+					🚨 Meldungen
+					<span id="reports-badge" style="display:none;background:#dc3545;color:white;border-radius:50%;padding:0.1rem 0.4rem;font-size:0.75rem;margin-left:0.3rem;"></span>
+				</button>				
+				<button class="tab-btn" id="settings-tab-btn" onclick="window.switchTab('settings')">
+					⚙️ Einstellungen
+				</button>
+			</div><!-- /tabs -->
+		</div><!-- /pf-sticky -->
+
+		<!-- ② STATS BAR: shown/hidden per tab, sits below tabs -->
+		<div class="pf-stats-bar" id="pf-stats-bar">
+			<!-- Stats Reviews -->
+			<div class="stats-grid" id="reviews-stats-grid">
+				<div class="stat-card"><h3>Reviews gesamt</h3><div class="number" id="stat-total">0</div></div>
+				<div class="stat-card pending"><h3>Wartend</h3><div class="number" id="stat-pending">0</div></div>
+				<div class="stat-card active"><h3>Aktiv</h3><div class="number" id="stat-active">0</div></div>
+				<div class="stat-card inactive"><h3>Inaktiv</h3><div class="number" id="stat-inactive">0</div></div>
+			</div>
+			<!-- Stats Jobs -->
+			<div class="stats-grid" id="jobs-stats-grid" style="display:none;">
+				<div class="stat-card"><h3>Jobs gesamt</h3><div class="number" id="stat-jobs-total">0</div></div>
+				<div class="stat-card pending"><h3>Wartend</h3><div class="number" id="stat-jobs-pending">0</div></div>
+				<div class="stat-card active"><h3>Aktiv</h3><div class="number" id="stat-jobs-active">0</div></div>
+				<div class="stat-card inactive"><h3>Inaktiv</h3><div class="number" id="stat-jobs-inactive">0</div></div>
+			</div>
+			<!-- Stats Companies -->
+			<div class="stats-grid" id="companies-stats-grid" style="display:none;">
+				<div class="stat-card"><h3>Gesamt</h3><div class="number" id="stat-companies-total">0</div></div>
+				<div class="stat-card active"><h3>Aktiv</h3><div class="number" id="stat-companies-active">0</div></div>
+				<div class="stat-card inactive"><h3>Inaktiv</h3><div class="number" id="stat-companies-inactive">0</div></div>
+				<div class="stat-card" style="border-left:3px solid #2563eb;background:#eff6ff;"><h3 style="color:#1e40af;">Verifiziert</h3><div class="number" id="stat-companies-verified" style="color:#1e3a8a;">0</div></div>
+			</div>
+		</div><!-- /pf-stats-bar -->
+
+		<!-- ③ CONTENT: scrollable tab content area -->
+		<div class="dashboard-content">
+			<!-- Reviews Content -->
+			<div class="tab-content active" id="reviews-content">
+				<div class="section-header" style="margin-bottom: 1rem;">
+					<h2>Bewertungen verwalten</h2>
+					<select class="filter-select" id="status-filter" onchange="filterReviews()">
+						<option value="">Alle Status</option>
+						<option value="pending">Wartend</option>
+						<option value="active">Aktiv</option>
+						<option value="inactive">Inaktiv</option>
+					</select>
+				</div>
+				
+				<div class="reviews-table">
+					<table>
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Unternehmen</th>
+								<th>Status</th>
+								<th>Eingereicht</th>
+								<th>Aktionen</th>
+							</tr>
+						</thead>
+						<tbody id="reviews-tbody">
+							<tr>
+								<td colspan="5">
+									<div class="loading">
+										<div class="spinner"></div>
+										<p>Lade Bewertungen...</p>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<!-- Jobs Content -->
+			<div class="tab-content" id="jobs-content">
+				<div class="section-header" style="margin-bottom: 1rem;">
+					<h2>Stellenangebote verwalten</h2>
+					<select class="filter-select" id="jobs-status-filter" onchange="filterJobs()">
+						<option value="">Alle Status</option>
+						<option value="pending">Wartend</option>
+						<option value="active">Aktiv</option>
+						<option value="inactive">Inaktiv</option>
+					</select>
+				</div>
+				
+				<div class="reviews-table">
+					<table>
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Unternehmen</th>
+								<th>Status</th>
+								<th>Gehalt</th>
+								<th>Eingereicht</th>
+								<th>Aktionen</th>
+							</tr>
+						</thead>
+						<tbody id="jobs-tbody">
+							<tr>
+								<td colspan="6">
+									<div class="loading">
+										<div class="spinner"></div>
+										<p>Lade Stellenangebote...</p>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Companies Content -->
+			<div class="tab-content" id="companies-content">
+				<div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+					<input type="text" id="company-search-filter" placeholder="Nach Name oder Adresse filtern..."
+						   oninput="filterCompaniesTable()"
+						   style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95rem; flex: 1; min-width: 200px;">
+					<select id="company-status-filter" onchange="filterCompaniesTable()"
+							style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px;">
+						<option value="">Alle Status</option>
+						<option value="active">Aktiv</option>
+						<option value="inactive">Inaktiv</option>
+					</select>
+					<select id="company-verified-filter" onchange="filterCompaniesTable()"
+							style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px;">
+						<option value="">Verifizierung: Alle</option>
+						<option value="yes">Verifiziert</option>
+						<option value="no">Nicht verifiziert</option>
+					</select>
+					<select id="company-mode-filter" onchange="filterCompaniesTable()"
+							style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px;">
+						<option value="all">Bereich: Alle</option>
+						<option value="pta">Nur PTA</option>
+						<option value="apo">Nur Apo</option>
+					</select>
+					<select id="company-sort" onchange="filterCompaniesTable()"
+							style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px;">
+						<option value="name">Sortierung: Name A–Z</option>
+						<option value="reviews">Sortierung: Reviews ↓</option>
+						<option value="jobs">Sortierung: Jobs ↓</option>
+					</select>
+					<button onclick="loadCompanies()"
+							style="padding: 0.6rem 1.2rem; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+						🔄 Aktualisieren
+					</button>
+				</div>
+
+				<div style="overflow-x: auto;">
+					<table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+						<thead style="background: #343a40; color: white;">
+							<tr>
+								<th style="padding: 0.75rem; text-align: left;">Nr.</th>
+								<th style="padding: 0.75rem; text-align: left;">Name</th>
+								<th style="padding: 0.75rem; text-align: left;">Adresse</th>
+								<th style="padding: 0.75rem; text-align: left;">Erstellt</th>
+								<th style="padding: 0.75rem; text-align: center;">Status</th>
+								<th style="padding: 0.75rem; text-align: center;">Verifiziert</th>
+								<th style="padding: 0.75rem; text-align: center;">Bewertungen</th>
+								<th style="padding: 0.75rem; text-align: center;">Jobs</th>
+								<th style="padding: 0.75rem; text-align: center;">Aktionen</th>
+							</tr>
+						</thead>
+						<tbody id="companies-tbody">
+							<tr>
+								<td colspan="11" style="text-align: center; padding: 2rem; color: #666;">
+									<div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+										<div class="spinner" style="width: 30px; height: 30px; border: 3px solid #e9ecef; border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+										<p>Lade Unternehmen...</p>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Awards Content -->
+			<div class="tab-content" id="awards-content">
+				<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+					<h2 style="margin:0;">🏆 BPhD Awards verwalten</h2>
+					<button onclick="loadAwards()"
+							style="padding:0.6rem 1.2rem;background:#6c757d;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+						🔄 Aktualisieren
+					</button>
+				</div>
+
+				<!-- Neue Auszeichnung -->
+				<div style="background:white;border-radius:12px;padding:1.5rem;margin-bottom:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom:1rem;">Neue Auszeichnung hinzufügen</h3>
+					<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+						<div>
+							<label style="display:block;margin-bottom:0.4rem;font-weight:600;">Jahr:</label>
+							<select id="admin-award-year"
+									style="width:100%;padding:0.75rem;border:2px solid #e9ecef;border-radius:8px;">
+							</select>
+						</div>
+						<div>
+							<label style="display:block;margin-bottom:0.4rem;font-weight:600;">Unternehmensname: *</label>
+							<div style="position:relative;">
+								<input type="text" id="admin-award-company" placeholder="z.B. Marien-Apotheke Berlin"
+									   oninput="window.filterAwardCompanySuggestions(this.value)"
+									   onblur="setTimeout(() => { const s = document.getElementById('award-company-suggestions'); if(s) s.style.display='none'; }, 200)"
+									   style="width:100%;padding:0.75rem;border:2px solid #e9ecef;border-radius:8px;">
+								<div id="award-company-suggestions" 
+									 style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:2px solid #e9ecef;border-top:none;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div style="margin-bottom:1rem;">
+						<label style="display:block;margin-bottom:0.4rem;font-weight:600;">Adresse:</label>
+						<input type="text" id="admin-award-address" placeholder="Straße Hausnummer, PLZ Ort"
+							   style="width:100%;padding:0.75rem;border:2px solid #e9ecef;border-radius:8px;">
+					</div>
+					<div style="margin-bottom:1rem;">
+						<label style="display:block;margin-bottom:0.4rem;font-weight:600;">Begründung: *</label>
+						<textarea id="admin-award-reason" rows="3" placeholder="Grund für die Auszeichnung..."
+								  style="width:100%;padding:0.75rem;border:2px solid #e9ecef;border-radius:8px;resize:vertical;"></textarea>
+					</div>
+					<div id="award-add-feedback" style="display:none;padding:0.75rem;background:#d4edda;border-radius:8px;margin-bottom:1rem;color:#155724;"></div>
+					<button onclick="window.addAward()"
+							style="background: #1a4a7a;color:white;padding:0.75rem 1.5rem;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+						+ Auszeichnung hinzufügen
+					</button>
+				</div>
+
+				<!-- Jahresfilter + Liste -->
+				<div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+					<div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;">
+						<div>
+							<label style="font-weight:600;margin-right:0.5rem;">Jahr:</label>
+							<select id="admin-award-filter-year" onchange="renderAwardsList()"
+									style="padding:0.6rem 1rem;border:2px solid #e9ecef;border-radius:8px;">
+								<option value="">Alle Jahre</option>
+							</select>
+						</div>
+						<input type="text" id="admin-award-filter-name" placeholder="Nach Name filtern..."
+							   oninput="renderAwardsList()"
+							   style="padding:0.6rem 1rem;border:2px solid #e9ecef;border-radius:8px;flex:1;min-width:200px;">
+					</div>
+					<div id="awards-list-admin">
+						<p style="color:#666;">Lade Awards...</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Verification Content -->
+			<div class="tab-content" id="verification-content">
+				<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+					<h2 style="margin:0;">Verifizierungsanträge</h2>
+					<button onclick="loadVerificationRequests()"
+							style="padding:0.6rem 1.2rem;background:#6c757d;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+						🔄 Aktualisieren
+					</button>
+				</div>
+				
+				<!-- Namensfilter -->
+				<div style="margin-bottom:1rem;">
+					<input type="text" id="verification-name-filter" placeholder="Nach Unternehmensname filtern..."
+						   oninput="loadVerificationRequests()"
+						   style="padding:0.6rem 1rem;border:2px solid #e9ecef;border-radius:8px;width:300px;font-size:0.95rem;">
+				</div>
+				
+				<!-- Sub-Tabs -->
+				<div style="display:flex;gap:0;border-bottom:2px solid #e9ecef;margin-bottom:1.5rem;">
+					<button id="vtab-pending" onclick="switchVerifTab('pending')"
+							style="padding:0.6rem 1.5rem;border:none;border-bottom:3px solid #ffc107;background:white;cursor:pointer;font-weight:600;color:#856404;margin-bottom:-2px;">
+						⏳ Ausstehend <span id="vtab-pending-count" style="background:#ffc107;color:#333;border-radius:50%;padding:0.1rem 0.45rem;font-size:0.8rem;margin-left:0.3rem;">0</span>
+					</button>
+					<button id="vtab-approved" onclick="switchVerifTab('approved')"
+							style="padding:0.6rem 1.5rem;border:none;border-bottom:3px solid transparent;background:white;cursor:pointer;font-weight:600;color:#666;margin-bottom:-2px;">
+						✅ Genehmigt <span id="vtab-approved-count" style="background:#e9ecef;color:#333;border-radius:50%;padding:0.1rem 0.45rem;font-size:0.8rem;margin-left:0.3rem;">0</span>
+					</button>
+					<button id="vtab-rejected" onclick="switchVerifTab('rejected')"
+							style="padding:0.6rem 1.5rem;border:none;border-bottom:3px solid transparent;background:white;cursor:pointer;font-weight:600;color:#666;margin-bottom:-2px;">
+						❌ Abgelehnt <span id="vtab-rejected-count" style="background:#e9ecef;color:#333;border-radius:50%;padding:0.1rem 0.45rem;font-size:0.8rem;margin-left:0.3rem;">0</span>
+					</button>
+				</div>
+				
+				<div id="verification-requests-list">
+					<div style="text-align:center;padding:2rem;color:#666;">Lade Anträge...</div>
+				</div>
+			</div>
+
+			<!-- Reports Content -->
+			<div class="tab-content" id="reports-content">
+				<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+					<h2 style="margin:0;">🚨 Meldungen</h2>
+					<button onclick="loadReports()"
+							style="padding:0.6rem 1.2rem;background:#6c757d;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+						🔄 Aktualisieren
+					</button>
+				</div>
+				
+				<!-- Sub-Tabs -->
+				<div style="display:flex;gap:0;border-bottom:2px solid #e9ecef;margin-bottom:1.5rem;">
+					<button id="rtab-open" onclick="window.switchReportsTab('open')"
+							style="padding:0.6rem 1.5rem;border:none;border-bottom:3px solid #dc3545;background:white;cursor:pointer;font-weight:600;color:#721c24;margin-bottom:-2px;">
+						🔴 Offen <span id="rtab-open-count" style="background:#dc3545;color:white;border-radius:50%;padding:0.1rem 0.45rem;font-size:0.8rem;margin-left:0.3rem;">0</span>
+					</button>
+					<button id="rtab-resolved" onclick="window.switchReportsTab('resolved')"
+							style="padding:0.6rem 1.5rem;border:none;border-bottom:3px solid transparent;background:white;cursor:pointer;font-weight:600;color:#666;margin-bottom:-2px;">
+						✅ Bearbeitet <span id="rtab-resolved-count" style="background:#e9ecef;color:#333;border-radius:50%;padding:0.1rem 0.45rem;font-size:0.8rem;margin-left:0.3rem;">0</span>
+					</button>
+				</div>
+				
+				<div id="reports-list">
+					<div style="text-align:center;padding:2rem;color:#666;">Lade Meldungen...</div>
+				</div>
+			</div>
+			
+			<!-- Settings Content -->
+			<div class="tab-content" id="settings-content">
+				<!-- Tarifgehalt -->
+				<div style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom: 0.5rem; color: #333;">💰 Aktuelles Tarifgehalt</h3>
+					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Bestimmt die Gehalts-Labels (unter/über Tarif) auf der Website und den Tariffilter.</p>
+					
+					<div style="margin-bottom: 1rem;">
+						<label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Standardtarif (€/Monat brutto, gilt für alle nicht gesondert aufgeführten Bundesländer):</label>
+						<div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+							<input type="number" id="tariff-salary-input" placeholder="z.B. 1800"
+								   style="padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; width: 200px; font-size: 1rem;">
+							<button type="button" onclick="window.addStateTariffField()"
+									style="padding:0.6rem 1rem;background:var(--pf-mid);color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;white-space:nowrap;">
+								+ Bundesland
+							</button>
+						</div>
+						<div id="state-tariff-fields" style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem;"></div>
+					</div>
+					
+					<div id="tariff-salary-current" style="padding: 0.75rem; background: #d4edda; border-radius: 8px; margin-bottom: 1rem; display: none; color: #155724; font-size: 0.95rem;"></div>
+					
+					<button onclick="window.saveTariffSalary()" 
+							style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+						Speichern
+					</button>
+					<div style="margin-top: 1.5rem;">
+						<button onclick="window.toggleTariffHistory()" 
+								style="background: #6c757d; color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+							📋 Tarifhistorie anzeigen/bearbeiten
+						</button>
+						
+						<div id="tariff-history-panel" style="display: none; margin-top: 1rem; border: 2px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+							<h4 style="margin-bottom: 1rem;">Tarifhistorie</h4>
+							<p style="color: #666; font-size: 0.85rem; margin-bottom: 1rem;">
+								Legt fest, welches Tarifgehalt zu welchem Zeitraum galt. Wird für die Gehalts-Labels bei Reviews verwendet.
+							</p>
+							
+							<div id="tariff-history-rows">
+								<!-- Zeilen werden per JS eingefügt -->
+							</div>
+							
+							<button onclick="window.addTariffHistoryRow()"
+									style="background: var(--pf-mid); color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 1rem;">
+								+ Zeile hinzufügen
+							</button>
+							
+							<div style="margin-top: 1rem;">
+								<button onclick="window.saveTariffHistory()"
+										style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+									Historie speichern
+								</button>
+							</div>
+							
+							<div id="tariff-history-feedback" style="display: none; padding: 0.75rem; background: #d4edda; border-radius: 8px; margin-top: 1rem; color: #155724;"></div>
+						</div>
+					</div>					
+				</div>
+
+				<!-- PTA-Gehalt -->
+				<div style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom: 0.5rem; color: #333;">🎓 PTA-Gehalt (Vollausbildung)</h3>
+					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Referenzgehalt für Bewertungen von Praktikant:innen mit abgeschlossener PTA-Ausbildung.</p>
+					
+					<div style="margin-bottom: 1rem;">
+						<label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Standardgehalt (€/Monat brutto, gilt für alle nicht gesondert aufgeführten Bundesländer):</label>
+						<div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+							<input type="number" id="pta-salary-input" placeholder="z.B. 2200"
+								   style="padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; width: 200px; font-size: 1rem;">
+							<button type="button" onclick="window.addPtaStateSalaryField()"
+									style="padding:0.6rem 1rem;background:#6b4f4a;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;white-space:nowrap;">
+								+ Bundesland
+							</button>
+						</div>
+						<div id="pta-state-salary-fields" style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem;"></div>
+					</div>
+					
+					<div id="pta-salary-current" style="padding: 0.75rem; background: #d4edda; border-radius: 8px; margin-bottom: 1rem; display: none; color: #155724; font-size: 0.95rem;"></div>
+					
+					<button onclick="window.savePtaSalary()" 
+							style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+						Speichern
+					</button>
+					<div style="margin-top: 1.5rem;">
+						<button onclick="window.togglePtaSalaryHistory()" 
+								style="background: #6c757d; color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+							📋 PTA-Gehaltshistorie anzeigen/bearbeiten
+						</button>
+						
+						<div id="pta-salary-history-panel" style="display: none; margin-top: 1rem; border: 2px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+							<h4 style="margin-bottom: 1rem;">PTA-Gehaltshistorie</h4>
+							<p style="color: #666; font-size: 0.85rem; margin-bottom: 1rem;">
+								Legt fest, welches PTA-Referenzgehalt zu welchem Zeitraum galt.
+							</p>
+							<div id="pta-salary-history-rows"></div>
+							<button onclick="window.addPtaSalaryHistoryRow()"
+									style="background: var(--pf-mid); color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 1rem;">
+								+ Zeile hinzufügen
+							</button>
+							<div style="margin-top: 1rem;">
+								<button onclick="window.savePtaSalaryHistory()"
+										style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+									Historie speichern
+								</button>
+							</div>
+							<div id="pta-salary-history-feedback" style="display: none; padding: 0.75rem; background: #d4edda; border-radius: 8px; margin-top: 1rem; color: #155724;"></div>
+						</div>
+					</div>
+				</div>
+				
+				<!-- Praktikumsleitfaden -->
+				<div style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom: 0.5rem; color: #333;">📚 Praktikumsleitfaden</h3>
+					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">HTML-Inhalt. Zeilenumbrüche mit &lt;br&gt;, Absätze mit &lt;p&gt;...&lt;/p&gt;. Wird sofort auf der Website übernommen.</p>
+					
+					<textarea id="guide-content" 
+							  style="width: 100%; height: 400px; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"
+							  placeholder="HTML-Inhalt, z.B.:&#10;&lt;h3&gt;1. Allgemeine Bestimmungen&lt;/h3&gt;&#10;&lt;p&gt;Das Pharmaziepraktikum...&lt;/p&gt;"></textarea>
+					
+					<div style="margin-bottom: 1rem;">
+						<label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">PDF hochladen (optional):</label>
+						<input type="file" id="guide-pdf" accept=".pdf" 
+							   style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 8px; width: 100%;">
+						<p id="guide-pdf-status" style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;"></p>
+					</div>
+					
+					<div id="guide-save-feedback" style="display: none; padding: 0.75rem; background: #d4edda; border-radius: 8px; margin-bottom: 1rem; color: #155724;"></div>
+					
+					<div style="display: flex; gap: 1rem;">
+						<button onclick="window.saveGuideContent()" 
+								style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+							Leitfaden speichern
+						</button>
+						<button onclick="window.previewContent('guide')"
+								style="background: #6c757d; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+							Vorschau
+						</button>
+					</div>
+				</div>
+				
+				<!-- Praktikumstipps -->
+				<div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom: 0.5rem; color: #333;">💡 Tipps zur Praktikumssuche</h3>
+					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">HTML-Inhalt. Zeilenumbrüche mit &lt;br&gt;, Absätze mit &lt;p&gt;...&lt;/p&gt;. Wird sofort auf der Website übernommen.</p>
+					
+					<textarea id="tips-content" 
+							  style="width: 100%; height: 400px; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"
+							  placeholder="HTML-Inhalt, z.B.:&#10;&lt;div style=&quot;background: white; padding: 2rem; border-radius: 10px;&quot;&gt;&#10;  &lt;h3 style=&quot;color: #667eea;&quot;&gt;💡 Tipp&lt;/h3&gt;&#10;  &lt;p&gt;Text...&lt;/p&gt;&#10;&lt;/div&gt;"></textarea>
+					
+					<div id="tips-save-feedback" style="display: none; padding: 0.75rem; background: #d4edda; border-radius: 8px; margin-bottom: 1rem; color: #155724;"></div>
+					
+					<div style="display: flex; gap: 1rem;">
+						<button onclick="window.saveTipsContent()"
+								style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+							Tipps speichern
+						</button>
+						<button onclick="window.previewContent('tips')"
+								style="background: #6c757d; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+							Vorschau
+						</button>
+					</div>
+				</div>
+				
+				<!-- Richtlinien Bewertungen -->
+				<div style="background: white; border-radius: 12px; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom: 0.5rem; color: #333;">📋 Richtlinien zum Einreichen von Bewertungen</h3>
+					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Wird im Bewertungsformular angezeigt. HTML-Inhalt erlaubt.</p>
+					<textarea id="review-guidelines-content" 
+							  style="width: 100%; height: 300px; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"
+							  placeholder="z.B. &lt;p&gt;Bitte beachten Sie folgende Richtlinien...&lt;/p&gt;"></textarea>
+					<div id="review-guidelines-feedback" style="display:none;padding:0.75rem;background:#d4edda;border-radius:8px;margin-bottom:1rem;color:#155724;"></div>
+					<button onclick="window.saveGuidelinesContent('review')"
+							style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+						Richtlinien speichern
+					</button>
+				</div>
+
+				<!-- Richtlinien Stellenangebote -->
+				<div style="background: white; border-radius: 12px; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom: 0.5rem; color: #333;">📋 Richtlinien zum Einreichen von Stellenangeboten</h3>
+					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Wird im Stellenangebots-Formular angezeigt. HTML-Inhalt erlaubt.</p>
+					<textarea id="job-guidelines-content" 
+							  style="width: 100%; height: 300px; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"
+							  placeholder="z.B. &lt;p&gt;Bitte beachten Sie folgende Richtlinien...&lt;/p&gt;"></textarea>
+					<div id="job-guidelines-feedback" style="display:none;padding:0.75rem;background:#d4edda;border-radius:8px;margin-bottom:1rem;color:#155724;"></div>
+					<button onclick="window.saveGuidelinesContent('job')"
+							style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+						Richtlinien speichern
+					</button>
+				</div>	
+
+				<!-- Datenschutzerklärung -->
+				<div style="background: white; border-radius: 12px; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom: 0.5rem; color: #333;">🔒 Datenschutzerklärung</h3>
+					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Wird im Datenschutz-Modal auf der Website angezeigt. HTML-Inhalt erlaubt.</p>
+					<textarea id="privacy-policy-content"
+							  style="width: 100%; height: 400px; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"
+							  placeholder="z.B. &lt;h3&gt;1. Verantwortlicher&lt;/h3&gt;&lt;p&gt;...&lt;/p&gt;"></textarea>
+					<div id="privacy-policy-feedback" style="display:none;padding:0.75rem;background:#d4edda;border-radius:8px;margin-bottom:1rem;color:#155724;"></div>
+					<button onclick="window.savePrivacyPolicy()"
+							style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+						Datenschutzerklärung speichern
+					</button>
+				</div>	
+
+				<!-- AGB -->
+				<div style="background: white; border-radius: 12px; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					<h3 style="margin-bottom: 0.5rem; color: #333;">📄 Nutzungsbedingungen (AGB)</h3>
+					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Wird im AGB-Modal auf der Website angezeigt. HTML-Inhalt erlaubt.</p>
+					<textarea id="agb-content"
+							  style="width: 100%; height: 400px; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"
+							  placeholder="z.B. &lt;h3&gt;1. Geltungsbereich&lt;/h3&gt;&lt;p&gt;...&lt;/p&gt;"></textarea>
+					<div id="agb-feedback" style="display:none;padding:0.75rem;background:#d4edda;border-radius:8px;margin-bottom:1rem;color:#155724;"></div>
+					<button onclick="window.saveAgbContent()"
+							style="background: #1a4a7a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+						AGB speichern
+					</button>
+				</div>				
+			</div>			
+		</div>
+	</div>
+
+	<script>
+	if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    location.replace('https:' + location.href.substring(location.protocol.length));
+	}
+	  window.SUPABASE_URL = 'https://wotwmwcgbihlhlcwlvbm.supabase.co';
+	  window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvdHdtd2NnYmlobGhsY3dsdmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc4MDcsImV4cCI6MjA4NjA1MzgwN30.Zwt-clrOnntZQZ_NvpKJVB5xBCZTl_PgzrC9F_7F-uU';
+	</script>
+	
+	<script type="module">
+		import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+		import { supabase as anonSupabase } from './js/supabase-client.js';
+		const supabase = anonSupabase;
+
+		async function callAdminFunction(action, params = {}) {
+			const { data: { session } } = await anonSupabase.auth.getSession();
+			if (!session) throw new Error('Nicht eingeloggt');
+			
+			const response = await fetch(`${window.SUPABASE_URL}/functions/v1/admin-operations`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+					'apikey': window.SUPABASE_ANON_KEY
+				},
+				body: JSON.stringify({ action, token: session.access_token, ...params })
+			});
+			const result = await response.json();
+			if (!result.success) throw new Error(result.error || 'Fehler');
+			return result;
+		}
+
+		const adminApi = {
+			activateReview: async (id) => {
+				const result = await callAdminFunction('activateReview', { id });
+				return { success: true, data: result.data };
+			},
+			deactivateReview: async (id) => {
+				const result = await callAdminFunction('deactivateReview', { id });
+				return { success: true, data: result.data };
+			},
+			activateJob: async (id) => {
+				const result = await callAdminFunction('activateJob', { id });
+				if (result.data?.contact_email && window.sendConfirmationEmail) {
+					await window.sendConfirmationEmail('job_activated', {
+						email: result.data.contact_email,
+						companyName: result.data.company_name,
+						contactPerson: result.data.contact_person,
+						id: typeof result.data.id === 'string' ? result.data.id.substring(0, 8) : result.data.id,
+						deactivateToken: result.data.deactivate_token
+					});
+				}
+				return { success: true, data: result.data };
+			},
+			deactivateJob: async (id) => {
+				const result = await callAdminFunction('deactivateJob', { id });
+				return { success: true, data: result.data };
+			},
+			approveVerification: async (id) => {
+				const result = await callAdminFunction('approveVerification', { id });
+				if (result.data?.contact_email && window.sendConfirmationEmail) {
+					await window.sendConfirmationEmail('verification_approved', {
+						email: result.data.contact_email,
+						companyName: result.data.company_name,
+						contactPerson: result.data.contact_person,
+						editToken: result.data.edit_token
+					});
+				}
+				return { success: true, data: result.data };
+			},
+			rejectVerification: async (id, reason) => {
+				const result = await callAdminFunction('rejectVerification', { id, reason });
+				if (result.data?.contact_email && window.sendConfirmationEmail) {
+					await window.sendConfirmationEmail('verification_rejected', {
+						email: result.data.contact_email,
+						companyName: result.data.company_name,
+						contactPerson: result.data.contact_person,
+						reason
+					});
+				}
+				return { success: true, data: result.data };
+			}
+		};
+
+		window.sendConfirmationEmail = async function(type, data) {
+			try {
+				const baseUrl = window.location.origin;
+				
+				const response = await fetch(`${window.SUPABASE_URL}/functions/v1/send-mail`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`
+					},
+					body: JSON.stringify({
+						type: type,
+						email: data.email,
+						companyName: data.companyName,
+						contactPerson: data.contactPerson,
+						id: data.id || 'N/A',
+						editToken: data.editToken || '',
+						deactivateToken: data.deactivateToken || '',
+						reason: data.reason || '',
+						practiceType: 'PTA',
+						baseUrl: baseUrl
+					})
+				});
+				
+				if (!response.ok) {
+					const errorText = await response.text();
+					throw new Error(`HTTP ${response.status}: ${errorText}`);
+				}
+				
+				const result = await response.json();
+				
+				if (!result.success) {
+					throw new Error(result.error || 'E-Mail konnte nicht gesendet werden');
+				}
+				
+			} catch(e) {
+				console.error('❌ E-Mail-Fehler:', e.message);
+			}
+		};
+		
+		let currentUser = null;
+		let allReviews = [];
+		let allJobs = [];
+		
+		document.addEventListener('DOMContentLoaded', initAdmin);
+		
+		async function initAdmin() {
+			await checkAuth();
+			
+			document.getElementById('login-form').addEventListener('submit', handleLogin);
+		}
+		
+		async function checkAuth() {
+			const { data: { session } } = await anonSupabase.auth.getSession();
+			
+			if (session) {
+				const isAdmin = await checkIfAdmin(session.user.email);
+				
+				if (isAdmin) {
+					currentUser = session.user;
+					await showDashboard();
+				} else {
+					showError('Sie haben keine Admin-Berechtigung.');
+					await anonSupabase.auth.signOut();
+				}
+			}
+		}
+		
+		async function checkIfAdmin(email) {
+			const { data, error } = await anonSupabase
+				.from('admin_users')
+				.select('email')
+				.eq('email', email)
+				.single();
+			
+			return !!data && !error;
+		}
+		
+		async function handleLogin(e) {
+			e.preventDefault();
+			
+			const email = document.getElementById('email').value;
+			const password = document.getElementById('password').value;
+			const loginBtn = document.getElementById('login-btn');
+			
+			loginBtn.disabled = true;
+			loginBtn.textContent = 'Anmeldung läuft...';
+			hideMessages();
+			
+			try {
+				const { data, error } = await anonSupabase.auth.signInWithPassword({
+					email: email,
+					password: password
+				});
+				
+				if (error) throw error;
+				
+				const isAdmin = await checkIfAdmin(email);
+				
+				if (!isAdmin) {
+					await anonSupabase.auth.signOut();
+					throw new Error('Sie haben keine Admin-Berechtigung.');
+				}
+				
+				currentUser = data.user;
+				showSuccess('Erfolgreich angemeldet!');
+				
+				setTimeout(async () => {
+					await showDashboard();
+				}, 1000);
+				
+			} catch (error) {
+				console.error('Login error:', error);
+				showError(error.message || 'Anmeldung fehlgeschlagen.');
+				loginBtn.disabled = false;
+				loginBtn.textContent = 'Anmelden';
+			}
+		}
+		
+		async function showDashboard() {
+			document.getElementById('login-screen').style.display = 'none';
+			document.getElementById('admin-dashboard').style.display = 'block';
+			document.body.classList.add('pf-dash');
+			const sb = document.getElementById('pf-stats-bar');
+			if (sb) sb.style.display = 'block';
+			document.getElementById('user-email').textContent = currentUser.email;
+			
+			await loadReviews();
+			await loadJobs();
+			await loadSiteSettings();
+			await loadVerificationBadge();
+			await loadReportsBadge();
+		}
+
+		window.switchTab = function(tabName) {
+			document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+			document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+			
+			const btn = document.getElementById(tabName + '-tab-btn');
+			const content = document.getElementById(tabName + '-content');
+			if (btn) btn.classList.add('active');
+			if (content) content.classList.add('active');
+			
+			const statsMap = { reviews:'reviews-stats-grid', jobs:'jobs-stats-grid', companies:'companies-stats-grid' };
+			['reviews-stats-grid','jobs-stats-grid','companies-stats-grid'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.style.display = 'none';
+			});
+			const statsBar = document.getElementById('pf-stats-bar');
+			if (statsMap[tabName]) {
+				const el = document.getElementById(statsMap[tabName]);
+				if (el) el.style.display = 'grid';
+				if (statsBar) statsBar.style.display = 'block';
+			} else {
+				if (statsBar) statsBar.style.display = 'none';
+			}
+			
+			const clearableTabs = ['reviews', 'jobs', 'companies', 'awards', 'verification', 'reports'];
+			clearableTabs.forEach(tabSel => {
+				const tab = document.getElementById(tabSel + '-content');
+				if (tab && !tab.classList.contains('active')) {
+					tab.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
+						el.value = '';
+					});
+				}
+			});
+			
+			if (tabName === 'reviews') loadReviews();
+			else if (tabName === 'jobs') loadJobs();
+			else if (tabName === 'companies') loadCompanies();
+			else if (tabName === 'awards') loadAwards();
+			else if (tabName === 'verification') loadVerificationRequests();
+			else if (tabName === 'reports') loadReports();
+			else if (tabName === 'settings') loadSiteSettings();
+		};
+		
+		window.loadReviews = async function() {
+			try {
+				const result = await callAdminFunction('loadReviews');
+				allReviews = (result.data || []).filter(r => r.practice_type === 'PTA');
+				updateStats();
+				renderReviews();
+			} catch (error) {
+				console.error('❌ Fehler beim Laden:', error);
+				showError('Fehler beim Laden der Bewertungen.');
+			}
+		}
+		
+		window.loadJobs = async function() {
+			try {
+				const result = await callAdminFunction('loadJobs');
+				allJobs = (result.data || []).filter(j => j.practice_type === 'PTA');
+				updateJobStats();
+				renderJobs();
+			} catch (error) {
+				console.error('❌ Fehler beim Laden der Jobs:', error);
+				showError('Fehler beim Laden der Stellenangebote.');
+			}
+		}
+		
+		function updateStats() {
+			document.getElementById('stat-total').textContent = allReviews.length;
+			document.getElementById('stat-pending').textContent = allReviews.filter(r => r.status === 'pending').length;
+			document.getElementById('stat-active').textContent = allReviews.filter(r => r.status === 'active').length;
+			document.getElementById('stat-inactive').textContent = allReviews.filter(r => r.status === 'inactive').length;
+		}
+		
+		function updateJobStats() {
+			document.getElementById('stat-jobs-total').textContent = allJobs.length;
+			document.getElementById('stat-jobs-pending').textContent = allJobs.filter(j => j.status === 'pending').length;
+			document.getElementById('stat-jobs-active').textContent = allJobs.filter(j => j.status === 'active').length;
+			document.getElementById('stat-jobs-inactive').textContent = allJobs.filter(j => j.status === 'inactive').length;
+		}
+		
+		function renderReviews() {
+			const tbody = document.getElementById('reviews-tbody');
+			const statusFilter = document.getElementById('status-filter').value;
+			
+			let filteredReviews = allReviews;
+			if (statusFilter) {
+				filteredReviews = allReviews.filter(r => r.status === statusFilter);
+			}
+			
+			if (filteredReviews.length === 0) {
+				tbody.innerHTML = `
+					<tr>
+						<td colspan="5" style="text-align: center; padding: 2rem; color: #666;">
+							Keine Bewertungen gefunden.
+						</td>
+					</tr>
+				`;
+				return;
+			}
+			
+			tbody.innerHTML = filteredReviews.map(review => `
+				<tr>
+					<td><strong>#${review.id.substring(0, 8)}</strong></td>
+					<td>${esc(review.company_name)}</td>
+					<td>
+						<span class="status-badge status-${review.status}">
+							${getStatusText(review.status)}
+						</span>
+					</td>
+					<td>${formatDate(review.created_at)}</td>
+					<td>
+						<div class="action-buttons">
+							<button class="action-btn btn-view" onclick="window.viewReview('${review.id}')">
+								Ansehen
+							</button>
+							${review.status === 'active' ? 
+								`<button class="action-btn btn-deactivate" onclick="window.toggleStatus('${review.id}', 'inactive')">Deaktivieren</button>` :
+								`<button class="action-btn btn-activate" onclick="window.toggleStatus('${review.id}', 'active')">Aktivieren</button>`
+							}
+							${review.user_email ? 
+								`<button class="action-btn" 
+										 onclick="window.location.href='mailto:${review.user_email}?subject=${encodeURIComponent('Ihre Bewertung auf PharmaFaro.de - ID: ' + review.id.substring(0,8))}'"
+										 style="background:#1a4a7a;color:white;">
+									Kontaktieren
+								</button>` : ''
+							}
+						</div>
+					</td>
+				</tr>
+			`).join('');
+		}
+		
+		function renderJobs() {
+			const tbody = document.getElementById('jobs-tbody');
+			const statusFilter = document.getElementById('jobs-status-filter').value;
+			
+			let filteredJobs = allJobs;
+			if (statusFilter) {
+				filteredJobs = allJobs.filter(j => j.status === statusFilter);
+			}
+			
+			if (filteredJobs.length === 0) {
+				tbody.innerHTML = `
+					<tr>
+						<td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
+							Keine Stellenangebote gefunden.
+						</td>
+					</tr>
+				`;
+				return;
+			}
+			
+			tbody.innerHTML = filteredJobs.map(job => `
+				<tr>
+					<td><strong>#${job.id.substring(0, 8)}</strong></td>
+					<td>${esc(job.company_name)}</td>
+					<td>
+						<span class="status-badge status-${job.status}">
+							${getStatusText(job.status)}
+						</span>
+					</td>
+					<td><strong>${esc(String(job.salary))}€</strong></td>
+					<td>${formatDate(job.created_at)}</td>
+					<td>
+						<div class="action-buttons">
+							<button class="action-btn btn-view" onclick="window.viewJob('${job.id}')">
+								Ansehen
+							</button>
+							${job.status === 'active' ? 
+								`<button class="action-btn btn-deactivate" onclick="window.toggleJobStatus('${job.id}', 'inactive')">Deaktivieren</button>` :
+								`<button class="action-btn btn-activate" onclick="window.toggleJobStatus('${job.id}', 'active')">Aktivieren</button>`
+							}
+							${job.contact_email ? 
+								`<button class="action-btn"
+										 onclick="window.location.href='mailto:${job.contact_email}?subject=${encodeURIComponent('Ihr Stellenangebot auf PharmaFaro.de - ID: ' + job.id.substring(0,8))}'"
+										 style="background:#1a4a7a;color:white;">
+									Kontaktieren
+								</button>` : ''
+							}
+						</div>
+					</td>
+				</tr>
+			`).join('');
+		}
+
+		window.loadSiteSettings = async function() {
+			try {
+				const { data } = await supabase
+					.from('site_settings')
+					.select('*');
+				
+				if (!data) return;
+				
+				data.forEach(setting => {
+					if (setting.key === 'pta_tariff_salary') {
+						const parsed = JSON.parse(setting.value);
+						// Rückwärtskompatibilität: altes Format war { amount: N }
+						if (typeof parsed.default === 'number') {
+							currentTariffData = parsed;
+						} else {
+							currentTariffData = { default: parsed.amount || 0, states: [] };
+						}
+						window.tariffSalary = currentTariffData.default;
+						window.tariffSalaryData = currentTariffData;
+						const input = document.getElementById('tariff-salary-input');
+						if (input) input.value = currentTariffData.default;
+						renderStateTariffFields();
+						const currentDiv = document.getElementById('tariff-salary-current');
+						if (currentDiv) {
+							currentDiv.style.display = 'block';
+							currentDiv.innerHTML = `<strong>Aktuell gespeichertes Standardtarif:</strong> ${currentTariffData.default}€/Monat brutto`;
+						}
+					}
+					if (setting.key === 'pta_guide_content') {
+						const ta = document.getElementById('guide-content');
+						if (ta) ta.value = setting.value;
+					}
+					if (setting.key === 'pta_tips_content') {
+						const ta = document.getElementById('tips-content');
+						if (ta) ta.value = setting.value;
+					}
+					if (setting.key === 'pta_tariff_history') {
+						tariffHistoryData = JSON.parse(setting.value);
+					}	
+					if (setting.key === 'pta_review_guidelines') {
+						const ta = document.getElementById('review-guidelines-content');
+						if (ta) ta.value = setting.value;
+					}
+					if (setting.key === 'pta_job_guidelines') {
+						const ta = document.getElementById('job-guidelines-content');
+						if (ta) ta.value = setting.value;
+					}
+					if (setting.key === 'pta_employee_salary') {
+						const parsed = JSON.parse(setting.value);
+						if (typeof parsed.default === 'number') {
+							currentPtaSalaryData = parsed;
+						} else {
+							currentPtaSalaryData = { default: parsed.amount || 0, states: [] };
+						}
+						window.ptaEmployeeSalary = currentPtaSalaryData.default;
+						window.ptaEmployeeSalaryData = currentPtaSalaryData;
+						const input = document.getElementById('pta-salary-input');
+						if (input) input.value = currentPtaSalaryData.default;
+						renderPtaStateSalaryFields();
+						const currentDiv = document.getElementById('pta-salary-current');
+						if (currentDiv) {
+							currentDiv.style.display = 'block';
+							currentDiv.innerHTML = `<strong>Aktuell gespeichertes PTA-Gehalt:</strong> ${currentPtaSalaryData.default}€/Monat brutto`;
+						}
+					}
+					if (setting.key === 'pta_employee_salary_history') {
+						window.ptaSalaryHistoryData = JSON.parse(setting.value);
+					}
+					if (setting.key === 'privacy_policy') {
+						const ta = document.getElementById('privacy-policy-content');
+						if (ta) ta.value = setting.value;
+					}
+					if (setting.key === 'agb_content') {
+						const ta = document.getElementById('agb-content');
+						if (ta) ta.value = setting.value;
+					}				
+				});
+				
+			} catch(e) {
+				console.error('Fehler beim Laden der Settings:', e);
+			}
+		}
+
+		window.saveTariffSalary = async function() {
+			const amount = document.getElementById('tariff-salary-input').value;
+			currentTariffData.default = parseInt(amount) || 0;
+			const saveValue = JSON.stringify(currentTariffData);
+			if (!amount || parseInt(amount) <= 0) { alert('Bitte gültiges Tarifgehalt eingeben.'); return; }
+			
+			const { error } = await supabase.from('site_settings')
+				.upsert({ key: 'pta_tariff_salary', value: saveValue },
+						 { onConflict: 'key' });
+			
+			if (error) { alert('Fehler: ' + error.message); return; }
+			
+			window.tariffSalary = parseInt(amount);
+			const openEntry = tariffHistoryData.find(e => e.to === null);
+			if (openEntry) {
+				openEntry.amount = parseInt(amount);
+			} else {
+				tariffHistoryData.push({ from: new Date().getFullYear(), to: null, amount: parseInt(amount) });
+			}
+			await supabase.from('site_settings')
+				.upsert({ key: 'pta_tariff_history', value: JSON.stringify(tariffHistoryData) }, { onConflict: 'key' });			
+			const currentDiv = document.getElementById('tariff-salary-current');
+			if (currentDiv) {
+				currentDiv.style.display = 'block';
+				currentDiv.innerHTML = `<strong>Aktuell gespeichertes Tarifgehalt:</strong> ${amount}€/Monat brutto`;
+			}
+			showSuccess('✅ Tarifgehalt gespeichert! Wird auf der Website sofort für Gehalts-Labels und Filter verwendet.');
+		};
+
+		window.ptaSalaryHistoryData = [];
+		let currentPtaSalaryData = { default: 0, states: [] };
+
+		window.addPtaStateSalaryField = function() {
+			currentPtaSalaryData.states.push({ states: [], amount: 0 });
+			renderPtaStateSalaryFields();
+		};
+
+		function renderPtaStateSalaryFields() {
+			const container = document.getElementById('pta-state-salary-fields');
+			if (!container) return;
+			container.innerHTML = currentPtaSalaryData.states.map((sf, i) => `
+				<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+					<div style="position:relative;">
+						<button type="button" onclick="window.togglePtaStateDropdown(${i})"
+								style="padding:0.5rem 0.75rem;border:2px solid #e9ecef;border-radius:6px;background:white;cursor:pointer;font-size:0.88rem;min-width:220px;text-align:left;">
+							${sf.states.length > 0 ? sf.states.join(', ') : 'Bundesländer wählen ▾'}
+						</button>
+						<div id="psd-${i}" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e9ecef;border-radius:8px;z-index:100;min-width:240px;max-height:280px;overflow-y:auto;padding:0.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+							${ALL_STATES.map(s => `
+								<label style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;">
+									<input type="checkbox" ${sf.states.includes(s) ? 'checked' : ''}
+										   onchange="window.updatePtaStateSelection(${i},'${s}',this.checked)">
+									${s}
+								</label>
+							`).join('')}
+							<div style="border-top:1px solid #eee;margin-top:0.25rem;padding-top:0.25rem;">
+								<button type="button" onclick="window.removePtaStateSalaryField(${i})"
+										style="width:100%;padding:0.3rem;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">
+									Entfernen
+								</button>
+							</div>
+						</div>
+					</div>
+					<input type="number" value="${sf.amount || ''}"
+						   oninput="currentPtaSalaryData.states[${i}].amount=parseInt(this.value)||0"
+						   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:130px;"
+						   placeholder="Gehalt €">
+					<span style="font-size:0.88rem;">€/Monat</span>
+					<button type="button" onclick="window.addPtaStateSalaryField()"
+							style="padding:0.5rem 0.75rem;background:#6b4f4a;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
+						+ Bundesland
+					</button>
+				</div>
+			`).join('');
+		}
+
+		window.togglePtaStateDropdown = function(i) {
+			document.querySelectorAll('[id^="psd-"]').forEach(d => { if (d.id !== 'psd-'+i) d.style.display='none'; });
+			const dd = document.getElementById('psd-'+i);
+			if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		};
+		window.updatePtaStateSelection = function(i, state, checked) {
+			if (checked) { if (!currentPtaSalaryData.states[i].states.includes(state)) currentPtaSalaryData.states[i].states.push(state); }
+			else { currentPtaSalaryData.states[i].states = currentPtaSalaryData.states[i].states.filter(s => s !== state); }
+			const btn = document.querySelector(`button[onclick="window.togglePtaStateDropdown(${i})"]`);
+			if (btn) btn.textContent = currentPtaSalaryData.states[i].states.length > 0 ? currentPtaSalaryData.states[i].states.join(', ') : 'Bundesländer wählen ▾';
+		};
+		window.removePtaStateSalaryField = function(i) {
+			currentPtaSalaryData.states.splice(i, 1);
+			renderPtaStateSalaryFields();
+		};
+
+		window.savePtaSalary = async function() {
+			const amount = document.getElementById('pta-salary-input').value;
+			if (!amount || parseInt(amount) <= 0) { alert('Bitte gültiges PTA-Gehalt eingeben.'); return; }
+			currentPtaSalaryData.default = parseInt(amount);
+			const { error } = await supabase.from('site_settings')
+				.upsert({ key: 'pta_employee_salary', value: JSON.stringify(currentPtaSalaryData) }, { onConflict: 'key' });
+			if (error) { alert('Fehler: ' + error.message); return; }
+			window.ptaEmployeeSalary = parseInt(amount);
+			const openEntry = window.ptaSalaryHistoryData.find(e => e.to === null);
+			if (openEntry) { openEntry.amount = parseInt(amount); }
+			else { window.ptaSalaryHistoryData.push({ from: new Date().getFullYear(), to: null, amount: parseInt(amount) }); }
+			await supabase.from('site_settings')
+				.upsert({ key: 'pta_employee_salary_history', value: JSON.stringify(window.ptaSalaryHistoryData) }, { onConflict: 'key' });
+			const currentDiv = document.getElementById('pta-salary-current');
+			if (currentDiv) {
+				currentDiv.style.display = 'block';
+				currentDiv.innerHTML = `<strong>Aktuell gespeichertes PTA-Gehalt:</strong> ${amount}€/Monat brutto`;
+			}
+			showSuccess('✅ PTA-Gehalt gespeichert!');
+		};
+
+		window.togglePtaSalaryHistory = function() {
+			const panel = document.getElementById('pta-salary-history-panel');
+			if (panel.style.display === 'none') {
+				panel.style.display = 'block';
+				renderPtaSalaryHistoryRows();
+			} else {
+				panel.style.display = 'none';
+			}
+		};
+
+		window.renderPtaSalaryHistoryRows = function renderPtaSalaryHistoryRows() {
+			const container = document.getElementById('pta-salary-history-rows');
+			if (!container) return;
+			if (window.ptaSalaryHistoryData.length === 0) {
+				container.innerHTML = '<p style="color:#666;font-size:0.9rem;">Noch keine Einträge.</p>';
+				return;
+			}
+			const currentYear = new Date().getFullYear();
+			function genYears(sel, withAktuell) {
+				let h = withAktuell ? `<option value="null" ${sel === null ? 'selected' : ''}>Aktuell</option>` : '';
+				for (let y = currentYear; y >= 1970; y--) h += `<option value="${y}" ${sel === y ? 'selected' : ''}>${y}</option>`;
+				return h;
+			}
+			container.innerHTML = window.ptaSalaryHistoryData.map((e, i) => `
+				<div style="margin-bottom:1rem;padding:0.75rem;border:1px solid #e9ecef;border-radius:8px;">
+					<div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.5rem;">
+						<select onchange="window.ptaSalaryHistoryData[${i}].from=parseInt(this.value)"
+								style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;">${genYears(e.from, false)}</select>
+						<span>bis</span>
+						<select onchange="window.ptaSalaryHistoryData[${i}].to=this.value==='null'?null:parseInt(this.value)"
+								style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;">${genYears(e.to, true)}</select>
+						<span>:</span>
+						<input type="number" value="${e.default || e.amount || ''}"
+							   onchange="window.ptaSalaryHistoryData[${i}].default=parseInt(this.value)"
+							   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:120px;"
+							   placeholder="Standardgehalt">
+						<span>€ Standard</span>
+						<button onclick="window.ptaSalaryHistoryData.splice(${i},1);window.renderPtaSalaryHistoryRows()"
+								style="background:#dc3545;color:white;padding:0.4rem 0.75rem;border:none;border-radius:6px;cursor:pointer;">
+							Zeile löschen
+						</button>
+						<button onclick="window.addPtaHistoryStateSalary(${i})"
+								style="background:var(--pf-mid);color:white;padding:0.4rem 0.75rem;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
+							+ Bundesland
+						</button>
+					</div>
+					<div id="pta-hist-state-${i}" style="padding-left:1rem;display:flex;flex-direction:column;gap:0.5rem;">
+						${(e.states || []).map((sf, si) => `
+							<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+								<button type="button" onclick="window.togglePtaHistStateDropdown(${i},${si})"
+										style="padding:0.4rem 0.6rem;border:2px solid #e9ecef;border-radius:6px;background:white;cursor:pointer;font-size:0.85rem;min-width:180px;text-align:left;">
+									${(sf.states||[]).length > 0 ? sf.states.join(', ') : 'Bundesländer wählen ▾'}
+								</button>
+								<div id="phsd-${i}-${si}" style="display:none;position:absolute;background:white;border:1px solid #e9ecef;border-radius:8px;z-index:200;min-width:220px;max-height:240px;overflow-y:auto;padding:0.4rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+									${(window.ALL_STATES||[]).map(s => `
+										<label style="display:flex;align-items:center;gap:0.35rem;padding:0.25rem 0.4rem;cursor:pointer;font-size:0.83rem;">
+											<input type="checkbox" ${(sf.states||[]).includes(s)?'checked':''}
+												   onchange="window.updatePtaHistStateSelection(${i},${si},'${s}',this.checked)">
+											${s}
+										</label>
+									`).join('')}
+									<div style="border-top:1px solid #eee;padding-top:0.25rem;margin-top:0.25rem;">
+										<button type="button" onclick="window.removePtaHistStateSalary(${i},${si})"
+												style="width:100%;padding:0.3rem;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">
+											Entfernen
+										</button>
+									</div>
+								</div>
+								<input type="number" value="${sf.amount||''}"
+									   onchange="window.ptaSalaryHistoryData[${i}].states[${si}].amount=parseInt(this.value)||0"
+									   style="padding:0.4rem;border:2px solid #e9ecef;border-radius:6px;width:110px;"
+									   placeholder="Gehalt €">
+								<span>€</span>
+							</div>
+						`).join('')}
+					</div>
+				</div>
+			`).join('');
+		}
+
+		window.ALL_STATES = window.ALL_STATES || [
+			'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg',
+			'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen',
+			'Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt',
+			'Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'
+		];
+		window.addPtaHistoryStateSalary = function(i) {
+			if (!window.ptaSalaryHistoryData[i].states) window.ptaSalaryHistoryData[i].states = [];
+			window.ptaSalaryHistoryData[i].states.push({ states: [], amount: 0 });
+			window.renderPtaSalaryHistoryRows();
+		};
+		window.togglePtaHistStateDropdown = function(i, si) {
+			const dd = document.getElementById(`phsd-${i}-${si}`);
+			if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		};
+		window.updatePtaHistStateSelection = function(i, si, state, checked) {
+			if (!window.ptaSalaryHistoryData[i].states[si].states) window.ptaSalaryHistoryData[i].states[si].states = [];
+			if (checked) {
+				if (!window.ptaSalaryHistoryData[i].states[si].states.includes(state))
+					window.ptaSalaryHistoryData[i].states[si].states.push(state);
+			} else {
+				window.ptaSalaryHistoryData[i].states[si].states =
+					window.ptaSalaryHistoryData[i].states[si].states.filter(s => s !== state);
+			}
+		};
+		window.removePtaHistStateSalary = function(i, si) {
+			window.ptaSalaryHistoryData[i].states.splice(si, 1);
+			window.renderPtaSalaryHistoryRows();
+		};
+		
+		window.addPtaSalaryHistoryRow = function() {
+			window.ptaSalaryHistoryData.push({ from: new Date().getFullYear(), to: null, amount: window.ptaEmployeeSalary || 2000 });
+			renderPtaSalaryHistoryRows();
+		};
+
+		window.savePtaSalaryHistory = async function() {
+			const { error } = await supabase.from('site_settings')
+				.upsert({ key: 'pta_employee_salary_history', value: JSON.stringify(window.ptaSalaryHistoryData) }, { onConflict: 'key' });
+			if (error) { alert('Fehler: ' + error.message); return; }
+			const fb = document.getElementById('pta-salary-history-feedback');
+			if (fb) { fb.style.display = 'block'; fb.textContent = '✅ PTA-Gehaltshistorie gespeichert!'; setTimeout(() => fb.style.display = 'none', 3000); }
+		};
+
+		window.toggleTariffHistory = function() {
+			const panel = document.getElementById('tariff-history-panel');
+			if (panel.style.display === 'none') {
+				panel.style.display = 'block';
+				renderTariffHistoryRows();
+			} else {
+				panel.style.display = 'none';
+			}
+		};
+
+const ALL_STATES = [
+			'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg',
+			'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen',
+			'Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt',
+			'Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'
+		];
+
+		// Aktueller Tarif: { default: number, states: [{states:[], amount:number}] }
+		let currentTariffData = { default: 0, states: [] };
+
+		window.addStateTariffField = function() {
+			currentTariffData.states.push({ states: [], amount: 0 });
+			renderStateTariffFields();
+		};
+
+		function renderStateTariffFields() {
+			const container = document.getElementById('state-tariff-fields');
+			if (!container) return;
+			container.innerHTML = currentTariffData.states.map((sf, i) => `
+				<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+					<div style="position:relative;">
+						<button type="button" onclick="window.toggleStateDropdown(${i})"
+								style="padding:0.5rem 0.75rem;border:2px solid #e9ecef;border-radius:6px;background:white;cursor:pointer;font-size:0.88rem;min-width:220px;text-align:left;">
+							${sf.states.length > 0 ? sf.states.join(', ') : 'Bundesländer wählen ▾'}
+						</button>
+						<div id="sd-${i}" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e9ecef;border-radius:8px;z-index:100;min-width:240px;max-height:280px;overflow-y:auto;padding:0.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+							${ALL_STATES.map(s => `
+								<label style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;">
+									<input type="checkbox" ${sf.states.includes(s) ? 'checked' : ''}
+										   onchange="window.updateStateSelection(${i},'${s}',this.checked)">
+									${s}
+								</label>
+							`).join('')}
+							<div style="border-top:1px solid #eee;margin-top:0.25rem;padding-top:0.25rem;">
+								<button type="button" onclick="window.removeStateTariffField(${i})"
+										style="width:100%;padding:0.3rem;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">
+									Entfernen
+								</button>
+							</div>
+						</div>
+					</div>
+					<input type="number" value="${sf.amount || ''}"
+						   oninput="currentTariffData.states[${i}].amount=parseInt(this.value)||0"
+						   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:130px;"
+						   placeholder="Tarif €">
+					<span style="font-size:0.88rem;">€/Monat</span>
+					<button type="button" onclick="window.addStateTariffField()"
+							style="padding:0.5rem 0.75rem;background:var(--pf-mid);color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
+						+ Bundesland
+					</button>
+				</div>
+			`).join('');
+		}
+
+		window.toggleStateDropdown = function(i) {
+			document.querySelectorAll('[id^="sd-"]').forEach(d => { if (d.id !== 'sd-'+i) d.style.display='none'; });
+			const dd = document.getElementById('sd-'+i);
+			if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		};
+		document.addEventListener('click', function(e) {
+			if (!e.target.closest('[id^="sd-"]') && !e.target.closest('button[onclick*="toggleStateDropdown"]')) {
+				document.querySelectorAll('[id^="sd-"]').forEach(d => d.style.display='none');
+			}
+			if (!e.target.closest('[id^="hsd-"]') && !e.target.closest('button[onclick*="toggleHistoryStateDropdown"]')) {
+				document.querySelectorAll('[id^="hsd-"]').forEach(d => d.style.display='none');
+			}
+		});
+		window.updateStateSelection = function(i, state, checked) {
+			if (checked) { if (!currentTariffData.states[i].states.includes(state)) currentTariffData.states[i].states.push(state); }
+			else { currentTariffData.states[i].states = currentTariffData.states[i].states.filter(s => s !== state); }
+			const btn = document.querySelector(`button[onclick="window.toggleStateDropdown(${i})"]`);
+			if (btn) btn.textContent = currentTariffData.states[i].states.length > 0 ? currentTariffData.states[i].states.join(', ') : 'Bundesländer wählen ▾';
+		};
+		window.removeStateTariffField = function(i) {
+			currentTariffData.states.splice(i, 1);
+			renderStateTariffFields();
+		};
+		window.addHistoryStateTariff = function(rowIndex) {
+			if (!tariffHistoryData[rowIndex].states) tariffHistoryData[rowIndex].states = [];
+			tariffHistoryData[rowIndex].states.push({ states: [], amount: 0 });
+			renderTariffHistoryRows();
+		};
+		window.toggleHistoryStateDropdown = function(i, si) {
+			const dd = document.getElementById(`hsd-${i}-${si}`);
+			if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		};
+		window.updateHistoryStateSelection = function(i, si, state, checked) {
+			if (!tariffHistoryData[i].states[si].states) tariffHistoryData[i].states[si].states = [];
+			if (checked) { if (!tariffHistoryData[i].states[si].states.includes(state)) tariffHistoryData[i].states[si].states.push(state); }
+			else { tariffHistoryData[i].states[si].states = tariffHistoryData[i].states[si].states.filter(s => s !== state); }
+		};
+		window.updateHistoryStateTariffAmount = function(i, si, val) {
+			tariffHistoryData[i].states[si].amount = parseInt(val) || 0;
+		};
+		window.removeHistoryStateTariff = function(i, si) {
+			tariffHistoryData[i].states.splice(si, 1);
+			renderTariffHistoryRows();
+		};
+		
+		let tariffHistoryData = [];
+
+		function generateYearOptions(selectedYear, includeAktuell = false) {
+			const currentYear = new Date().getFullYear();
+			let html = '';
+			if (includeAktuell) {
+				html += `<option value="null" ${selectedYear === null ? 'selected' : ''}>Aktuell</option>`;
+			}
+			for (let y = currentYear; y >= 1970; y--) {
+				html += `<option value="${y}" ${selectedYear === y ? 'selected' : ''}>${y}</option>`;
+			}
+			return html;
+		}
+
+		function renderTariffHistoryRows() {
+			const container = document.getElementById('tariff-history-rows');
+			if (!container) return;
+			
+			if (tariffHistoryData.length === 0) {
+				container.innerHTML = '<p style="color: #666; font-size: 0.9rem;">Noch keine Einträge. Klicke auf "Zeile hinzufügen".</p>';
+				return;
+			}
+			
+			container.innerHTML = tariffHistoryData.map((entry, i) => `
+				<div class="tariff-row" data-index="${i}" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;padding:0.75rem;border:1px solid #e9ecef;border-radius:8px;">
+					<div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+						<select onchange="window.updateTariffRow(${i}, 'from', this.value)"
+								style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 6px;">
+							${generateYearOptions(entry.from, false)}
+						</select>
+						<span>bis</span>
+						<select onchange="window.updateTariffRow(${i}, 'to', this.value)"
+								style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 6px;">
+							${generateYearOptions(entry.to, true)}
+						</select>
+						<span>:</span>
+						<input type="number" value="${entry.default || entry.amount || ''}"
+							   onchange="window.updateTariffRow(${i}, 'default', this.value)"
+							   style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 6px; width: 120px;"
+							   placeholder="Standardtarif">
+						<span>€ Standard</span>
+						<button onclick="window.deleteTariffRow(${i})"
+								style="background: #dc3545; color: white; padding: 0.4rem 0.75rem; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+							Zeile löschen
+						</button>
+						<button onclick="window.addHistoryStateTariff(${i})"
+								style="background: var(--pf-mid); color: white; padding: 0.4rem 0.75rem; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+							+ Bundesland
+						</button>
+					</div>
+					<div id="history-state-fields-${i}" style="display:flex;flex-direction:column;gap:0.5rem;padding-left:1rem;">
+						${(entry.states || []).map((sf, si) => `
+							<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+								<div style="position:relative;">
+									<button type="button" onclick="window.toggleHistoryStateDropdown(${i},${si})"
+											style="padding:0.4rem 0.75rem;border:2px solid #e9ecef;border-radius:6px;background:white;cursor:pointer;font-size:0.85rem;min-width:200px;text-align:left;">
+										${(sf.states||[]).length > 0 ? sf.states.join(', ') : 'Bundesländer wählen'} ▾
+									</button>
+									<div id="hsd-${i}-${si}" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e9ecef;border-radius:8px;z-index:100;min-width:220px;max-height:260px;overflow-y:auto;padding:0.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+										${ALL_STATES.map(s => `
+											<label style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.5rem;cursor:pointer;font-size:0.85rem;">
+												<input type="checkbox" ${(sf.states||[]).includes(s) ? 'checked' : ''}
+													   onchange="window.updateHistoryStateSelection(${i},${si},'${s}',this.checked)">
+												${s}
+											</label>
+										`).join('')}
+										<div style="border-top:1px solid #eee;margin-top:0.25rem;padding-top:0.25rem;">
+											<button type="button" onclick="window.removeHistoryStateTariff(${i},${si})"
+													style="width:100%;padding:0.3rem;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">
+												Entfernen
+											</button>
+										</div>
+									</div>
+								</div>
+								<input type="number" value="${sf.amount || ''}"
+									   onchange="window.updateHistoryStateTariffAmount(${i},${si},this.value)"
+									   style="padding:0.4rem;border:2px solid #e9ecef;border-radius:6px;width:110px;"
+									   placeholder="Tarif €">
+								<span style="font-size:0.85rem;">€</span>
+							</div>
+						`).join('')}
+					</div>
+				</div>
+			`).join('');
+		}
+
+		window.updateTariffRow = function(index, field, value) {
+			if (field === 'to') {
+				tariffHistoryData[index].to = value === 'null' ? null : parseInt(value);
+			} else if (field === 'from') {
+				tariffHistoryData[index].from = parseInt(value);
+			} else if (field === 'default') {
+				tariffHistoryData[index].default = parseInt(value);
+			}
+		};
+
+		window.addTariffHistoryRow = function() {
+			const currentYear = new Date().getFullYear();
+			tariffHistoryData.push({ from: currentYear, to: null, default: window.tariffSalary || 1040, states: [] });
+			renderTariffHistoryRows();
+		};
+
+		window.deleteTariffRow = function(index) {
+			tariffHistoryData.splice(index, 1);
+			renderTariffHistoryRows();
+		};
+
+		window.saveTariffHistory = async function() {
+			const { error } = await supabase.from('site_settings')
+				.upsert({ key: 'pta_tariff_history', value: JSON.stringify(tariffHistoryData) }, { onConflict: 'key' });
+			
+			if (error) { alert('Fehler: ' + error.message); return; }
+			
+			const fb = document.getElementById('tariff-history-feedback');
+			if (fb) {
+				fb.textContent = '✅ Tarifhistorie gespeichert!';
+				fb.style.display = 'block';
+				setTimeout(() => fb.style.display = 'none', 4000);
+			}
+		};
+		
+		function getCategoryLabel(cat) {
+			const map = {
+				'offizin': 'Offizin',
+				'krankenhaus': 'Krankenhausapotheke',
+				'industrie': 'Industrie',
+				'universitaet': 'Universität',
+				'bundeswehr': 'Bundeswehr',
+				'pta-schule': 'PTA-Schule',
+				'behoerde': 'Behörde',
+				'sonstiges': 'Sonstiges'
+			};
+			return map[cat] || cat || '';
+		}
+
+		function getStatusText(status) {
+			const texts = {
+				'pending': 'Wartend',
+				'active': 'Aktiv',
+				'inactive': 'Inaktiv'
+			};
+			return texts[status] || status;
+		}
+		
+		function formatDate(dateString) {
+			const date = new Date(dateString);
+			return date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'});
+		}
+		
+		window.filterReviews = renderReviews;
+		window.filterJobs = renderJobs;
+		
+		let allCompanies = [];
+		let allReviewsForCompanies = [];
+		let allJobsForCompanies = [];
+
+		window.loadCompanies = async function() {
+			const tbody = document.getElementById('companies-tbody');
+			tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:#666;">Lade...</td></tr>`;
+
+			try {
+				const { data: companiesDb, error: ceErr } = await supabase
+					.from('companies')
+					.select('*')
+					.order('created_at', { ascending: false });
+				if (ceErr) throw ceErr;
+
+				const { data: reviewsDb, error: reErr } = await supabase
+					.from('reviews')
+					.select('id, company_name, address, state, status, practice_type');
+				if (reErr) throw reErr;
+
+				const { data: jobsDb, error: jeErr } = await supabase
+					.from('jobs')
+					.select('id, company_name, address, state, status, created_at, practice_type');
+				if (jeErr) throw jeErr;
+
+				allReviewsForCompanies = reviewsDb || [];
+				allJobsForCompanies = jobsDb || [];
+
+				const companyMap = {};
+
+				allReviewsForCompanies.forEach(r => {
+					const key = r.company_name.trim().toLowerCase() + '||' + (r.address || '').trim().toLowerCase();
+					if (!companyMap[key]) {
+						companyMap[key] = {
+							name: r.company_name,
+							address: r.address || '',
+							state: r.state || '',
+							reviewCountApo: 0,
+							reviewCountPta: 0,
+							activeJobCountApo: 0,
+							activeJobCountPta: 0,
+							expiredJobCount: 0,
+							verified: false,
+							status: 'active',
+							companyId: null,
+							createdAt: null
+						};
+					}
+					if (r.status === 'active') {
+						if (r.practice_type === 'PTA') companyMap[key].reviewCountPta++;
+						else companyMap[key].reviewCountApo++;
+					}
+				});
+
+				const thirtyDaysAgo = new Date();
+				thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+				allJobsForCompanies.forEach(j => {
+					const key = j.company_name.trim().toLowerCase() + '||' + (j.address || '').trim().toLowerCase();
+					if (!companyMap[key]) {
+						companyMap[key] = {
+							name: j.company_name,
+							address: j.address || '',
+							state: j.state || '',
+							reviewCountApo: 0,
+							reviewCountPta: 0,
+							activeJobCountApo: 0,
+							activeJobCountPta: 0,
+							expiredJobCount: 0,
+							verified: false,
+							status: 'active',
+							companyId: null,
+							createdAt: j.created_at
+						};
+					}
+					if (j.status === 'active') {
+						const jobDate = new Date(j.created_at);
+						if (jobDate >= thirtyDaysAgo) {
+							if (j.practice_type === 'PTA') companyMap[key].activeJobCountPta++;
+							else companyMap[key].activeJobCountApo++;
+						} else {
+							companyMap[key].expiredJobCount++;
+						}
+					}
+				});
+
+				const { data: verificationsDb, error: veErr } = await supabase
+					.from('company_verifications')
+					.select('company_name, status, contact_email, contact_person')
+					.eq('status', 'verified');
+
+				if (veErr) console.error('Fehler beim Laden der Verifizierungen:', veErr);
+
+				const verifiedCompanies = new Set();
+				(verificationsDb || []).forEach(v => {
+					verifiedCompanies.add(v.company_name.trim().toLowerCase());
+				});
+
+				(companiesDb || []).forEach(c => {
+					const key = c.name.trim().toLowerCase() + '||' + (c.address || '').trim().toLowerCase();
+					
+					const keyByName = Object.keys(companyMap).find(k => 
+						k.startsWith(c.name.trim().toLowerCase() + '||')
+					);
+					
+					const matchKey = companyMap[key] ? key : keyByName;
+					
+					if (matchKey && companyMap[matchKey]) {
+						const isVerified = verifiedCompanies.has(c.name.trim().toLowerCase());
+						companyMap[matchKey].verified = isVerified;
+						companyMap[matchKey].status = c.status || 'active';
+						companyMap[matchKey].companyId = c.id;
+						companyMap[matchKey].createdAt = companyMap[matchKey].createdAt || c.created_at;
+						companyMap[matchKey].contactEmail = c.contact_email || '';
+						companyMap[matchKey].contactPerson = c.contact_person || '';
+					} else {
+						const isVerified = verifiedCompanies.has(c.name.trim().toLowerCase());
+						companyMap[key] = {
+							name: c.name,
+							address: c.address || '',
+							state: c.state || '',
+							reviewCountApo: 0,
+							reviewCountPta: 0,
+							activeJobCountApo: 0,
+							activeJobCountPta: 0,
+							expiredJobCount: 0,
+							verified: isVerified,
+							status: c.status || 'active',
+							companyId: c.id,
+							createdAt: c.created_at,
+							contactEmail: c.contact_email || '',
+							contactPerson: c.contact_person || ''
+						};
+					}
+				});
+
+				(verificationsDb || []).forEach(v => {
+					Object.keys(companyMap).forEach(key => {
+						const company = companyMap[key];
+						if (company.name.trim().toLowerCase() === v.company_name.trim().toLowerCase()) {
+							company.verified = true;
+							if (v.contact_email) company.contactEmail = v.contact_email;
+							if (v.contact_person) company.contactPerson = v.contact_person;
+						}
+					});
+				});
+
+				allCompanies = Object.values(companyMap);
+
+				updateCompaniesStats();
+				renderCompaniesTable(allCompanies, 'all');
+
+			} catch (err) {
+				console.error('Fehler:', err);
+				tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:#dc3545;">Fehler: ${err.message}</td></tr>`;
+			}
+		}
+
+		function updateCompaniesStats() {
+			document.getElementById('stat-companies-total').textContent = allCompanies.length;
+			document.getElementById('stat-companies-active').textContent = allCompanies.filter(c => c.status !== 'inactive').length;
+			document.getElementById('stat-companies-inactive').textContent = allCompanies.filter(c => c.status === 'inactive').length;
+			document.getElementById('stat-companies-verified').textContent = allCompanies.filter(c => c.verified).length;
+		}
+
+		function esc(str) {
+			return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+		}
+
+		function renderCompaniesTable(companies, modeF) {
+			modeF = modeF || 'all';
+			const tbody = document.getElementById('companies-tbody');
+
+			if (companies.length === 0) {
+				tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:#666;">Keine Unternehmen gefunden.</td></tr>`;
+				return;
+			}
+
+			tbody.innerHTML = companies.map((c, i) => `
+				<tr style="border-bottom: 1px solid #f0f0f0; ${c.status === 'inactive' ? 'opacity: 0.6;' : ''}">
+					<td style="padding: 0.75rem;">${i + 1}</td>
+					<td style="padding: 0.75rem;">
+						<strong>${esc(c.name)}</strong>
+						${c.verified ? '<br><span style="color:#28a745;font-size:0.8rem;">✓ Verifiziert</span>' : ''}
+					</td>
+					<td style="padding: 0.75rem; font-size: 0.9rem; color: #555;">${esc(c.address)}${c.state ? ', ' + c.state : ''}</td>
+					<td style="padding: 0.75rem; font-size: 0.85rem; color: #888;">${c.createdAt ? formatDate(c.createdAt) : '–'}</td>
+					<td style="padding: 0.75rem; text-align:center;">
+						<span class="status-badge ${c.status === 'inactive' ? 'status-inactive' : 'status-active'}">
+							${c.status === 'inactive' ? 'Inaktiv' : 'Aktiv'}
+						</span>
+					</td>
+					<td style="padding: 0.75rem; text-align:center;">
+						${c.verified 
+							? '<span style="color:#28a745;font-weight:600;">✓</span>' 
+							: '<span style="color:#aaa;">–</span>'}
+					</td>
+					<td style="padding: 0.75rem; text-align:center; font-size:0.85rem;">
+						<span style="cursor:pointer;color:#667eea;font-weight:600;"
+							  onclick="window.showCompanyReviews('${c.name.replace(/'/g, "\\'")}', '${c.address.replace(/'/g, "\\'")}')">
+							${modeF === 'apo' ? (c.reviewCountApo > 0 ? c.reviewCountApo : '–')
+							: modeF === 'pta' ? (c.reviewCountPta > 0 ? c.reviewCountPta : '–')
+							: ((c.reviewCountApo + c.reviewCountPta) > 0 ? (c.reviewCountApo + c.reviewCountPta) : '–')}
+						</span>
+					</td>
+					<td style="padding: 0.75rem; text-align:center; font-size:0.85rem;">
+						<span style="cursor:pointer;color:#667eea;font-weight:600;"
+							  onclick="window.showCompanyJobs('${c.name.replace(/'/g, "\\'")}', '${c.address.replace(/'/g, "\\'")}')">
+							${modeF === 'apo' ? (c.activeJobCountApo > 0 ? c.activeJobCountApo : '–')
+							: modeF === 'pta' ? (c.activeJobCountPta > 0 ? c.activeJobCountPta : '–')
+							: ((c.activeJobCountApo + c.activeJobCountPta) > 0 ? (c.activeJobCountApo + c.activeJobCountPta) : '–')}
+							${c.expiredJobCount > 0 ? `<span style="color:#aaa;"> / ${c.expiredJobCount} abgel.</span>` : ''}
+						</span>
+					</td>
+					<td style="padding: 0.75rem; text-align:center;">
+						<div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap;">
+							<button onclick="window.toggleCompanyStatusAdmin('${c.name.replace(/'/g, "\\'")}', '${c.address.replace(/'/g, "\\'")}', '${c.status}', '${c.companyId || ''}')"
+									style="padding:0.3rem 0.6rem;font-size:0.8rem;border:none;border-radius:6px;cursor:pointer;
+										   background:${c.status === 'inactive' ? '#28a745' : '#dc3545'};color:white;">
+								${c.status === 'inactive' ? 'Aktivieren' : 'Deaktivieren'}
+							</button>
+							<button onclick="window.startMergeProcessAdmin('${c.name.replace(/'/g, "\\'")}', '${c.address.replace(/'/g, "\\'")}', '${c.companyId || ''}')"
+									style="padding:0.3rem 0.6rem;font-size:0.8rem;border:none;border-radius:6px;cursor:pointer;background:#6c757d;color:white;">
+								Zusammenführen
+							</button>
+							${c.verified ? 
+								'<button onclick="contactVerifiedCompany(\'' + c.name.replace(/'/g, "\\'") + '\', \'' + (c.contactEmail || '') + '\', \'' + (c.contactPerson || '') + '\')" style="padding:0.3rem 0.6rem;font-size:0.8rem;border:none;border-radius:6px;cursor:pointer;background:#1a4a7a;color:white;margin-left:0.5rem;">Kontaktieren</button>' 
+							: ''}	
+						</div>
+					</td>
+				</tr>
+			`).join('');
+		}
+
+		window.filterCompaniesTable = function() {
+			const search = document.getElementById('company-search-filter').value.toLowerCase();
+			const statusF = document.getElementById('company-status-filter').value;
+			const verifiedF = document.getElementById('company-verified-filter').value;
+			const modeF = document.getElementById('company-mode-filter')?.value || 'all';
+
+			const filtered = allCompanies.filter(c => {
+				const matchSearch = !search || 
+					c.name.toLowerCase().includes(search) || 
+					c.address.toLowerCase().includes(search);
+				const matchStatus = !statusF || c.status === statusF;
+				const matchVerified = !verifiedF || 
+					(verifiedF === 'yes' && c.verified) || 
+					(verifiedF === 'no' && !c.verified);
+				const hasPta = (c.reviewCountPta > 0 || c.activeJobCountPta > 0);
+				const hasApo = (c.reviewCountApo > 0 || c.activeJobCountApo > 0);
+				const matchMode = modeF === 'all' || 
+					(modeF === 'pta' && hasPta) || 
+					(modeF === 'apo' && hasApo);
+				return matchSearch && matchStatus && matchVerified && matchMode;
+			});
+			const sort = document.getElementById('company-sort')?.value || 'name';
+			if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+			else if (sort === 'reviews') filtered.sort((a, b) => (b.reviewCountPta + b.reviewCountApo) - (a.reviewCountPta + a.reviewCountApo));
+			else if (sort === 'jobs') filtered.sort((a, b) => (b.activeJobCountPta + b.activeJobCountApo) - (a.activeJobCountPta + a.activeJobCountApo));
+			renderCompaniesTable(filtered, modeF);
+		};
+
+
+		window.loadVerificationBadge = async function() {
+			try {
+				const { count } = await supabase
+					.from('verification_requests')
+					.select('id', { count: 'exact', head: true })
+					.eq('status', 'pending');
+				
+				const badge = document.getElementById('verification-badge');
+				if (badge) {
+					if (count > 0) {
+						badge.textContent = count;
+						badge.style.display = 'inline';
+					} else {
+						badge.style.display = 'none';
+					}
+				}
+			} catch(e) {}
+		}
+
+		window.loadReportsBadge = async function() {
+
+			try {
+				const { count } = await supabase
+					.from('reports')
+					.select('id', { count: 'exact', head: true })
+					.eq('status', 'open');
+				
+				const badge = document.getElementById('reports-badge');
+				if (badge) {
+					badge.textContent = count || 0;
+					badge.style.display = count > 0 ? 'inline' : 'none';
+				}
+			} catch(e) {}
+		}
+
+		let verificationData = { pending: [], approved: [], rejected: [] };
+		let currentVerifTab = 'pending';
+
+		window.switchVerifTab = function(tab) {
+			currentVerifTab = tab;
+			
+			['pending', 'approved', 'rejected'].forEach(t => {
+				const btn = document.getElementById(`vtab-${t}`);
+				if (!btn) return;
+				const colors = { pending: '#ffc107', approved: '#28a745', rejected: '#dc3545' };
+				if (t === tab) {
+					btn.style.borderBottom = `3px solid ${colors[t]}`;
+					btn.style.color = t === 'pending' ? '#856404' : t === 'approved' ? '#155724' : '#721c24';
+				} else {
+					btn.style.borderBottom = '3px solid transparent';
+					btn.style.color = '#666';
+				}
+			});
+			
+			renderVerificationList();
+		};
+
+		function renderVerificationList() {
+			const list = document.getElementById('verification-requests-list');
+			const nameFilter = document.getElementById('verification-name-filter')?.value?.toLowerCase() || '';
+			
+			let reqs = verificationData[currentVerifTab] || [];
+			if (nameFilter) reqs = reqs.filter(r => r.company_name.toLowerCase().includes(nameFilter));
+			
+			if (reqs.length === 0) {
+				list.innerHTML = `<p style="color:#aaa;font-style:italic;padding:1rem;">Keine Einträge.</p>`;
+				return;
+			}
+			
+			const colors = { pending: '#ffc107', approved: '#28a745', rejected: '#dc3545' };
+			const color = colors[currentVerifTab];
+			
+			list.innerHTML = reqs.map(req => `
+				<div style="background:white;border-radius:10px;padding:1.25rem;margin-bottom:0.75rem;
+							box-shadow:0 2px 6px rgba(0,0,0,0.07);border-left:4px solid ${color};">
+					<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.75rem;">
+						<div>
+							<strong style="font-size:1.05rem;">${esc(req.company_name)}</strong><br>
+							<span style="color:#666;font-size:0.9rem;line-height:1.8;">
+								${req.company_address ? `📍 ${req.company_address}<br>` : ''}
+								👤 ${req.contact_person || '–'} &nbsp;|&nbsp;
+								✉️ <a href="mailto:${req.contact_email}" style="color:#667eea;">${req.contact_email}</a><br>
+								🕐 ${formatDate(req.created_at)}
+								${req.reviewed_at ? ` · Bearbeitet: ${formatDate(req.reviewed_at)}` : ''}
+							</span>
+						</div>
+						<div style="display:flex;flex-direction:column;gap:0.4rem;">
+							${currentVerifTab === 'pending' ? `
+								<button onclick="window.approveVerification('${req.id}')"
+										style="padding:0.4rem 0.9rem;background:#28a745;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;">
+									✓ Genehmigen
+								</button>
+								<button onclick="window.rejectVerification('${req.id}')"
+										style="padding:0.4rem 0.9rem;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;">
+									✗ Ablehnen
+								</button>
+							` : currentVerifTab === 'approved' ? `
+								<button onclick="window.revokeVerification('${req.id}')"
+										style="padding:0.4rem 0.9rem;background:#ffc107;color:#333;border:none;border-radius:6px;cursor:pointer;font-weight:600;">
+									↩ Zurückziehen
+								</button>
+							` : currentVerifTab === 'rejected' ? `
+								<button onclick="window.undoRejection('${req.id}')"
+										style="padding:0.4rem 0.9rem;background:#6c757d;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;">
+									↩ Ablehnung zurückziehen
+								</button>
+							` : ''}
+						</div>
+					</div>
+				</div>
+			`).join('');
+		}
+
+		window.loadVerificationRequests = async function() {
+			const list = document.getElementById('verification-requests-list');
+			list.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Lade...</div>';
+			
+			try {
+				const { data, error } = await supabase
+					.from('company_verifications')
+					.select('*')
+					.order('created_at', { ascending: false });
+				if (error) throw error;
+				
+				verificationData.pending  = data.filter(r => r.status === 'pending');
+				verificationData.approved = data.filter(r => r.status === 'verified');
+				verificationData.rejected = data.filter(r => r.status === 'rejected');
+				
+				document.getElementById('vtab-pending-count').textContent  = verificationData.pending.length;
+				document.getElementById('vtab-approved-count').textContent = verificationData.approved.length;
+				document.getElementById('vtab-rejected-count').textContent = verificationData.rejected.length;
+				
+				const badge = document.getElementById('verification-badge');
+				if (badge) {
+					badge.textContent = verificationData.pending.length;
+					badge.style.display = verificationData.pending.length > 0 ? 'inline' : 'none';
+				}
+				
+				renderVerificationList();
+				
+			} catch(err) {
+				list.innerHTML = `<div style="color:#dc3545;padding:1rem;">Fehler: ${err.message}</div>`;
+			}
+		}
+
+		window.approveVerification = async function(verificationId) {
+			try {
+				const { data: verification, error: fetchError } = await supabase
+					.from('company_verifications')
+					.select('*')
+					.eq('id', verificationId)
+					.single();
+				
+				if (fetchError) throw fetchError;
+				
+				if (!confirm(`"${verification.company_name}" verifizieren und Antrag genehmigen?`)) return;
+				
+				const result = await adminApi.approveVerification(verificationId);
+				
+				if (!result.success) {
+					throw new Error(result.error || 'Fehler beim Genehmigen');
+				}
+
+				showSuccess(`✅ "${verification.company_name}" wurde verifiziert! E-Mail gesendet.`);
+				await loadVerificationRequests();
+
+				try {
+					localStorage.setItem('verification_updated', Date.now().toString());
+				} catch(e) {}
+				
+			} catch(err) {
+				showError('Fehler: ' + err.message);
+			}			
+		};
+
+		window.rejectVerification = async function(verificationId) {
+			try {
+				const { data: verification, error: fetchError } = await supabase
+					.from('company_verifications')
+					.select('*')
+					.eq('id', verificationId)
+					.single();
+				
+				if (fetchError) throw fetchError;
+				
+				const reason = prompt(`Grund für Ablehnung von "${verification.company_name}" (optional, wird dem Antragsteller angezeigt):`);
+				if (reason === null) return;
+				
+				const result = await adminApi.rejectVerification(verificationId, reason);
+				
+				if (!result.success) {
+					throw new Error(result.error || 'Fehler beim Ablehnen');
+				}
+
+				showSuccess(`Antrag für "${verification.company_name}" wurde abgelehnt. E-Mail gesendet.`);
+				await loadVerificationRequests();
+				
+			} catch(err) {
+				showError('Fehler: ' + err.message);
+			}
+		};
+
+		window.undoRejection = async function(verificationId) {
+			try {
+				const { data: verification, error: fetchError } = await supabase
+					.from('company_verifications')
+					.select('*')
+					.eq('id', verificationId)
+					.single();
+				
+				if (fetchError) throw fetchError;
+				
+				if (!confirm(`Ablehnung für "${verification.company_name}" zurückziehen? Der Antrag wird wieder auf "Ausstehend" gesetzt.`)) return;
+				
+				const { error } = await supabase
+					.from('company_verifications')
+					.update({ 
+						status: 'pending',
+						rejection_reason: null
+					})
+					.eq('id', verificationId);
+				
+				if (error) throw error;
+				
+				showSuccess(`Ablehnung für "${verification.company_name}" zurückgezogen — Antrag ist wieder ausstehend.`);
+				await loadVerificationRequests();
+				
+			} catch(err) {
+				showError('Fehler: ' + err.message);
+			}
+		};
+
+		window.revokeVerification = async function(verificationId) {
+			try {
+				const { data: verification, error: fetchError } = await supabase
+					.from('company_verifications')
+					.select('*')
+					.eq('id', verificationId)
+					.single();
+				
+				if (fetchError) throw fetchError;
+				
+				if (!confirm(`Verifizierung von "${verification.company_name}" wirklich zurückziehen?`)) return;
+				
+				const { error } = await supabase
+					.from('company_verifications')
+					.update({ 
+						status: 'pending', 
+						verified_at: null 
+					})
+					.eq('id', verificationId);
+				
+				if (error) throw error;
+				
+				showSuccess(`Verifizierung von "${verification.company_name}" zurückgezogen.`);
+				await loadVerificationRequests();
+				
+				try {
+					localStorage.setItem('verification_updated', Date.now().toString());
+				} catch(e) {}				
+				
+			} catch(err) {
+				showError('Fehler: ' + err.message);
+			}
+		};
+
+		let reportsData = { open: [], resolved: [] };
+		let currentReportsTab = 'open';
+
+		window.switchReportsTab = function(tab) {
+			currentReportsTab = tab;
+			['open', 'resolved'].forEach(t => {
+				const btn = document.getElementById(`rtab-${t}`);
+				if (!btn) return;
+				if (t === tab) {
+					btn.style.borderBottom = `3px solid ${t === 'open' ? '#dc3545' : '#28a745'}`;
+					btn.style.color = t === 'open' ? '#721c24' : '#155724';
+				} else {
+					btn.style.borderBottom = '3px solid transparent';
+					btn.style.color = '#666';
+				}
+			});
+			renderReportsList();
+		};
+
+		window.loadReports = async function() {
+			const list = document.getElementById('reports-list');
+			if (list) list.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Lade...</div>';
+			
+			try {
+				const { data, error } = await supabase
+					.from('reports')
+					.select('*, reviews(company_name, address, status, practice_type)')
+					.order('reported_at', { ascending: false });
+				const filteredData = (data || []).filter(r => !r.reviews || r.reviews.practice_type === 'PTA');
+				if (error) throw error;
+				
+				reportsData.open = filteredData.filter(r => r.status === 'open');
+				reportsData.resolved = filteredData.filter(r => r.status !== 'open');
+				
+				document.getElementById('rtab-open-count').textContent = reportsData.open.length;
+				document.getElementById('rtab-resolved-count').textContent = reportsData.resolved.length;
+				
+				const badge = document.getElementById('reports-badge');
+				if (badge) {
+					badge.textContent = reportsData.open.length;
+					badge.style.display = reportsData.open.length > 0 ? 'inline' : 'none';
+				}
+				
+				renderReportsList();
+			} catch(err) {
+				if (list) list.innerHTML = `<div style="color:#dc3545;padding:1rem;">Fehler: ${err.message}</div>`;
+			}
+		}
+
+		function renderReportsList() {
+			const list = document.getElementById('reports-list');
+			const reports = reportsData[currentReportsTab] || [];
+			
+			if (reports.length === 0) {
+				list.innerHTML = '<p style="color:#aaa;font-style:italic;padding:1rem;">Keine Meldungen.</p>';
+				return;
+			}
+			
+			list.innerHTML = reports.map(r => {
+				const reviewInfo = r.reviews || {};
+				const statusLabel = r.status === 'deactivated' 
+					? '<span style="color:#dc3545;font-weight:600;">Bewertung inaktiviert</span>'
+					: r.status === 'dismissed'
+					? '<span style="color:#6c757d;font-weight:600;">Meldung verworfen</span>'
+					: '';
+				
+				return `
+					<div style="background:white;border-radius:10px;padding:1.25rem;margin-bottom:0.75rem;
+								box-shadow:0 2px 6px rgba(0,0,0,0.07);
+								border-left:4px solid ${currentReportsTab === 'open' ? '#dc3545' : '#6c757d'};">
+						<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.75rem;">
+							<div style="flex:1;">
+								<strong>${esc(r.company_name || reviewInfo.company_name || 'Unbekannt')}</strong>
+								${r.company_address ? `<span style="color:#888;margin-left:0.5rem;font-size:0.9rem;">📍 ${r.company_address}</span>` : ''}
+								<br>
+								<small style="color:#888;">
+									ID: <code>${r.review_id?.substring(0,8)}</code> &nbsp;|&nbsp;
+									Gemeldet: ${formatDate(r.reported_at)} &nbsp;|&nbsp;
+									Von: ${r.contact_name} (${r.contact_email})
+								</small>
+								<br>
+								<div style="margin-top:0.5rem;padding:0.5rem;background:#fff3cd;border-radius:6px;font-size:0.9rem;">
+									<strong>Grund:</strong> ${esc(r.reason)}
+								</div>
+								${statusLabel ? `<div style="margin-top:0.5rem;">${statusLabel}</div>` : ''}
+							</div>
+							<div style="display:flex;flex-direction:column;gap:0.4rem;flex-shrink:0;">
+								<button onclick="window.viewReview('${r.review_id}')"
+										style="padding:0.4rem 0.9rem;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+									👁 Bewertung anzeigen
+								</button>
+								${currentReportsTab === 'open' ? `
+								<button onclick="window.resolveReport('${r.id}', '${r.review_id}', 'deactivated')"
+										style="padding:0.4rem 0.9rem;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+									🚫 Bewertung deaktivieren
+								</button>
+								<button onclick="window.resolveReport('${r.id}', '${r.review_id}', 'dismissed')"
+										style="padding:0.4rem 0.9rem;background:#6c757d;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+									✗ Meldung verwerfen
+								</button>
+								` : ''}
+							</div>
+						</div>
+					</div>
+				`;
+			}).join('');
+		}
+
+		window.resolveReport = async function(reportId, reviewId, action) {
+			const label = action === 'deactivated' ? 'Bewertung deaktivieren' : 'Meldung verwerfen';
+			if (!confirm(`${label}?`)) return;
+			
+			try {
+				await supabase.from('reports')
+					.update({ 
+						status: action, 
+						resolved_at: new Date().toISOString(),
+						resolved_by: currentUser?.email || 'Admin'
+					})
+					.eq('id', reportId);
+				
+				if (action === 'deactivated') {
+					await supabase.from('reviews')
+						.update({ status: 'inactive' })
+						.eq('id', reviewId);
+					
+					const idx = allReviews.findIndex(r => r.id === reviewId);
+					if (idx > -1) allReviews[idx].status = 'inactive';
+					renderReviews();
+				}
+				
+				showSuccess(action === 'deactivated' 
+					? '✅ Bewertung deaktiviert und Meldung bearbeitet.'
+					: '✅ Meldung verworfen.');
+				await loadReports();
+			} catch(err) {
+				showError('Fehler: ' + err.message);
+			}
+		};
+
+		window.toggleCompanyVerified = async function(name, address, currentVerified, companyId) {
+			const newVerified = !currentVerified;
+			const action = newVerified ? 'verifizieren' : 'Verifizierung entfernen';
+			if (!confirm(`"${name}" wirklich ${action}?`)) return;
+
+			try {
+				if (companyId) {
+					const { error } = await supabase.from('companies')
+						.update({ verified: newVerified, updated_at: new Date().toISOString() })
+						.eq('id', companyId);
+					if (error) throw error;
+				} else {
+					const { error } = await supabase.from('companies')
+						.insert([{ name, address, verified: newVerified, status: 'active' }]);
+					if (error) throw error;
+				}
+				showSuccess(`"${name}" erfolgreich ${newVerified ? 'verifiziert' : 'Verifizierung entfernt'}!`);
+				await loadCompanies();
+			} catch (err) {
+				showError('Fehler: ' + err.message);
+			}
+		};
+
+		window.toggleCompanyStatusAdmin = async function(name, address, currentStatus, companyId) {
+			const newStatus = currentStatus === 'inactive' ? 'active' : 'inactive';
+			const action = newStatus === 'active' ? 'aktivieren' : 'deaktivieren';
+			if (!confirm(`"${name}" wirklich ${action}?`)) return;
+
+			try {
+				if (companyId) {
+					const { error } = await supabase.from('companies')
+						.update({ status: newStatus, updated_at: new Date().toISOString() })
+						.eq('id', companyId);
+					if (error) throw error;
+				} else {
+					const { error } = await supabase.from('companies')
+						.insert([{ name, address, status: newStatus, verified: false }]);
+					if (error) throw error;
+				}
+				showSuccess(`"${name}" erfolgreich ${newStatus === 'active' ? 'aktiviert' : 'deaktiviert'}!`);
+				await loadCompanies();
+			} catch (err) {
+				showError('Fehler: ' + err.message);
+			}
+		};
+
+		window.showCompanyReviews = function(name, address) {
+			const reviews = allReviewsForCompanies.filter(r => 
+				r.company_name === name && r.status === 'active'
+			);
+
+			const modal = document.createElement('div');
+			modal.className = 'modal';
+			modal.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9998;overflow-y:auto;';
+			modal.innerHTML = `
+				<div style="max-width:800px;width:90%;margin:2rem auto;background:white;border-radius:12px;">
+					<div style="padding:1.5rem;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center;">
+						<h2 style="margin:0;">Reviews: ${name} (${reviews.length})</h2>
+						<button onclick="this.closest('.modal').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+					</div>
+					<div style="padding:1.5rem;">
+						${reviews.length === 0 
+							? '<p style="color:#666;">Keine aktiven Bewertungen vorhanden.</p>'
+							: reviews.map(r => `
+								<div style="background:#f8f9fa;padding:1rem;border-radius:8px;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+									<div>
+										<strong>ID:</strong> <code>${r.id.substring(0,8)}</code>
+										<span class="status-badge status-${r.status}" style="margin-left:0.5rem;">${getStatusText(r.status)}</span>
+									</div>
+									<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+										<button onclick="window.viewReview('${r.id}')"
+												class="action-btn btn-view">Ansehen</button>
+										<button onclick="window.toggleStatus('${r.id}','inactive');this.closest('.modal').remove();" 
+												class="action-btn btn-deactivate">Deaktivieren</button>
+										${r.user_email ? `<button onclick="window.location.href='mailto:${r.user_email}?subject=${encodeURIComponent('Ihre Bewertung auf PharmaFaro.de - ID: ' + r.id.substring(0,8))}'"
+												class="action-btn" style="background:#1a4a7a;color:white;">Kontaktieren</button>` : ''}
+									</div>
+								</div>
+							`).join('')
+						}
+					</div>
+					<div style="padding:1rem;text-align:center;border-top:1px solid #e9ecef;">
+						<button onclick="this.closest('.modal').remove()" 
+								style="padding:0.6rem 1.5rem;background:#6c757d;color:white;border:none;border-radius:8px;cursor:pointer;">
+							Schließen
+						</button>
+					</div>
+				</div>
+			`;
+			document.body.appendChild(modal);
+			modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+		};
+
+		window.showCompanyJobs = function(name, address) {
+			const jobs = allJobsForCompanies.filter(j => j.company_name === name);
+
+			const modal = document.createElement('div');
+			modal.className = 'modal';
+			modal.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9998;overflow-y:auto;';
+			modal.innerHTML = `
+				<div style="max-width:800px;width:90%;margin:2rem auto;background:white;border-radius:12px;">
+					<div style="padding:1.5rem;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center;">
+						<h2 style="margin:0;">Jobs: ${name} (${jobs.length})</h2>
+						<button onclick="this.closest('.modal').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+					</div>
+					<div style="padding:1.5rem;">
+						${jobs.length === 0 
+							? '<p style="color:#666;">Keine Jobs vorhanden.</p>'
+							: jobs.map(j => `
+								<div style="background:#f8f9fa;padding:1rem;border-radius:8px;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+									<div>
+										<strong>ID:</strong> <code>${j.id.substring(0,8)}</code>
+										<span class="status-badge status-${j.status}" style="margin-left:0.5rem;">${getStatusText(j.status)}</span>
+										<br><small style="color:#666;">${formatDate(j.created_at)}</small>
+									</div>
+									<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+										<button onclick="window.viewJob('${j.id}')"
+												class="action-btn btn-view">Ansehen</button>
+										<button onclick="window.toggleJobStatus('${j.id}','${j.status === 'active' ? 'inactive' : 'active'}');this.closest('.modal').remove();" 
+												class="action-btn ${j.status === 'active' ? 'btn-deactivate' : 'btn-activate'}">
+											${j.status === 'active' ? 'Deaktivieren' : 'Aktivieren'}
+										</button>
+										${j.contact_email ? `<button onclick="window.location.href='mailto:${j.contact_email}?subject=${encodeURIComponent('Ihr Stellenangebot auf PharmaFaro.de - ID: ' + j.id.substring(0,8))}'"
+												class="action-btn" style="background:#1a4a7a;color:white;">Kontaktieren</button>` : ''}
+									</div>
+								</div>
+							`).join('')
+						}
+					</div>
+					<div style="padding:1rem;text-align:center;border-top:1px solid #e9ecef;">
+						<button onclick="this.closest('.modal').remove()" 
+								style="padding:0.6rem 1.5rem;background:#6c757d;color:white;border:none;border-radius:8px;cursor:pointer;">
+							Schließen
+						</button>
+					</div>
+				</div>
+			`;
+			document.body.appendChild(modal);
+			modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+		};
+
+		window.startMergeProcessAdmin = function(sourceName, sourceAddress, sourceId) {
+			const others = allCompanies.filter(c => !(c.name === sourceName && c.address === sourceAddress));
+
+			const modal = document.createElement('div');
+			modal.className = 'modal';
+			modal.id = 'merge-select-modal';
+			modal.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;overflow-y:auto;';
+			modal.innerHTML = `
+				<div style="max-width:700px;width:90%;margin:2rem auto;background:white;border-radius:12px;">
+					<div style="padding:1.5rem;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center;">
+						<h2 style="margin:0;">Zusammenführen: "${sourceName}"</h2>
+						<button onclick="this.closest('.modal').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+					</div>
+					<div style="padding:1.5rem;">
+						<div style="background:#fff3cd;padding:1rem;border-left:4px solid #ffc107;border-radius:4px;margin-bottom:1.5rem;">
+							<strong>Hinweis:</strong> "${sourceName}" wird in das Ziel-Unternehmen überführt. 
+							Alle Reviews und Jobs werden dem Ziel zugewiesen. "${sourceName}" wird anschließend gelöscht.
+						</div>
+						<p style="margin-bottom:0.75rem;color:#666;">Ziel-Unternehmen wählen:</p>
+						<input type="text" id="merge-search" placeholder="Nach Name oder Adresse filtern..."
+							   oninput="window.filterMergeList(this.value)"
+							   style="width:100%;padding:0.6rem 1rem;border:2px solid #e9ecef;border-radius:8px;margin-bottom:0.75rem;font-size:0.95rem;">
+						<div id="merge-company-list" style="max-height:400px;overflow-y:auto;border:1px solid #e9ecef;border-radius:8px;">
+							${others.map(c => `
+								<div style="padding:1rem;border-bottom:1px solid #f0f0f0;cursor:pointer;"
+									 onmouseenter="this.style.background='#f8f9fa'"
+									 onmouseleave="this.style.background='white'"
+									 onclick="window.confirmMergeAdmin(
+										'${sourceName.replace(/'/g, "\\'")}',
+										'${sourceAddress.replace(/'/g, "\\'")}',
+										'${c.name.replace(/'/g, "\\'")}',
+										'${c.address.replace(/'/g, "\\'")}'
+									 )">
+									<strong>${esc(c.name)}</strong><br>
+									<small style="color:#666;">${esc(c.address)}</small><br>
+									<small style="color:#999;">${c.reviewCount} Bewertungen · ${c.activeJobCount} aktive Jobs</small>
+								</div>
+							`).join('')}
+						</div>
+					</div>
+					<div style="padding:1rem;text-align:center;border-top:1px solid #e9ecef;">
+						<button onclick="this.closest('.modal').remove()" 
+								style="padding:0.6rem 1.5rem;background:#6c757d;color:white;border:none;border-radius:8px;cursor:pointer;">
+							Abbrechen
+						</button>
+					</div>
+				</div>
+			`;
+			document.body.appendChild(modal);
+			modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+		};
+
+		window.filterMergeList = function(query) {
+			const items = document.querySelectorAll('#merge-company-list > div');
+			const q = query.toLowerCase();
+			items.forEach(item => {
+				const text = item.textContent.toLowerCase();
+				item.style.display = (!q || text.includes(q)) ? 'block' : 'none';
+			});
+		};
+
+		window.confirmMergeAdmin = function(sourceName, sourceAddress, targetName, targetAddress) {
+			document.getElementById('merge-select-modal')?.remove();
+
+			const src = allCompanies.find(c => c.name === sourceName && c.address === sourceAddress);
+			const tgt = allCompanies.find(c => c.name === targetName && c.address === targetAddress);
+
+			const modal = document.createElement('div');
+			modal.className = 'modal';
+			modal.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;overflow-y:auto;';
+			modal.innerHTML = `
+				<div style="max-width:600px;width:90%;margin:2rem auto;background:white;border-radius:12px;">
+					<div style="padding:1.5rem;border-bottom:1px solid #e9ecef;">
+						<h2 style="margin:0;">Zusammenführung bestätigen</h2>
+					</div>
+					<div style="padding:1.5rem;">
+						<div style="background:#f8d7da;padding:1rem;border-left:4px solid #dc3545;border-radius:4px;margin-bottom:1.5rem;">
+							<strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden!
+						</div>
+						<div style="background:#f8f9fa;padding:1rem;border-radius:8px;margin-bottom:1rem;">
+							<strong>Wird gelöscht:</strong> ${src?.name}<br>
+							<small style="color:#666;">${src?.address}</small><br>
+							<small style="color:#999;">${src?.reviewCount || 0} Bewertungen · ${src?.activeJobCount || 0} Jobs</small>
+						</div>
+						<div style="text-align:center;font-size:1.5rem;color:#667eea;margin:0.5rem 0;">↓</div>
+						<div style="background:#d4edda;padding:1rem;border-radius:8px;border:2px solid #28a745;">
+							<strong>Ziel:</strong> ${tgt?.name}<br>
+							<small style="color:#666;">${tgt?.address}</small><br>
+							<small style="color:#28a745;font-weight:600;">
+								Nach Merge: ${(src?.reviewCount || 0) + (tgt?.reviewCount || 0)} Bewertungen · 
+								${(src?.activeJobCount || 0) + (tgt?.activeJobCount || 0)} Jobs
+							</small>
+						</div>
+					</div>
+					<div style="padding:1rem;text-align:center;border-top:1px solid #e9ecef;display:flex;gap:1rem;justify-content:center;">
+						<button onclick="this.closest('.modal').remove()"
+								style="padding:0.6rem 1.5rem;background:#6c757d;color:white;border:none;border-radius:8px;cursor:pointer;">
+							Abbrechen
+						</button>
+						<button onclick="window.executeMergeAdmin('${sourceName.replace(/'/g, "\\'")}','${sourceAddress.replace(/'/g, "\\'")}','${targetName.replace(/'/g, "\\'")}','${targetAddress.replace(/'/g, "\\'")}');this.closest('.modal').remove();"
+								style="padding:0.6rem 1.5rem;background:#dc3545;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+							Jetzt zusammenführen
+						</button>
+					</div>
+				</div>
+			`;
+			document.body.appendChild(modal);
+		};
+
+		window.executeMergeAdmin = async function(sourceName, sourceAddress, targetName, targetAddress) {
+			try {
+				const targetCompany = allCompanies.find(c => c.name === targetName);
+				const targetState = targetCompany?.state || '';
+				
+				const { data: sourceReviews, error: rFetchErr } = await supabase
+					.from('reviews')
+					.select('id')
+					.eq('company_name', sourceName);
+				if (rFetchErr) throw rFetchErr;
+				
+				if (sourceReviews && sourceReviews.length > 0) {
+					const { error: rErr } = await supabase
+						.from('reviews')
+						.update({ 
+							company_name: targetName, 
+							address: targetAddress,
+							state: targetState
+						})
+						.eq('company_name', sourceName);
+					if (rErr) throw rErr;
+				}
+				
+				const { data: sourceJobs, error: jFetchErr } = await supabase
+					.from('jobs')
+					.select('id')
+					.eq('company_name', sourceName);
+				if (jFetchErr) throw jFetchErr;
+				
+				if (sourceJobs && sourceJobs.length > 0) {
+					const { error: jErr } = await supabase
+						.from('jobs')
+						.update({ 
+							company_name: targetName, 
+							address: targetAddress,
+							state: targetState
+						})
+						.eq('company_name', sourceName);
+					if (jErr) throw jErr;
+				}
+				
+				await supabase.from('bphd_awards')
+					.update({ company_name: targetName, company_address: targetAddress })
+					.eq('company_name', sourceName);
+				
+				await supabase.from('companies')
+					.delete()
+					.eq('name', sourceName);
+				
+				await supabase.from('verification_requests')
+					.update({ company_name: targetName, company_address: targetAddress })
+					.eq('company_name', sourceName);
+				
+				const reviewCount = sourceReviews?.length || 0;
+				const jobCount = sourceJobs?.length || 0;
+				
+				showSuccess(`✅ Zusammenführung abgeschlossen! ${reviewCount} Reviews und ${jobCount} Jobs wurden zu "${targetName}" übertragen.`);
+				await loadCompanies();
+				
+			} catch (err) {
+				showError('Fehler beim Zusammenführen: ' + err.message);
+				console.error(err);
+			}
+		};
+
+		window.contactCompany = function(companyName, email) {
+			const subject = encodeURIComponent('Ihre Unternehmensseite auf PharmaFaro.de');
+			window.location.href = `mailto:${email}?subject=${subject}`;
+		};
+
+		let allAwards = [];
+		window.loadAwards = async function() {
+			document.getElementById('awards-list-admin').innerHTML = '<p style="color:#666;">Lade...</p>';
+			
+			const yearSel = document.getElementById('admin-award-year');
+			const filterSel = document.getElementById('admin-award-filter-year');
+			const currentYear = new Date().getFullYear();
+			if (yearSel && yearSel.options.length === 0) {
+				for (let y = currentYear; y >= 2000; y--) {
+					yearSel.add(new Option(y, y, y === currentYear, y === currentYear));
+				}
+			}
+			if (filterSel && filterSel.options.length <= 1) {
+				for (let y = currentYear; y >= 2000; y--) {
+					filterSel.add(new Option(y, y));
+				}
+			}
+			
+			try {
+				const { data, error } = await supabase
+					.from('bphd_awards')
+					.select('*')
+					.order('year', { ascending: false })
+					.order('company_name', { ascending: true });
+				if (error) throw error;
+				
+				allAwards = data || [];
+				renderAwardsList();
+				
+			} catch(err) {
+				document.getElementById('awards-list-admin').innerHTML = 
+					`<p style="color:#dc3545;">Fehler: ${err.message}</p>`;
+			}
+		}
+
+		function renderAwardsList() {
+			const container = document.getElementById('awards-list-admin');
+			const yearFilter = document.getElementById('admin-award-filter-year')?.value;
+			const nameFilter = document.getElementById('admin-award-filter-name')?.value?.toLowerCase() || '';
+			
+			let filtered = allAwards;
+			if (yearFilter) filtered = filtered.filter(a => String(a.year) === yearFilter);
+			if (nameFilter) filtered = filtered.filter(a => a.company_name.toLowerCase().includes(nameFilter));
+			
+			if (filtered.length === 0) {
+				container.innerHTML = '<p style="color:#666;font-style:italic;">Keine Auszeichnungen gefunden.</p>';
+				return;
+			}
+			
+			const byYear = {};
+			filtered.forEach(a => {
+				if (!byYear[a.year]) byYear[a.year] = [];
+				byYear[a.year].push(a);
+			});
+			
+			container.innerHTML = Object.keys(byYear)
+				.sort((a, b) => b - a)
+				.map(year => `
+					<div style="margin-bottom:1.5rem;">
+						<h4 style="color:#667eea;border-bottom:2px solid #e9ecef;padding-bottom:0.5rem;margin-bottom:1rem;">
+							🏆 ${year} — ${byYear[year].length} Auszeichnung${byYear[year].length !== 1 ? 'en' : ''}
+						</h4>
+						${byYear[year].map(award => `
+							<div style="background:#f8f9fa;border-radius:8px;padding:1rem;margin-bottom:0.75rem;
+										display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+								<div style="flex:1;">
+									<strong>${award.company_name}</strong><br>
+									${award.company_address ? `<small style="color:#888;">📍 ${award.company_address}</small><br>` : ''}
+									<span style="color:#555;font-size:0.9rem;">${award.reason}</span><br>
+									<small style="color:#aaa;">Eingetragen: ${formatDate(award.created_at)}</small>
+								</div>
+								<div style="display:flex;gap:0.4rem;flex-shrink:0;">
+									<button onclick="window.editAward('${award.id}')"
+											style="padding:0.3rem 0.7rem;background:#ffc107;color:#333;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">
+										Bearbeiten
+									</button>
+									<button onclick="window.deleteAward('${award.id}', '${award.company_name.replace(/'/g,"\\'")}', ${award.year})"
+											style="padding:0.3rem 0.7rem;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">
+										Löschen
+									</button>
+								</div>
+							</div>
+						`).join('')}
+					</div>
+				`).join('');
+		}
+
+		window.addAward = async function() {
+			const year = parseInt(document.getElementById('admin-award-year').value);
+			const company = document.getElementById('admin-award-company').value.trim();
+			const address = document.getElementById('admin-award-address').value.trim();
+			const reason = document.getElementById('admin-award-reason').value.trim();
+			
+			if (!company || !reason) {
+				alert('Bitte Unternehmensname und Begründung ausfüllen.');
+				return;
+			}
+			
+			try {
+				const { error } = await supabase.from('bphd_awards')
+					.insert([{ year, company_name: company, company_address: address || null, reason }]);
+				if (error) throw error;
+				
+				document.getElementById('admin-award-company').value = '';
+				document.getElementById('admin-award-address').value = '';
+				document.getElementById('admin-award-reason').value = '';
+				
+				const fb = document.getElementById('award-add-feedback');
+				fb.textContent = `✅ Auszeichnung für "${company}" (${year}) gespeichert!`;
+				fb.style.display = 'block';
+				setTimeout(() => fb.style.display = 'none', 4000);
+				
+				await loadAwards();
+				
+			} catch(err) {
+				alert('Fehler: ' + err.message);
+			}
+		};
+
+		window.editAward = function(awardId) {
+			const award = allAwards.find(a => a.id === awardId);
+			if (!award) return;
+			
+			document.getElementById('admin-award-company').value = award.company_name;
+			document.getElementById('admin-award-address').value = award.company_address || '';
+			document.getElementById('admin-award-reason').value = award.reason;
+			document.getElementById('admin-award-year').value = award.year;
+			
+			window.deleteAward(award.id, award.company_name, award.year, true);
+			
+			document.getElementById('admin-award-company').scrollIntoView({ behavior: 'smooth' });
+			document.getElementById('admin-award-company').focus();
+		};
+
+		window.deleteAward = async function(awardId, companyName, year, silent = false) {
+			if (!silent && !confirm(`Auszeichnung für "${companyName}" (${year}) wirklich löschen?`)) return;
+			
+			try {
+				const { error } = await supabase.from('bphd_awards').delete().eq('id', awardId);
+				if (error) throw error;
+				if (!silent) showSuccess(`Auszeichnung für "${companyName}" gelöscht.`);
+				await loadAwards();
+			} catch(err) {
+				showError('Fehler: ' + err.message);
+			}
+		};
+
+		window.filterAwardCompanySuggestions = async function(query) {
+			const container = document.getElementById('award-company-suggestions');
+			if (!container) return;
+			
+			if (!query || query.trim().length < 1) {
+				container.style.display = 'none';
+				return;
+			}
+			
+			const q = query.toLowerCase().trim();
+			let sources = typeof allCompanies !== 'undefined' && allCompanies.length > 0 ? allCompanies : [];
+			if (sources.length === 0) {
+				try {
+					const { data } = await supabase
+						.from('company_verifications')
+						.select('company_name, company_address:contact_email')
+						.eq('status', 'verified');
+					const { data: reviewData } = await supabase
+						.from('reviews')
+						.select('company_name, address')
+						.eq('status', 'active');
+					const seen = new Set();
+					sources = [];
+					(reviewData || []).forEach(r => {
+						if (!seen.has(r.company_name)) {
+							seen.add(r.company_name);
+							sources.push({ name: r.company_name, address: r.address || '' });
+						}
+					});
+				} catch(e) { sources = []; }
+			}
+			const matches = sources
+				.filter(c => c.name && c.name.toLowerCase().includes(q))
+				.slice(0, 8);			
+			if (matches.length === 0) {
+				container.style.display = 'none';
+				return;
+			}
+			
+			container.innerHTML = matches.map(c => `
+				<div style="padding:0.6rem 1rem;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:0.9rem;"
+					 onmouseenter="this.style.background='#f8f9fa'"
+					 onmouseleave="this.style.background='white'"
+					 onclick="
+						document.getElementById('admin-award-company').value = '${c.name.replace(/'/g, "\\'")}';
+						document.getElementById('admin-award-address').value = '${c.address.replace(/'/g, "\\'")}';
+						document.getElementById('award-company-suggestions').style.display = 'none';
+					 ">
+					<strong>${esc(c.name)}</strong>
+					<span style="color:#888;margin-left:0.5rem;font-size:0.85rem;">${c.address || ''}</span>
+				</div>
+			`).join('');
+			
+			container.style.display = 'block';
+		};
+
+		window.saveGuideContent = async function() {
+			const content = document.getElementById('guide-content').value;
+			if (!content.trim()) { alert('Kein Inhalt zum Speichern.'); return; }
+			
+			const { error } = await supabase.from('site_settings')
+				.upsert({ key: 'pta_guide_content', value: content }, { onConflict: 'key' });
+			if (error) { alert('Fehler: ' + error.message); return; }
+
+			const today = new Date();
+			const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+			const dateStr = `${today.getDate()}. ${months[today.getMonth()]} ${today.getFullYear()}`;
+			await supabase.from('site_settings')
+				.upsert({ key: 'guide_updated_at', value: dateStr }, { onConflict: 'key' });
+			
+			const pdfFile = document.getElementById('guide-pdf')?.files[0];
+			if (pdfFile) {
+				const pdfStatus = document.getElementById('guide-pdf-status');
+				if (pdfStatus) pdfStatus.textContent = 'PDF wird hochgeladen...';
+				const { error: uploadError } = await supabase.storage
+					.from('site-assets')
+					.upload('guide.pdf', pdfFile, { upsert: true });
+				if (uploadError) {
+					if (pdfStatus) pdfStatus.textContent = 'PDF-Upload fehlgeschlagen: ' + uploadError.message;
+				} else {
+					await supabase.from('site_settings')
+						.upsert({ key: 'guide_pdf_name', value: pdfFile.name }, { onConflict: 'key' });
+					if (pdfStatus) pdfStatus.textContent = `✅ PDF hochgeladen: ${pdfFile.name}`;
+				}
+			}
+			
+			const feedbackDiv = document.getElementById('guide-save-feedback');
+			if (feedbackDiv) {
+				feedbackDiv.textContent = '✅ Leitfaden gespeichert! Die Website zeigt jetzt den neuen Inhalt an.';
+				feedbackDiv.style.display = 'block';
+				setTimeout(() => { feedbackDiv.style.display = 'none'; }, 5000);
+			}
+		};
+
+		window.saveTipsContent = async function() {
+			const content = document.getElementById('tips-content').value;
+			if (!content.trim()) { alert('Kein Inhalt zum Speichern.'); return; }
+			
+			const { error } = await supabase.from('site_settings')
+				.upsert({ key: 'pta_tips_content', value: content }, { onConflict: 'key' });
+			if (error) { alert('Fehler: ' + error.message); return; }
+			
+			const feedbackDiv = document.getElementById('tips-save-feedback');
+			if (feedbackDiv) {
+				feedbackDiv.textContent = '✅ Tipps gespeichert! Die Website zeigt jetzt den neuen Inhalt an.';
+				feedbackDiv.style.display = 'block';
+				setTimeout(() => { feedbackDiv.style.display = 'none'; }, 5000);
+			}
+		};
+
+		window.saveGuidelinesContent = async function(type) {
+			const key = type === 'review' ? 'pta_review_guidelines' : 'pta_job_guidelines';
+			const dateKey = key + '_updated_at';
+			const content = document.getElementById(type + '-guidelines-content').value;
+			if (!content.trim()) { alert('Kein Inhalt zum Speichern.'); return; }
+			
+			const { error } = await supabase.from('site_settings')
+				.upsert({ key, value: content }, { onConflict: 'key' });
+			if (error) { alert('Fehler: ' + error.message); return; }
+			
+			const today = new Date();
+			const months = ['Januar','Februar','März','April','Mai','Juni',
+							'Juli','August','September','Oktober','November','Dezember'];
+			const dateStr = `${today.getDate()}. ${months[today.getMonth()]} ${today.getFullYear()}`;
+			await supabase.from('site_settings')
+				.upsert({ key: dateKey, value: dateStr }, { onConflict: 'key' });
+			
+			const fb = document.getElementById(type + '-guidelines-feedback');
+			if (fb) {
+				fb.textContent = `✅ Richtlinien gespeichert! Stand: ${dateStr}`;
+				fb.style.display = 'block';
+				setTimeout(() => fb.style.display = 'none', 5000);
+			}
+		};
+
+		window.previewContent = function(type) {
+			const content = document.getElementById(type === 'guide' ? 'guide-content' : 'tips-content').value;
+			const title = type === 'guide' ? 'Praktikumsleitfaden Vorschau' : 'Tipps Vorschau';
+			const html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>${title}</title>
+				<style>body{font-family:-apple-system,sans-serif;max-width:900px;margin:2rem auto;padding:2rem;line-height:1.6;}h3{color:#667eea;margin-top:1.5rem;}p{margin-bottom:1rem;}</style>
+				</head><body><h2>${title}</h2><hr>${content}</body></html>`;
+			const blob = new Blob([html], { type: 'text/html' });
+			const url = URL.createObjectURL(blob);
+			const w = window.open(url, '_blank');
+			setTimeout(() => URL.revokeObjectURL(url), 10000);
+		};
+
+		window.savePrivacyPolicy = async function() {
+			const content = document.getElementById('privacy-policy-content').value;
+			const now = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+			const { error } = await supabase.from('site_settings')
+				.upsert([
+					{ key: 'privacy_policy', value: content },
+					{ key: 'privacy_policy_updated_at', value: now }
+				], { onConflict: 'key' });
+			const fb = document.getElementById('privacy-policy-feedback');
+			if (error) {
+				fb.style.background = '#f8d7da'; fb.style.color = '#721c24';
+				fb.textContent = 'Fehler: ' + error.message;
+			} else {
+				fb.textContent = '✅ Datenschutzerklärung gespeichert! Stand: ' + now;
+			}
+			fb.style.display = 'block';
+			setTimeout(() => fb.style.display = 'none', 4000);
+		};
+
+		window.saveAgbContent = async function() {
+			const content = document.getElementById('agb-content').value;
+			const now = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+			const { error } = await supabase.from('site_settings')
+				.upsert([
+					{ key: 'agb_content', value: content },
+					{ key: 'agb_updated_at', value: now }
+				], { onConflict: 'key' });
+			const fb = document.getElementById('agb-feedback');
+			if (error) {
+				fb.style.background = '#f8d7da'; fb.style.color = '#721c24';
+				fb.textContent = 'Fehler: ' + error.message;
+			} else {
+				fb.textContent = '✅ AGB gespeichert! Stand: ' + now;
+			}
+			fb.style.display = 'block';
+			setTimeout(() => fb.style.display = 'none', 4000);
+		};
+		
+		window.viewReview = async function(reviewId) {
+			const review = allReviews.find(r => r.id === reviewId) || allReviewsForCompanies.find(r => r.id === reviewId);
+			if (!review) return;
+			
+			const modal = document.createElement('div');
+			modal.className = 'modal';
+			modal.style.display = 'block';
+			
+			const ratings = review.ratings || {};
+			const ratingValues = Object.values(ratings);
+			const avgRating = ratingValues.length > 0 
+				? (ratingValues.reduce((a, b) => a + b, 0) / ratingValues.length).toFixed(1)
+				: 'N/A';
+			
+			modal.innerHTML = `
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2>Bewertung #${review.id.substring(0, 8)}</h2>
+						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+					</div>
+					<div class="modal-body">
+						<div class="detail-section">
+							<h3>📍 Unternehmensinformationen</h3>
+							<div class="detail-grid">
+								<span class="detail-label">Unternehmen:</span>
+								<span class="detail-value"><strong>${review.company_name}</strong></span>
+								
+								<span class="detail-label">Adresse:</span>
+								<span class="detail-value">${review.address}</span>
+								
+								<span class="detail-label">Bundesland:</span>
+								<span class="detail-value">${review.state}</span>
+								
+								${review.country ? `
+								<span class="detail-label">Land:</span>
+								<span class="detail-value">${review.country}</span>
+								` : ''}
+								
+								<span class="detail-label">Kategorie:</span>
+								<span class="detail-value">${getCategoryLabel(review.category)}</span>
+								
+								${review.area ? `
+								<span class="detail-label">Bereich:</span>
+								<span class="detail-value">${review.area}</span>
+								` : ''}
+								
+								${review.internship_year ? `
+								<span class="detail-label">Praktikumsjahr:</span>
+								<span class="detail-value">${review.internship_year}</span>
+								` : ''}
+							</div>
+						</div>
+						
+						<div class="detail-section">
+							<h3>💼 Praktikumsdetails</h3>
+							<div class="detail-grid">
+								<span class="detail-label">Gehalt:</span>
+								<span class="detail-value"><strong>${review.salary}€</strong> brutto</span>
+								
+								<span class="detail-label">Samstagsarbeit:</span>
+								<span class="detail-value">${review.saturday_work || 0}x pro Monat</span>
+								
+								<span class="detail-label">Benefits:</span>
+								<span class="detail-value">${review.benefits || 'Keine angegeben'}</span>
+								
+								${review.specializations ? `
+								<span class="detail-label">Spezialisierungen:</span>
+								<span class="detail-value">${review.specializations}</span>
+								` : ''}
+								
+								${review.customer_type ? `
+								<span class="detail-label">Kundschaftstyp:</span>
+								<span class="detail-value">${review.customer_type}</span>
+								` : ''}
+								
+								${review.working_hours_data && review.working_hours_data.length > 0 ? `
+								<span class="detail-label">Arbeitszeiten:</span>
+								<span class="detail-value">${review.working_hours_data.map(w => w.type === 'flexible' ? 'Gleitzeit' : w.start + ' – ' + w.end + (w.isSaturday ? ' (Sa)' : '')).join(', ')}</span>
+								` : ''}
+							</div>
+						</div>
+						
+						<div class="detail-section">
+							<h3>⭐ Bewertungen (Durchschnitt: ${avgRating})</h3>
+							<div class="rating-display">
+								${Object.entries(ratings).map(([key, value]) => `
+									<div class="rating-item">
+										<div class="label">${getRatingLabel(key)}</div>
+										<div class="stars">${'★'.repeat(value)}${'☆'.repeat(5-value)}</div>
+									</div>
+								`).join('')}
+							</div>
+						</div>
+						
+						<div class="detail-section">
+							<h3>📝 Bewertungstext</h3>
+							
+							${review.tasks ? `
+								<div style="margin-bottom: 1.5rem;">
+									<strong style="color: #667eea;">Absolvierte Aufgaben:</strong>
+									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.tasks)}</p>
+								</div>
+							` : ''}
+							
+							${review.feedback ? `
+								<div style="margin-bottom: 1.5rem;">
+									<strong style="color: #667eea;">Lob/Kritik:</strong>
+									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.feedback)}</p>
+								</div>
+							` : ''}
+							
+							${review.highlights ? `
+								<div style="margin-bottom: 1.5rem;">
+									<strong style="color: #667eea;">Besonders hervorzuheben:</strong>
+									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.highlights)}</p>
+								</div>
+							` : ''}
+						</div>
+						
+						${review.pdf_url ? `
+							<div class="detail-section">
+								<h3>📄 Praktikumsbescheinigung</h3>
+								<div class="pdf-preview">
+									<p><strong>Datei:</strong> ${review.pdf_filename || 'Bescheinigung.pdf'}</p>
+									<button class="btn" onclick="window.viewPDF('${review.pdf_url}')">
+										📥 PDF anzeigen
+									</button>
+								</div>
+							</div>
+						` : ''}
+						
+						<div class="detail-section">
+							<h3>ℹ️ System-Informationen</h3>
+							<div class="detail-grid">
+								<span class="detail-label">Bewerter-E-Mail:</span>
+								<span class="detail-value">${review.user_email}</span>
+								
+								<span class="detail-label">Status:</span>
+								<span class="detail-value">
+									<span class="status-badge status-${review.status}">
+										${getStatusText(review.status)}
+									</span>
+								</span>
+								
+								<span class="detail-label">Eingereicht:</span>
+								<span class="detail-value">${formatDate(review.created_at)}</span>
+								
+								${review.activated_at ? `
+									<span class="detail-label">Aktiviert:</span>
+									<span class="detail-value">${formatDate(review.activated_at)}</span>
+								` : ''}
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+			
+			document.body.appendChild(modal);
+			
+			modal.addEventListener('click', (e) => {
+				if (e.target === modal) {
+					modal.remove();
+				}
+			});
+		};
+
+		function getRatingLabel(key) {
+			const labels = {
+				'verguetung': 'Vergütung',
+				'arbeitszeiten': 'Arbeitszeiten',
+				'ausbildung': 'Ausbildung',
+				'vorgesetzte': 'Vorgesetzte',
+				'ausstattung': 'Ausstattung',
+				'kommunikation': 'Kommunikation'
+			};
+			return labels[key] || key;
+		}
+		
+		window.viewPDF = async function(pdfPath) {
+			try {
+				
+				const { data, error } = await supabase.storage
+					.from('certificates')
+					.createSignedUrl(pdfPath, 3600);
+				
+				if (error) throw error;
+				
+				if (data.signedUrl) {
+					window.open(data.signedUrl, '_blank');
+				} else {
+					alert('PDF-URL konnte nicht erstellt werden.');
+				}
+				
+			} catch (error) {
+				console.error('❌ PDF-Fehler:', error);
+				alert('Fehler beim Laden der PDF: ' + error.message);
+			}
+		};
+		
+		window.viewJob = async function(jobId) {
+			const job = allJobs.find(j => j.id === jobId) || allJobsForCompanies.find(j => j.id === jobId);
+			if (!job) return;
+			
+			const modal = document.createElement('div');
+			modal.className = 'modal';
+			modal.style.display = 'block';
+			
+			modal.innerHTML = `
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2>Stellenangebot #${job.id.substring(0, 8)}</h2>
+						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+					</div>
+					<div class="modal-body">
+						<div class="detail-section">
+							<h3>📍 Unternehmensinformationen</h3>
+							<div class="detail-grid">
+								<span class="detail-label">Unternehmen:</span>
+								<span class="detail-value"><strong>${job.company_name}</strong></span>
+								
+								<span class="detail-label">Adresse:</span>
+								<span class="detail-value">${job.address}</span>
+								
+								<span class="detail-label">Bundesland:</span>
+								<span class="detail-value">${job.state}</span>
+								
+								<span class="detail-label">Kategorie:</span>
+								<span class="detail-value">${job.category}</span>
+							</div>
+						</div>
+						
+						<div class="detail-section">
+							<h3>💼 Stellendetails</h3>
+							<div class="detail-grid">
+								<span class="detail-label">Gehalt:</span>
+								<span class="detail-value"><strong>${job.salary}€</strong> brutto</span>
+								
+								<span class="detail-label">Kontaktperson:</span>
+								<span class="detail-value">${job.contact_person || 'N/A'}</span>
+								
+								<span class="detail-label">Kontakt-E-Mail:</span>
+								<span class="detail-value">${job.contact_email}</span>
+								
+								${job.saturday_work !== undefined ? `
+								<span class="detail-label">Samstagsarbeit:</span>
+								<span class="detail-value">${job.saturday_work}x pro Monat</span>
+								` : ''}
+								
+								${job.earliest_start ? `
+								<span class="detail-label">Frühester Beginn:</span>
+								<span class="detail-value">${job.earliest_start}</span>
+								` : ''}
+								
+								${job.benefits ? `
+								<span class="detail-label">Benefits:</span>
+								<span class="detail-value">${job.benefits}</span>
+								` : ''}
+								
+								${job.specializations ? `
+								<span class="detail-label">Spezialisierungen:</span>
+								<span class="detail-value">${job.specializations}</span>
+								` : ''}
+								
+								${job.customer_type ? `
+								<span class="detail-label">Kundschaftstyp:</span>
+								<span class="detail-value">${job.customer_type}</span>
+								` : ''}
+								
+								${job.area ? `
+								<span class="detail-label">Bereich:</span>
+								<span class="detail-value">${job.area}</span>
+								` : ''}
+								
+								${job.working_hours_data && job.working_hours_data.length > 0 ? `
+								<span class="detail-label">Arbeitszeiten:</span>
+								<span class="detail-value">${job.working_hours_data.map(w => w.type === 'flexible' ? 'Gleitzeit' : w.start + ' – ' + w.end + (w.isSaturday ? ' (Sa)' : '')).join(', ')}</span>
+								` : ''}
+							</div>
+						</div>
+						
+						<div class="detail-section">
+							<h3>📝 Stellenbeschreibung</h3>
+							<p style="line-height: 1.6; white-space: pre-wrap;">${esc(job.description)}</p>
+						</div>
+						
+						${job.application_notes ? `
+						<div class="detail-section">
+							<h3>📬 Bewerbungshinweise</h3>
+							<p style="line-height: 1.6; white-space: pre-wrap;">${esc(job.application_notes)}</p>
+						</div>
+						` : ''}
+						
+						<div class="detail-section">
+							<h3>ℹ️ System-Informationen</h3>
+							<div class="detail-grid">
+								<span class="detail-label">Status:</span>
+								<span class="detail-value">
+									<span class="status-badge status-${job.status}">
+										${getStatusText(job.status)}
+									</span>
+								</span>
+								
+								<span class="detail-label">Eingereicht:</span>
+								<span class="detail-value">${formatDate(job.created_at)}</span>
+								
+								${job.activated_at ? `
+									<span class="detail-label">Aktiviert:</span>
+									<span class="detail-value">${formatDate(job.activated_at)}</span>
+								` : ''}
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+			
+			document.body.appendChild(modal);
+			
+			modal.addEventListener('click', (e) => {
+				if (e.target === modal) {
+					modal.remove();
+				}
+			});
+		};
+		
+		window.toggleStatus = async function(reviewId, newStatus) {
+			const action = newStatus === 'active' ? 'aktivieren' : 'deaktivieren';
+			
+			if (!confirm(`Bewertung wirklich ${action}?`)) return;
+			
+			try {
+				if (newStatus === 'active') {
+					const result = await adminApi.activateReview(reviewId);
+					if (!result.success) throw new Error(result.error);
+				} else {
+					const result = await adminApi.deactivateReview(reviewId);
+					if (!result.success) throw new Error(result.error);
+				}
+				
+				showSuccess(`Bewertung erfolgreich ${newStatus === 'active' ? 'aktiviert' : 'deaktiviert'}!`);
+				
+				await loadReviews();
+				
+			} catch (error) {
+				console.error('Error:', error);
+				showError('Fehler beim Ändern des Status.');
+			}
+		};
+		
+		window.toggleJobStatus = async function(jobId, newStatus) {
+			const action = newStatus === 'active' ? 'aktivieren' : 'deaktivieren';
+			
+			if (!confirm(`Stellenangebot wirklich ${action}?${newStatus === 'active' ? ' Eine Bestätigungs-E-Mail wird an die Ansprechperson gesendet.' : ''}`)) return;
+			
+			try {
+				if (newStatus === 'active') {
+					const result = await adminApi.activateJob(jobId);
+					
+					if (!result.success) {
+						throw new Error(result.error || 'Fehler beim Aktivieren');
+					}
+					
+					showSuccess('Stellenangebot erfolgreich aktiviert und E-Mail gesendet!');
+				} else {
+					const result = await adminApi.deactivateJob(jobId);
+					
+					if (!result.success) {
+						throw new Error(result.error || 'Fehler beim Deaktivieren');
+					}
+					
+					showSuccess('Stellenangebot erfolgreich deaktiviert!');
+				}
+				
+				await loadJobs();
+				
+			} catch (error) {
+				console.error('Error:', error);
+				showError('Fehler beim Ändern des Status: ' + error.message);
+			}
+		};
+		
+		window.logout = async function() {
+			await anonSupabase.auth.signOut();
+			location.reload();
+		};
+		
+		function showError(message) {
+			const errorDiv = document.getElementById('error-message');
+			if (errorDiv) {
+				errorDiv.textContent = message;
+				errorDiv.style.display = 'block';
+			}
+		}
+		
+		function showSuccess(message) {
+			const successDiv = document.getElementById('success-message');
+			if (successDiv) {
+				successDiv.textContent = message;
+				successDiv.style.display = 'block';
+				setTimeout(() => {
+					successDiv.style.display = 'none';
+				}, 3000);
+			}
+		}
+		
+		function hideMessages() {
+			const errorDiv = document.getElementById('error-message');
+			const successDiv = document.getElementById('success-message');
+			if (errorDiv) errorDiv.style.display = 'none';
+			if (successDiv) successDiv.style.display = 'none';
+		}
+
+		window.contactVerifiedCompany = function(companyName, email, person) {
+			if (!email) {
+				alert('Keine E-Mail-Adresse hinterlegt.');
+				return;
+			}
+			
+			const subject = encodeURIComponent(`Anfrage bezüglich ${companyName}`);
+			const body = encodeURIComponent(`Guten Tag ${person || ''},\n\n`);
+			window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+		}
+
+		function toggleAdminModeSwitcher(e) {
+			e.stopPropagation();
+			const dd = document.getElementById('admin-mode-dropdown');
+			dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		}
+		function selectAdminMode(mode) {
+			document.getElementById('admin-mode-dropdown').style.display = 'none';
+			if (mode === 'pta') {
+				window.location.href = './pf-akw-Na242Cl.html';
+			}
+		}
+		document.addEventListener('click', function(e) {
+			const dd = document.getElementById('admin-mode-dropdown');
+			const sw = document.getElementById('admin-mode-switcher');
+			if (dd && sw && !sw.contains(e.target)) dd.style.display = 'none';
+		});
+	</script>
+	<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const tabs = document.querySelector('.tabs');
+		if (tabs) {
+			tabs.addEventListener('wheel', function(e) {
+				e.preventDefault();
+				tabs.scrollLeft += e.deltaY * 0.8;
+			}, { passive: false });
+		}
+
+		const adminBtn = document.getElementById('admin-mode-btn');
+		const adminDd = document.getElementById('admin-mode-dropdown');
+		const adminSw = document.getElementById('admin-mode-switcher');
+		const adminApo = document.getElementById('admin-mode-apo');
+		const adminPta = document.getElementById('admin-mode-pta');
+
+		if (adminBtn && adminDd) {
+			adminBtn.addEventListener('click', function(e) {
+				e.stopPropagation();
+				adminDd.style.display = adminDd.style.display === 'none' ? 'block' : 'none';
+			});
+			if (adminApo) {
+				adminApo.addEventListener('click', function() {
+					window.location.href = './pf-akw-Na242Cl.html';
+				});
+			}
+			if (adminPta) {
+				adminPta.addEventListener('click', function() {
+					adminDd.style.display = 'none';
+				});
+			}
+			document.addEventListener('click', function(e) {
+				if (!adminSw.contains(e.target)) {
+					adminDd.style.display = 'none';
+				}
+			});
+		}
+	});
+	</script>
