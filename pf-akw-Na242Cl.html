@@ -163,9 +163,15 @@
         /* Stats bar between sticky and content */
         .pf-stats-bar { background:var(--pf-card); border-bottom:1px solid var(--pf-border); padding:1rem 2rem; display:none; }
         .pf-stats-bar .stats-grid { margin-bottom:0; }
+
+		.admin-mode-item { padding:0.85rem 1.25rem; font-size:0.88rem; font-weight:500; color:#333; cursor:pointer; border-bottom:1px solid #eee; transition:background 0.15s, color 0.15s; }
+        .admin-mode-item:last-child { border-bottom:none; }
+        .admin-mode-item:hover { background:#fdecea; color:#b83228; }
+        .admin-mode-item.active { color:#b83228; font-weight:700; cursor:default; }
+        .admin-mode-item.active:hover { background:white; color:#b83228; }
         
         .dashboard-header { background:linear-gradient(160deg,var(--pf-dark) 0%,#3d1a17 100%); color:white; padding:1.1rem 2rem; display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid var(--pf-red); }
-        
+			
         .dashboard-header .pf-logo { font-size:1.3rem; color:white; }
         .dash-subtitle { font-size:0.82rem; font-weight:300; color:rgba(255,255,255,0.5); margin-top:2px; }
         
@@ -468,9 +474,20 @@
 		<!-- ① STICKY BAR: header + tabs — always same height -->
 		<div class="pf-sticky">
 			<div class="dashboard-header">
-				<div>
-					<div class="pf-logo">PharmaFaro</div>
-					<div class="dash-subtitle">Admin-Dashboard</div>
+				<div style="display:flex;align-items:center;gap:0.75rem;">
+					<div>
+						<div class="pf-logo">PharmaFaro</div>
+						<div class="dash-subtitle">Admin-Dashboard</div>
+					</div>
+					<div id="admin-mode-switcher" style="position:relative;display:inline-flex;align-items:center;">
+						<button id="admin-mode-btn" style="background:none;border:none;padding:0.3rem 0.4rem;cursor:pointer;color:rgba(255,255,255,0.7);display:flex;align-items:center;" title="Bereich wechseln">
+							<span style="display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;"></span>
+						</button>
+						<div id="admin-mode-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:white;min-width:190px;border:1px solid #ddd;border-radius:10px;z-index:1002;box-shadow:0 8px 30px rgba(0,0,0,0.15);overflow:hidden;">
+							<div id="admin-mode-apo" class="admin-mode-item active">Pharmaziepraktika</div>
+							<div id="admin-mode-pta" class="admin-mode-item">PTA-Praktika</div>
+						</div>
+					</div>
 				</div>
 				<div class="user-info">
 					<span id="user-email"></span>
@@ -624,6 +641,12 @@
 						<option value="yes">Verifiziert</option>
 						<option value="no">Nicht verifiziert</option>
 					</select>
+					<select id="company-mode-filter" onchange="filterCompaniesTable()"
+							style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px;">
+						<option value="all">Bereich: Alle</option>
+						<option value="pta">Nur PTA</option>
+						<option value="apo">Nur Apo</option>
+					</select>
 					<select id="company-sort" onchange="filterCompaniesTable()"
 							style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px;">
 						<option value="name">Sortierung: Name A–Z</option>
@@ -646,14 +669,14 @@
 								<th style="padding: 0.75rem; text-align: left;">Erstellt</th>
 								<th style="padding: 0.75rem; text-align: center;">Status</th>
 								<th style="padding: 0.75rem; text-align: center;">Verifiziert</th>
-								<th style="padding: 0.75rem; text-align: center;">Reviews</th>
+								<th style="padding: 0.75rem; text-align: center;">Bewertungen</th>
 								<th style="padding: 0.75rem; text-align: center;">Jobs</th>
 								<th style="padding: 0.75rem; text-align: center;">Aktionen</th>
 							</tr>
 						</thead>
 						<tbody id="companies-tbody">
 							<tr>
-								<td colspan="9" style="text-align: center; padding: 2rem; color: #666;">
+								<td colspan="11" style="text-align: center; padding: 2rem; color: #666;">
 									<div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
 										<div class="spinner" style="width: 30px; height: 30px; border: 3px solid #e9ecef; border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
 										<p>Lade Unternehmen...</p>
@@ -1225,7 +1248,7 @@
 		window.loadReviews = async function() {
 			try {
 				const result = await callAdminFunction('loadReviews');
-				allReviews = result.data;
+				allReviews = (result.data || []).filter(r => r.practice_type === 'Apo' || !r.practice_type);
 				updateStats();
 				renderReviews();
 			} catch (error) {
@@ -1237,7 +1260,7 @@
 		window.loadJobs = async function() {
 			try {
 				const result = await callAdminFunction('loadJobs');
-				allJobs = result.data;
+				allJobs = (result.data || []).filter(j => j.practice_type === 'Apo' || !j.practice_type);
 				updateJobStats();
 				renderJobs();
 			} catch (error) {
@@ -1606,8 +1629,10 @@
 							name: r.company_name,
 							address: r.address || '',
 							state: r.state || '',
-							reviewCount: 0,
-							activeJobCount: 0,
+							reviewCountApo: 0,
+							reviewCountPta: 0,
+							activeJobCountApo: 0,
+							activeJobCountPta: 0,
 							expiredJobCount: 0,
 							verified: false,
 							status: 'active',
@@ -1615,7 +1640,10 @@
 							createdAt: null
 						};
 					}
-					if (r.status === 'active') companyMap[key].reviewCount++;
+					if (r.status === 'active') {
+						if (r.practice_type === 'PTA') companyMap[key].reviewCountPta++;
+						else companyMap[key].reviewCountApo++;
+					}
 				});
 
 				const thirtyDaysAgo = new Date();
@@ -1627,8 +1655,10 @@
 							name: j.company_name,
 							address: j.address || '',
 							state: j.state || '',
-							reviewCount: 0,
-							activeJobCount: 0,
+							reviewCountApo: 0,
+							reviewCountPta: 0,
+							activeJobCountApo: 0,
+							activeJobCountPta: 0,
 							expiredJobCount: 0,
 							verified: false,
 							status: 'active',
@@ -1638,8 +1668,12 @@
 					}
 					if (j.status === 'active') {
 						const jobDate = new Date(j.created_at);
-						if (jobDate >= thirtyDaysAgo) companyMap[key].activeJobCount++;
-						else companyMap[key].expiredJobCount++;
+						if (jobDate >= thirtyDaysAgo) {
+							if (j.practice_type === 'PTA') companyMap[key].activeJobCountPta++;
+							else companyMap[key].activeJobCountApo++;
+						} else {
+							companyMap[key].expiredJobCount++;
+						}
 					}
 				});
 
@@ -1678,8 +1712,10 @@
 							name: c.name,
 							address: c.address || '',
 							state: c.state || '',
-							reviewCount: 0,
-							activeJobCount: 0,
+							reviewCountApo: 0,
+							reviewCountPta: 0,
+							activeJobCountApo: 0,
+							activeJobCountPta: 0,
 							expiredJobCount: 0,
 							verified: isVerified,
 							status: c.status || 'active',
@@ -1705,7 +1741,7 @@
 				allCompanies = Object.values(companyMap);
 
 				updateCompaniesStats();
-				renderCompaniesTable(allCompanies);
+				renderCompaniesTable(allCompanies, 'all');
 
 			} catch (err) {
 				console.error('Fehler:', err);
@@ -1724,7 +1760,8 @@
 			return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 		}
 
-		function renderCompaniesTable(companies) {
+		function renderCompaniesTable(companies, modeF) {
+			modeF = modeF || 'all';
 			const tbody = document.getElementById('companies-tbody');
 
 			if (companies.length === 0) {
@@ -1751,16 +1788,21 @@
 							? '<span style="color:#28a745;font-weight:600;">✓</span>' 
 							: '<span style="color:#aaa;">–</span>'}
 					</td>
-					<td style="padding: 0.75rem; text-align:center;">
+					<td style="padding: 0.75rem; text-align:center; font-size:0.85rem;">
 						<span style="cursor:pointer;color:#667eea;font-weight:600;"
 							  onclick="window.showCompanyReviews('${c.name.replace(/'/g, "\\'")}', '${c.address.replace(/'/g, "\\'")}')">
-							${c.reviewCount}
+							${modeF === 'pta' ? (c.reviewCountPta > 0 ? c.reviewCountPta : '–')
+							: modeF === 'apo' ? (c.reviewCountApo > 0 ? c.reviewCountApo : '–')
+							: ((c.reviewCountApo + c.reviewCountPta) > 0 ? (c.reviewCountApo + c.reviewCountPta) : '–')}
 						</span>
 					</td>
-					<td style="padding: 0.75rem; text-align:center; font-size:0.9rem;">
+					<td style="padding: 0.75rem; text-align:center; font-size:0.85rem;">
 						<span style="cursor:pointer;color:#667eea;font-weight:600;"
 							  onclick="window.showCompanyJobs('${c.name.replace(/'/g, "\\'")}', '${c.address.replace(/'/g, "\\'")}')">
-							${c.activeJobCount} aktiv${c.expiredJobCount > 0 ? ` / ${c.expiredJobCount} abgel.` : ''}
+							${modeF === 'pta' ? (c.activeJobCountPta > 0 ? c.activeJobCountPta : '–')
+							: modeF === 'apo' ? (c.activeJobCountApo > 0 ? c.activeJobCountApo : '–')
+							: ((c.activeJobCountApo + c.activeJobCountPta) > 0 ? (c.activeJobCountApo + c.activeJobCountPta) : '–')}
+							${c.expiredJobCount > 0 ? `<span style="color:#aaa;"> / ${c.expiredJobCount} abgel.</span>` : ''}
 						</span>
 					</td>
 					<td style="padding: 0.75rem; text-align:center;">
@@ -1787,6 +1829,7 @@
 			const search = document.getElementById('company-search-filter').value.toLowerCase();
 			const statusF = document.getElementById('company-status-filter').value;
 			const verifiedF = document.getElementById('company-verified-filter').value;
+			const modeF = document.getElementById('company-mode-filter')?.value || 'all';
 
 			const filtered = allCompanies.filter(c => {
 				const matchSearch = !search || 
@@ -1796,13 +1839,18 @@
 				const matchVerified = !verifiedF || 
 					(verifiedF === 'yes' && c.verified) || 
 					(verifiedF === 'no' && !c.verified);
-				return matchSearch && matchStatus && matchVerified;
+				const hasPta = (c.reviewCountPta > 0 || c.activeJobCountPta > 0);
+				const hasApo = (c.reviewCountApo > 0 || c.activeJobCountApo > 0);
+				const matchMode = modeF === 'all' || 
+					(modeF === 'pta' && hasPta) || 
+					(modeF === 'apo' && hasApo);
+				return matchSearch && matchStatus && matchVerified && matchMode;
 			});
 			const sort = document.getElementById('company-sort')?.value || 'name';
 			if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
-			else if (sort === 'reviews') filtered.sort((a, b) => b.reviewCount - a.reviewCount);
-			else if (sort === 'jobs') filtered.sort((a, b) => b.activeJobCount - a.activeJobCount);
-			renderCompaniesTable(filtered);
+			else if (sort === 'reviews') filtered.sort((a, b) => (b.reviewCountPta + b.reviewCountApo) - (a.reviewCountPta + a.reviewCountApo));
+			else if (sort === 'jobs') filtered.sort((a, b) => (b.activeJobCountPta + b.activeJobCountApo) - (a.activeJobCountPta + a.activeJobCountApo));
+			renderCompaniesTable(filtered, modeF);
 		};
 
 
@@ -2864,7 +2912,7 @@
 		};
 		
 		window.viewReview = async function(reviewId) {
-			const review = allReviews.find(r => r.id === reviewId);
+			const review = allReviews.find(r => r.id === reviewId) || allReviewsForCompanies.find(r => r.id === reviewId);
 			if (!review) return;
 			
 			const modal = document.createElement('div');
@@ -3284,6 +3332,23 @@
 			const body = encodeURIComponent(`Guten Tag ${person || ''},\n\n`);
 			window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
 		}
+
+		function toggleAdminModeSwitcher(e) {
+			e.stopPropagation();
+			const dd = document.getElementById('admin-mode-dropdown');
+			dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		}
+		function selectAdminMode(mode) {
+			document.getElementById('admin-mode-dropdown').style.display = 'none';
+			if (mode === 'pta') {
+				window.location.href = './pf-akw-Na242Cl-pta.html'; // deine Admin-PTA-Seite
+			}
+		}
+		document.addEventListener('click', function(e) {
+			const dd = document.getElementById('admin-mode-dropdown');
+			const sw = document.getElementById('admin-mode-switcher');
+			if (dd && sw && !sw.contains(e.target)) dd.style.display = 'none';
+		});
 	</script>
 	<script>
 	document.addEventListener('DOMContentLoaded', function() {
@@ -3293,6 +3358,26 @@
 				e.preventDefault();
 				tabs.scrollLeft += e.deltaY * 0.8;
 			}, { passive: false });
+		}
+
+		const adminBtn = document.getElementById('admin-mode-btn');
+		const adminDd = document.getElementById('admin-mode-dropdown');
+		const adminSw = document.getElementById('admin-mode-switcher');
+		const adminPta = document.getElementById('admin-mode-pta');
+
+		if (adminBtn && adminDd) {
+			adminBtn.addEventListener('click', function(e) {
+				e.stopPropagation();
+				adminDd.style.display = adminDd.style.display === 'none' ? 'block' : 'none';
+			});
+			adminPta.addEventListener('click', function() {
+				window.location.href = './pf-akw-Na242Cl-pta.html';
+			});
+			document.addEventListener('click', function(e) {
+				if (!adminSw.contains(e.target)) {
+					adminDd.style.display = 'none';
+				}
+			});
 		}
 	});
 	</script>
