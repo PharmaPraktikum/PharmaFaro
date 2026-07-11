@@ -26,6 +26,8 @@ export async function createReview(reviewData) {
                 working_hours_data: reviewData.workingHoursData,
 				internship_year: reviewData.internshipYear || null,
                 status: 'pending',
+				practice_type: reviewData.practiceType || 'Apo',
+				has_pta_degree: reviewData.hasPtaDegree || false,
                 delete_token: deleteToken,
             }])
             .select()
@@ -40,12 +42,13 @@ export async function createReview(reviewData) {
     }
 }
 
-export async function getActiveReviews() {
+export async function getActiveReviews(practiceType = 'Apo') {
     try {
 		const { data, error } = await supabase
 			.from('public_reviews')
 			.select('*')
 			.eq('status', 'active')
+			.eq('practice_type', practiceType)
 			.order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -109,6 +112,7 @@ export async function createJob(jobData) {
 			working_hours_data: jobData.workingHoursData,
 			earliest_start: jobData.earliestStart || null,
             deactivate_token: deactivateToken,
+			practice_type: jobData.practiceType || 'Apo',			
 			status: 'pending'
 		};	
 		
@@ -127,12 +131,13 @@ export async function createJob(jobData) {
     }
 }
 
-export async function getActiveJobs() {
+export async function getActiveJobs(practiceType = 'Apo') {
     try {
         const { data, error } = await supabase
             .from('jobs')
             .select('*')
             .eq('status', 'active')
+            .eq('practice_type', practiceType)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
