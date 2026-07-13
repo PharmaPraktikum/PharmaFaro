@@ -1840,7 +1840,7 @@
 					<div class="dropdown-content" id="wissenswert-dropdown">
 						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('company-search'); closeMobileMenu(); return false;">Unternehmen suchen</a>
 						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('awarded-companies'); closeMobileMenu(); return false;" style="display:none;">Ausgezeichnete Unternehmen</a>
-						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsleitfaden</a>
+						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsrichtlinie</a>
 						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-tips'); closeMobileMenu(); return false;">Tipps zur Praktikumssuche</a>
 					</div>
 				</div>
@@ -1936,7 +1936,7 @@
                         </div>
 						<div class="landing-feature-card" onclick="showSection('internship-guide')" style="cursor:pointer;">
                             <div class="landing-feature-icon">📄</div>
-                            <div class="landing-feature-title">Praktikumsleitfaden</div>
+                            <div class="landing-feature-title">Praktikumsrichtlinien</div>
                             <p class="landing-feature-text">Alle wichtigen Informationen zum PTA-Praktikum – von Pflichten bis zu Rechten – kompakt zusammengefasst.</p>
                         </div>
                     </div>
@@ -2016,12 +2016,12 @@
                                 <option value="">Alle Kategorien</option>
                                 <option value="offizin">Offizin</option>
                                 <option value="krankenhaus">Krankenhausapotheke</option>
-                                <option value="industrie">Industrie</option>
-                                <option value="universitaet">Universität</option>
-                                <option value="bundeswehr">Bundeswehr</option>
-                                <option value="pta-schule">PTA-Schule</option>
-                                <option value="behoerde">Behörde</option>
-                                <option value="sonstiges">Sonstiges</option>
+                                <option value="industrie" style="display:none;">Industrie</option>
+                                <option value="universitaet" style="display:none;">Universität</option>
+                                <option value="bundeswehr" style="display:none;">Bundeswehr</option>
+                                <option value="pta-schule" style="display:none;">PTA-Schule</option>
+                                <option value="behoerde" style="display:none;">Behörde</option>
+                                <option value="sonstiges" style="display:none;">Sonstiges</option>
                             </select>
                         </div>
 				<div class="filter-group">
@@ -2128,12 +2128,12 @@
                                         <option value="">Bitte wählen</option>
                                         <option value="offizin">Offizin</option>
                                         <option value="krankenhaus">Krankenhausapotheke</option>
-                                        <option value="industrie">Industrie</option>
-                                        <option value="universitaet">Universität</option>
-                                        <option value="bundeswehr">Bundeswehr</option>
-                                        <option value="pta-schule">PTA-Schule</option>
-                                        <option value="behoerde">Behörde</option>
-                                        <option value="sonstiges">Sonstiges</option>
+                                        <option value="industrie" style="display:none;">Industrie</option>
+                                        <option value="universitaet" style="display:none;">Universität</option>
+                                        <option value="bundeswehr" style="display:none;">Bundeswehr</option>
+                                        <option value="pta-schule" style="display:none;">PTA-Schule</option>
+                                        <option value="behoerde" style="display:none;">Behörde</option>
+                                        <option value="sonstiges" style="display:none;">Sonstiges</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -2146,9 +2146,9 @@
                                 </div>
 								<div class="form-group">
 									<label>Arbeitszeiten *</label>
-									<div style="margin-bottom: 1rem;">
-										<select id="working-time-type" style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
-											<option value="fixed">Feste Arbeitszeiten</option>
+									<div style="display:none;">
+										<select id="working-time-type">
+											<option value="fixed" selected>Feste Arbeitszeiten</option>
 											<option value="flexible">Gleitzeit</option>
 										</select>
 									</div>
@@ -2432,7 +2432,7 @@
 						</div>
 						<div onclick="showSection('internship-guide')" style="background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(45,32,64,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
 							<div style="font-size: 2rem; margin-bottom: 1rem;">📄</div>
-							<div style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; letter-spacing: -0.01em;">Praktikumsleitfaden</div>
+							<div style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; letter-spacing: -0.01em;">Praktikumsrichtlinien</div>
 							<p style="color: var(--mid); font-size: 0.9rem; line-height: 1.6; margin: 0;">Rechte, Pflichten, Vergütung – alle wichtigen Infos zum PTA-Praktikum kompakt erklärt.</p>
 						</div>
 						<div onclick="showSection('internship-tips')" style="background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(45,32,64,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -2462,12 +2462,12 @@
 									<option value="">Alle Kategorien</option>
 									<option value="offizin">Offizin</option>
 									<option value="krankenhaus">Krankenhausapotheke</option>
-									<option value="industrie">Industrie</option>
-									<option value="universitaet">Universität</option>
-									<option value="bundeswehr">Bundeswehr</option>
-									<option value="pta-schule">PTA-Schule</option>
-									<option value="behoerde">Behörde</option>
-									<option value="sonstiges">Sonstiges</option>
+									<option value="industrie" style="display:none;">Industrie</option>
+									<option value="universitaet" style="display:none;">Universität</option>
+									<option value="bundeswehr" style="display:none;">Bundeswehr</option>
+									<option value="pta-schule" style="display:none;">PTA-Schule</option>
+									<option value="behoerde" style="display:none;">Behörde</option>
+									<option value="sonstiges" style="display:none;">Sonstiges</option>
 								</select>
 							</div>
 							<div class="filter-group">
@@ -2546,12 +2546,12 @@
 				</div>
 			</div>
 
-			<!-- Praktikumsleitfaden -->
+			<!-- Praktikumsrichtlinie -->
 			<div id="internship-guide-section" class="content-section">
 				<div class="container">
 					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-						<h2>Praktikumsleitfaden</h2>
-						<button class="btn btn-primary" onclick="downloadGuidePDF()">Leitfaden herunterladen</button>
+						<h2>Praktikumsrichtlinie</h2>
+						<button class="btn btn-primary" onclick="downloadGuidePDF()">Richtlinie herunterladen</button>
 					</div>
 					<p style="color: #666; margin-bottom: 1rem;">Stand: 15. März 2024</p>
 					
@@ -2647,12 +2647,12 @@
                                 <option value="">Alle Kategorien</option>
                                 <option value="offizin">Offizin</option>
                                 <option value="krankenhaus">Krankenhausapotheke</option>
-                                <option value="industrie">Industrie</option>
-                                <option value="universitaet">Universität</option>
-                                <option value="bundeswehr">Bundeswehr</option>
-                                <option value="pta-schule">PTA-Schule</option>
-                                <option value="behoerde">Behörde</option>
-                                <option value="sonstiges">Sonstiges</option>
+                                <option value="industrie" style="display:none;">Industrie</option>
+                                <option value="universitaet" style="display:none;">Universität</option>
+                                <option value="bundeswehr" style="display:none;">Bundeswehr</option>
+                                <option value="pta-schule" style="display:none;">PTA-Schule</option>
+                                <option value="behoerde" style="display:none;">Behörde</option>
+                                <option value="sonstiges" style="display:none;">Sonstiges</option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -2748,12 +2748,12 @@
 									<option value="">Bitte wählen</option>
 									<option value="offizin">Offizin</option>
 									<option value="krankenhaus">Krankenhausapotheke</option>
-									<option value="industrie">Industrie</option>
-									<option value="universitaet">Universität</option>
-									<option value="bundeswehr">Bundeswehr</option>
-									<option value="pta-schule">PTA-Schule</option>
-									<option value="behoerde">Behörde</option>
-									<option value="sonstiges">Sonstiges</option>
+									<option value="industrie" style="display:none;">Industrie</option>
+									<option value="universitaet" style="display:none;">Universität</option>
+									<option value="bundeswehr" style="display:none;">Bundeswehr</option>
+									<option value="pta-schule" style="display:none;">PTA-Schule</option>
+									<option value="behoerde" style="display:none;">Behörde</option>
+									<option value="sonstiges" style="display:none;">Sonstiges</option>
 								</select>
 							</div>
 							<div class="form-group">
@@ -2793,9 +2793,9 @@
 							</div>
 							<div class="form-group">
 								<label>Arbeitszeiten *</label>
-								<div style="margin-bottom: 1rem;">
-									<select id="job-working-time-type" style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
-										<option value="fixed">Feste Arbeitszeiten</option>
+								<div style="display:none;">
+									<select id="job-working-time-type">
+										<option value="fixed" selected>Feste Arbeitszeiten</option>
 										<option value="flexible">Gleitzeit</option>
 									</select>
 								</div>
@@ -3145,14 +3145,10 @@
 						</div>
 					</div>
 					<!-- Kategoriespezifische Filter -->
-					<div class="form-group">
-						<label style="font-weight: 600;">Kategoriespezifische Filter</label>
+					<div>
 						<!-- Offizin -->
-						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
-							<button type="button" id="toggle-offizin" onclick="toggleFilterSection('offizin-content','toggle-offizin')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
-								Offizin <span id="icon-offizin">+</span>
-							</button>
-							<div id="offizin-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+						<div>
+							<div id="offizin-content" style="display:block;">
 								<div class="form-group" style="margin-bottom:1rem;">
 									<label style="font-weight:600;font-size:0.9rem;">Spezialisierung</label>
 									<div class="checkbox-group">
@@ -3168,7 +3164,7 @@
 										<label><input type="checkbox" value="sonstige-spec"> Sonstige</label>
 									</div>
 								</div>
-								<div class="form-group" style="margin-bottom:0;">
+								<div class="form-group">
 									<label style="font-weight:600;font-size:0.9rem;">Kundschaft</label>
 									<select id="customer-type-filter">
 										<option value="">Bitte auswählen</option>
@@ -3180,11 +3176,8 @@
 							</div>
 						</div>
 						<!-- Industrie -->
-						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
-							<button type="button" id="toggle-industrie" onclick="toggleFilterSection('industrie-content','toggle-industrie')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
-								Industrie <span id="icon-industrie">+</span>
-							</button>
-							<div id="industrie-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+						<div style="display:none;">
+							<div id="industrie-content" style="display:none;">
 								<div class="form-group" style="margin-bottom:0;">
 									<label style="font-weight:600;font-size:0.9rem;">Bereich</label>
 									<select id="industrie-area-filter">
@@ -3200,11 +3193,8 @@
 							</div>
 						</div>
 						<!-- Universität -->
-						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
-							<button type="button" id="toggle-universitaet" onclick="toggleFilterSection('universitaet-content','toggle-universitaet')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
-								Universität <span id="icon-universitaet">+</span>
-							</button>
-							<div id="universitaet-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+						<div style="display:none;">
+							<div id="universitaet-content" style="display:none;">
 								<div class="form-group" style="margin-bottom:0;">
 									<label style="font-weight:600;font-size:0.9rem;">Bereich</label>
 									<select id="universitaet-area-filter">
@@ -3220,7 +3210,7 @@
 						</div>
 					</div>
 					<!-- Zeitmodell -->
-					<div class="form-group">
+					<div style="display:none;">
 						<label style="font-weight: 600;">Zeitmodell</label>
 						<select id="time-model-filter">
 							<option value="">Alle</option>
@@ -3228,9 +3218,9 @@
 							<option value="gleitzeit">Gleitzeit</option>
 						</select>
 					</div>
-					<!-- Auszeichnung & Verifizierung -->
+					<!-- Verifizierung -->
 					<div class="form-group">
-						<label style="font-weight: 600;">Auszeichnung & Verifizierung</label>
+						<label style="font-weight: 600;">Verifizierung</label>
 						<div class="checkbox-group" style="grid-template-columns: 1fr;">
 							<label style="display:none;"><input type="checkbox" id="bphd-award-filter"> Ausgezeichnet vom BPhD</label>
 							<label><input type="checkbox" id="verified-filter"> Verifiziertes Unternehmen</label>
@@ -3322,15 +3312,11 @@
 						</div>
 					</div>
 					<!-- Kategoriespezifische Filter -->
-					<div class="form-group">
-						<label style="font-weight: 600;">Kategoriespezifische Filter</label>
+					<div>
 						<!-- Offizin -->
-						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
-							<button type="button" id="job-toggle-offizin" onclick="toggleFilterSection('job-offizin-content','job-toggle-offizin')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
-								Offizin <span id="icon-job-offizin">+</span>
-							</button>
-							<div id="job-offizin-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
-								<div class="form-group" style="margin-bottom:1rem;">
+						<div>
+							<div id="job-offizin-content" style="display:block;">
+								<div class="form-group">
 									<label style="font-weight:600;font-size:0.9rem;">Spezialisierung</label>
 									<div class="checkbox-group">
 										<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
@@ -3345,7 +3331,7 @@
 										<label><input type="checkbox" value="sonstige-spec"> Sonstige</label>
 									</div>
 								</div>
-								<div class="form-group" style="margin-bottom:0;">
+								<div class="form-group">
 									<label style="font-weight:600;font-size:0.9rem;">Kundschaft</label>
 									<select id="job-customer-type-filter">
 										<option value="">Bitte auswählen</option>
@@ -3357,11 +3343,8 @@
 							</div>
 						</div>
 						<!-- Industrie -->
-						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
-							<button type="button" id="job-toggle-industrie" onclick="toggleFilterSection('job-industrie-content','job-toggle-industrie')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
-								Industrie <span id="icon-job-industrie">+</span>
-							</button>
-							<div id="job-industrie-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+						<div style="display:none;">
+							<div id="job-industrie-content" style="display:none;">
 								<div class="form-group" style="margin-bottom:0;">
 									<label style="font-weight:600;font-size:0.9rem;">Bereich</label>
 									<select id="job-industrie-area-filter">
@@ -3377,11 +3360,8 @@
 							</div>
 						</div>
 						<!-- Universität -->
-						<div style="margin-top:0.5rem;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;">
-							<button type="button" id="job-toggle-universitaet" onclick="toggleFilterSection('job-universitaet-content','job-toggle-universitaet')" style="width:100%;text-align:left;background:var(--bg);border:none;padding:0.75rem 1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;">
-								Universität <span id="icon-job-universitaet">+</span>
-							</button>
-							<div id="job-universitaet-content" style="display:none;padding:1rem;border-top:1.5px solid var(--border);">
+						<div style="display:none;">
+							<div id="job-universitaet-content" style="display:none;">
 								<div class="form-group" style="margin-bottom:0;">
 									<label style="font-weight:600;font-size:0.9rem;">Bereich</label>
 									<select id="job-universitaet-area-filter">
@@ -3397,7 +3377,7 @@
 						</div>
 					</div>
 					<!-- Zeitmodell -->
-					<div class="form-group">
+					<div class="form-group" style="display:none">
 						<label style="font-weight: 600;">Zeitmodell</label>
 						<select id="job-time-model-filter">
 							<option value="">Alle</option>
@@ -3405,9 +3385,9 @@
 							<option value="gleitzeit">Gleitzeit</option>
 						</select>
 					</div>
-					<!-- Auszeichnung & Verifizierung -->
+					<!-- Verifizierung -->
 					<div class="form-group">
-						<label style="font-weight: 600;">Auszeichnung & Verifizierung</label>
+						<label style="font-weight: 600;">Verifizierung</label>
 						<div class="checkbox-group" style="grid-template-columns: 1fr;">
 							<label style="display:none;"><input type="checkbox" id="job-bphd-award-filter"> Ausgezeichnet vom BPhD</label>
 							<label><input type="checkbox" id="job-verified-filter"> Verifiziertes Unternehmen</label>
@@ -5984,14 +5964,12 @@
 		function showAdvancedFilters() {
 			document.querySelectorAll('#advanced-filters-modal input[type="checkbox"]').forEach(cb => cb.checked = false);
 			document.querySelectorAll('#advanced-filters-modal select').forEach(sel => sel.value = '');
-			['offizin-content','industrie-content','universitaet-content'].forEach(id => {
+			['industrie-content','universitaet-content'].forEach(id => {
 				const el = document.getElementById(id);
 				if (el) el.style.display = 'none';
 			});
-			['icon-offizin','icon-industrie','icon-universitaet'].forEach(id => {
-				const el = document.getElementById(id);
-				if (el) el.textContent = '+';
-			});
+			const offEl = document.getElementById('offizin-content');
+			if (offEl) offEl.style.display = 'block';
 			
 			const filterMapping = {
 				'Sterilherstellung': 'sterilherstellung', 'Zytostatikaherstellung': 'zytostatikaherstellung',
@@ -6226,14 +6204,12 @@
 				}
 			}
 
-			['job-offizin-content','job-industrie-content','job-universitaet-content'].forEach(id => {
+			['job-industrie-content','job-universitaet-content'].forEach(id => {
 				const el = document.getElementById(id);
 				if (el) el.style.display = 'none';
 			});
-			['icon-job-offizin','icon-job-industrie','icon-job-universitaet'].forEach(id => {
-				const el = document.getElementById(id);
-				if (el) el.textContent = '+';
-			});
+			const jobOffEl = document.getElementById('job-offizin-content');
+			if (jobOffEl) jobOffEl.style.display = 'block';
 
             const activeJobRadiusFilter = activeJobAdvancedFilters.find(f => f.startsWith('Im Umkreis von'));
             if (activeJobRadiusFilter) {
@@ -9124,7 +9100,7 @@
 				const contentDiv = document.querySelector('#internship-guide-section .container div[style*="background: white; padding: 3rem"]');
 				if (contentDiv) contentDiv.innerHTML = content;
 
-				alert('Praktikumsleitfaden gespeichert! Die Website zeigt jetzt den neuen Inhalt an.');
+				alert('Praktikumsrichtlinie gespeichert! Die Website zeigt jetzt den neuen Inhalt an.');
 				
 			} catch (error) {
 				alert('Fehler: ' + error.message);
@@ -9326,7 +9302,7 @@
 			if (pdfData) {
 				const link = document.createElement('a');
 				link.href = pdfData;
-				link.download = 'Praktikumsleitfaden.pdf';
+				link.download = 'Praktikumsrichtlinie.pdf';
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);
@@ -9338,7 +9314,7 @@
 					<html>
 					<head>
 						<meta charset="UTF-8">
-						<title>Praktikumsleitfaden</title>
+						<title>Praktikumsrichtlinie</title>
 						<style>
 							body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; }
 							h1, h2, h3 { color: #333; }
@@ -9373,7 +9349,7 @@
 			modal.innerHTML = `
 				<div class="modal-content" style="max-width: 900px; width: 90%; max-height: 90vh;">
 					<div class="modal-header">
-						<h2>Vorschau: Praktikumsleitfaden</h2>
+						<h2>Vorschau: Praktikumsrichtlinie</h2>
 						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
 					</div>
 					<div class="modal-body" style="overflow-y: auto;">
