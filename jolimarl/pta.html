@@ -2503,8 +2503,8 @@
 										<input type="checkbox" id="verified-company-filter" onchange="filterAllCompanies()">
 										Verifizierte Unternehmen
 									</label>
-									<label style="display: flex; align-items: center; gap: 0.5rem;">
-										<input type="checkbox" id="bphd-company-filter" onchange="filterAllCompanies()">
+									<label style="display:none;">
+										<input type="checkbox" id="bphd-company-filter" disabled>
 										Ausgezeichnete Unternehmen
 									</label>
 								</div>
@@ -2702,6 +2702,7 @@
 				<button class="close-btn" onclick="closeModal('job-modal')">&times;</button>
 			</div>
 			<div class="modal-body" style="overflow-y:auto;max-height:80vh;">
+			<p style="font-size:0.85rem;color:var(--mid);margin-bottom:0.5rem;">* Pflichtfelder</p>
 				<form id="job-form">
 					<div class="form-section">
 						<h3>Basisangaben zum Betrieb</h3>
@@ -3150,7 +3151,7 @@
 						<div>
 							<div id="offizin-content" style="display:block;">
 								<div class="form-group" style="margin-bottom:1rem;">
-									<label style="font-weight:600;font-size:0.9rem;">Spezialisierung</label>
+									<label style="font-weight:600;">Spezialisierung</label>
 									<div class="checkbox-group">
 										<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
 										<label><input type="checkbox" value="zytostatikaherstellung"> Zytostatikaherstellung</label>
@@ -3165,7 +3166,7 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<label style="font-weight:600;font-size:0.9rem;">Kundschaft</label>
+									<label style="font-weight:600;">Kundschaft</label>
 									<select id="customer-type-filter">
 										<option value="">Bitte auswählen</option>
 										<option value="stammkundschaft">Überwiegend Stammkundschaft</option>
@@ -3222,7 +3223,6 @@
 					<div class="form-group">
 						<label style="font-weight: 600;">Verifizierung</label>
 						<div class="checkbox-group" style="grid-template-columns: 1fr;">
-							<label style="display:none;"><input type="checkbox" id="bphd-award-filter"> Ausgezeichnet vom BPhD</label>
 							<label><input type="checkbox" id="verified-filter"> Verifiziertes Unternehmen</label>
 						</div>
 					</div>
@@ -3317,7 +3317,7 @@
 						<div>
 							<div id="job-offizin-content" style="display:block;">
 								<div class="form-group">
-									<label style="font-weight:600;font-size:0.9rem;">Spezialisierung</label>
+									<label style="font-weight:600;">Spezialisierung</label>
 									<div class="checkbox-group">
 										<label><input type="checkbox" value="sterilherstellung"> Sterilherstellung</label>
 										<label><input type="checkbox" value="zytostatikaherstellung"> Zytostatikaherstellung</label>
@@ -3332,7 +3332,7 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<label style="font-weight:600;font-size:0.9rem;">Kundschaft</label>
+									<label style="font-weight:600;">Kundschaft</label>
 									<select id="job-customer-type-filter">
 										<option value="">Bitte auswählen</option>
 										<option value="stammkundschaft">Überwiegend Stammkundschaft</option>
@@ -3389,7 +3389,6 @@
 					<div class="form-group">
 						<label style="font-weight: 600;">Verifizierung</label>
 						<div class="checkbox-group" style="grid-template-columns: 1fr;">
-							<label style="display:none;"><input type="checkbox" id="job-bphd-award-filter"> Ausgezeichnet vom BPhD</label>
 							<label><input type="checkbox" id="job-verified-filter"> Verifiziertes Unternehmen</label>
 						</div>
 					</div>
