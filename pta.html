@@ -2456,7 +2456,7 @@
 								<label>Unternehmensname</label>
 								<input type="text" id="company-search-filter" placeholder="Nach Unternehmen suchen..." oninput="filterAllCompanies()">
 							</div>
-							<div class="form-group">
+							<div class="filter-group">
 								<label>Kategorie</label>
 								<select id="company-category-filter" onchange="filterAllCompanies()">
 									<option value="">Alle Kategorien</option>
@@ -2494,7 +2494,7 @@
 								</select>
 							</div>
 							<div class="filter-group" style="grid-column: span 2;">
-								<div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+								<div style="display: flex; gap: 2rem; margin-top: 0.9rem;">
 									<label style="display: flex; align-items: center; gap: 0.5rem;">
 										<input type="checkbox" id="open-positions-filter" onchange="filterAllCompanies()">
 										Offene Stellen
@@ -8346,7 +8346,8 @@
 			const dd = document.querySelector('.nav-dropdown');
 			const wt = document.getElementById('wissenswert-tab');
 			if (!window.matchMedia('(max-width: 768px)').matches) { showSection('wissenswert'); return; }
-			const isOpen = wt.getAttribute('data-open') === 'true';
+			// Wahrheit aus dem DOM lesen, nicht aus data-open (kann veraltet sein)
+			const isOpen = dd.classList.contains('mobile-sub-open');
 			dd.classList.toggle('mobile-sub-open');
 			wt.setAttribute('data-open', isOpen ? 'false' : 'true');
 			wt.innerHTML = 'Wissenswert <span style="display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:middle;margin-left:4px;' + (!isOpen ? 'border-bottom:5px solid currentColor;' : 'border-top:5px solid currentColor;') + '"></span>';
@@ -10129,20 +10130,40 @@
 			canvas.addEventListener('mouseup', function() { logoDragging = false; });
 			canvas.addEventListener('mouseleave', function() { logoDragging = false; });
 
+			let lastPinchDist = null;
 			canvas.addEventListener('touchstart', function(e) {
 				e.preventDefault();
-				logoDragging = true;
-				logoDragStartX = e.touches[0].clientX - logoOffsetX;
-				logoDragStartY = e.touches[0].clientY - logoOffsetY;
+				if (e.touches.length === 1) {
+					logoDragging = true;
+					logoDragStartX = e.touches[0].clientX - logoOffsetX;
+					logoDragStartY = e.touches[0].clientY - logoOffsetY;
+					lastPinchDist = null;
+				} else if (e.touches.length === 2) {
+					logoDragging = false;
+					const dx = e.touches[0].clientX - e.touches[1].clientX;
+					const dy = e.touches[0].clientY - e.touches[1].clientY;
+					lastPinchDist = Math.sqrt(dx * dx + dy * dy);
+				}
 			}, { passive: false });
 			canvas.addEventListener('touchmove', function(e) {
 				e.preventDefault();
-				if (!logoDragging) return;
-				logoOffsetX = e.touches[0].clientX - logoDragStartX;
-				logoOffsetY = e.touches[0].clientY - logoDragStartY;
-				drawLogoCanvas();
+				if (e.touches.length === 2 && lastPinchDist !== null) {
+					const dx = e.touches[0].clientX - e.touches[1].clientX;
+					const dy = e.touches[0].clientY - e.touches[1].clientY;
+					const dist = Math.sqrt(dx * dx + dy * dy);
+					logoScale *= dist / lastPinchDist;
+					lastPinchDist = dist;
+					drawLogoCanvas();
+				} else if (e.touches.length === 1 && logoDragging) {
+					logoOffsetX = e.touches[0].clientX - logoDragStartX;
+					logoOffsetY = e.touches[0].clientY - logoDragStartY;
+					drawLogoCanvas();
+				}
 			}, { passive: false });
-			canvas.addEventListener('touchend', function() { logoDragging = false; });
+			canvas.addEventListener('touchend', function(e) {
+				if (e.touches.length < 2) lastPinchDist = null;
+				if (e.touches.length === 0) logoDragging = false;
+			});
 			
 			canvas.addEventListener('wheel', function(e) {
 				e.preventDefault();
