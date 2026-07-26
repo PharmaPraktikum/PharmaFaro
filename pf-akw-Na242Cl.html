@@ -645,7 +645,7 @@
 							style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px;">
 						<option value="all">Bereich: Alle</option>
 						<option value="pta">Nur PTA</option>
-						<option value="apo">Nur Apo</option>
+						<option value="apo" selected>Nur Apo</option>
 					</select>
 					<select id="company-sort" onchange="filterCompaniesTable()"
 							style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 8px;">
@@ -1740,8 +1740,8 @@
 
 				allCompanies = Object.values(companyMap);
 
+				renderCompaniesTable(allCompanies, 'apo');
 				updateCompaniesStats();
-				renderCompaniesTable(allCompanies, 'all');
 
 			} catch (err) {
 				console.error('Fehler:', err);
@@ -1750,10 +1750,19 @@
 		}
 
 		function updateCompaniesStats() {
-			document.getElementById('stat-companies-total').textContent = allCompanies.length;
-			document.getElementById('stat-companies-active').textContent = allCompanies.filter(c => c.status !== 'inactive').length;
-			document.getElementById('stat-companies-inactive').textContent = allCompanies.filter(c => c.status === 'inactive').length;
-			document.getElementById('stat-companies-verified').textContent = allCompanies.filter(c => c.verified).length;
+			const modeF = document.getElementById('company-mode-filter')?.value || 'all';
+			let subset;
+			if (modeF === 'apo') {
+				subset = allCompanies.filter(c => c.reviewCountApo > 0 || c.activeJobCountApo > 0);
+			} else if (modeF === 'pta') {
+				subset = allCompanies.filter(c => c.reviewCountPta > 0 || c.activeJobCountPta > 0);
+			} else {
+				subset = allCompanies;
+			}
+			document.getElementById('stat-companies-total').textContent = subset.length;
+			document.getElementById('stat-companies-active').textContent = subset.filter(c => c.status !== 'inactive').length;
+			document.getElementById('stat-companies-inactive').textContent = subset.filter(c => c.status === 'inactive').length;
+			document.getElementById('stat-companies-verified').textContent = subset.filter(c => c.verified).length;
 		}
 
 		function esc(str) {
@@ -1851,6 +1860,7 @@
 			else if (sort === 'reviews') filtered.sort((a, b) => (b.reviewCountPta + b.reviewCountApo) - (a.reviewCountPta + a.reviewCountApo));
 			else if (sort === 'jobs') filtered.sort((a, b) => (b.activeJobCountPta + b.activeJobCountApo) - (a.activeJobCountPta + a.activeJobCountApo));
 			renderCompaniesTable(filtered, modeF);
+			updateCompaniesStats();
 		};
 
 
