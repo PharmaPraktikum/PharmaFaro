@@ -7179,6 +7179,13 @@
 					deleteToken: reviewResult?.delete_token || '',
 				});
 
+                await sendConfirmationEmail('admin_new_review', {
+					email: 'admin@pharmafaro.de',
+					companyName: formData.companyName,
+					reason: `Kategorie: ${formData.category} | Bundesland: ${formData.state}`,
+					practiceType: 'PTA'
+				});
+
 				showSuccessModal(
 					'Bewertung eingereicht!',
 					`Vielen Dank! Sie erhalten in Kürze eine Bestätigungs-E-Mail an ${formData.email}.<br><br>Die Bewertung wird nach Prüfung durch den Seitenbetreiber freigeschaltet.`,
@@ -7219,7 +7226,14 @@
 						contactPerson: jobFormData.contactPerson,
 						id: typeof jobId === 'string' ? jobId.substring(0, 8) : jobId
 					});
-					
+
+                    await sendConfirmationEmail('admin_new_job', {
+						email: 'admin@pharmafaro.de',
+						companyName: jobFormData.companyName,
+						reason: `Kontakt: ${contactEmail}`,
+						practiceType: 'PTA'
+					});
+
 					showSuccessModal(
 						'Stellenangebot eingereicht!',
 						`Vielen Dank! Sie erhalten eine Bestätigungs-E-Mail an ${contactEmail}.<br><br>Nach Freischaltung erhalten Sie eine weitere Bestätigung.`,
@@ -9621,48 +9635,26 @@
 			(async function checkJobDeactivation() {
 				const urlParams = new URLSearchParams(window.location.search);
 
-				const deleteReviewToken = urlParams.get('delete_review');
-				if (deleteReviewToken) {
-					history.replaceState({}, '', window.location.pathname);
-					setTimeout(function() {
-						showConfirmModal(
-							'Bewertung löschen?',
-							'Möchten Sie Ihre Bewertung wirklich unwiderruflich löschen?',
-							async function() {
-								try {
-									const { data: reviewCheck } = await window.supabase
-										.from('reviews')
-										.select('status')
-										.eq('delete_token', deleteReviewToken)
-										.single();
-
-									if (!reviewCheck) {
-										showToast('Bewertung nicht gefunden.', 'error');
-										return;
-									}
-
-									if (reviewCheck.status === 'pending') {
-										showToast('Ihre Bewertung wird noch geprüft und kann noch nicht gelöscht werden. Bitte wenden Sie sich an uns.', 'info', 8000);
-										return;
-									}
-
-									const { error } = await window.supabase
-										.from('reviews')
-										.update({ status: 'deleted' })
-										.eq('delete_token', deleteReviewToken);
-
-									if (!error) {
-										showToast('Ihre Bewertung wurde erfolgreich gelöscht.', 'success', 6000);
-									} else {
-										showToast('Fehler beim Löschen. Bitte versuchen Sie es erneut.', 'error');
-									}
-								} catch (e) {
-									showToast('Fehler beim Löschen der Bewertung.', 'error');
-								}
-							}
-						);
-					}, 800);
-				}
+				const deleteToken = urlParams.get('delete_review');
+                if (deleteToken) {
+                    try {
+                        const res = await fetch(`${window.SUPABASE_URL}/functions/v1/delete-review`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: deleteToken })
+                        });
+                        const result = await res.json();
+                        if (result.success) {
+                            showToast('Deine Bewertung wurde erfolgreich gelöscht.', 'success');
+                        } else {
+                            showToast('Bewertung konnte nicht gelöscht werden.', 'error');
+                        }
+                    } catch(e) {
+                        showToast('Fehler beim Löschen der Bewertung.', 'error');
+                    }
+                    // Token aus URL entfernen
+                    window.history.replaceState({}, '', window.location.pathname);
+                }
 
 				const deactivateToken = urlParams.get('deactivate_job');
 				
@@ -9934,6 +9926,13 @@
 					companyName: companyName,
 					contactPerson: contactPerson,
 					id: result.data.id
+				});
+
+                await window.sendConfirmationEmail('admin_new_verification', {
+					email: 'admin@pharmafaro.de',
+					companyName: companyName,
+					reason: `Antragsteller: ${contactPerson} (${contactEmail})`,
+					practiceType: 'PTA'
 				});
 
 				showSuccessModal(
