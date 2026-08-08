@@ -386,10 +386,10 @@
     }
 
     .hero p {
-        font-family: 'Fraunces', serif;
-        font-style: italic;
-        font-weight: 300;
-        font-size: 1.1rem;
+        font-family: 'DM Sans', sans-serif;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 1.05rem;
         color: rgba(255,255,255,0.65);
         margin-bottom: 2rem;
         position: relative;
@@ -641,7 +641,7 @@
 
     .review-text {
         color: var(--mid);
-        font-family: 'Lora', serif;
+        font-family: 'DM Sans', sans-serif;
         font-style: italic;
         font-size: 0.95rem;
         line-height: 1.75;
@@ -931,9 +931,10 @@
     }
 
     .footer-brand p {
+        font-family: 'DM Sans', sans-serif;
         font-size: 0.82rem;
         color: rgba(255,255,255,0.4);
-        font-style: italic;
+        font-style: normal;
         margin: 0;
     }
 
@@ -1538,7 +1539,7 @@
     .lhc-score-max { font-size: 0.7rem; opacity: 0.7; margin-top: 0.1rem; }
     .lhc-stars { color: var(--red); font-size: 1rem; letter-spacing: 1px; margin-bottom: 1rem; }
     .lhc-label { font-size: 0.72rem; font-weight: 700; color: var(--red); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 0.6rem; display: block; }
-    .lhc-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.92rem; line-height: 1.75; color: var(--mid); position: relative; z-index: 1; }
+    .lhc-text { font-family: 'DM Sans', sans-serif; font-style: italic; font-size: 0.92rem; line-height: 1.75; color: var(--mid); position: relative; z-index: 1; }
 
     .landing-review-skeleton {
         background: var(--bg-card);
@@ -1581,8 +1582,8 @@
     .landing-cta-title em { font-style: italic; font-weight: 400; color: var(--accent); }
 
     .landing-cta-sub {
-        font-family: 'Fraunces', serif;
-        font-style: italic;
+        font-family: 'DM Sans', sans-serif;
+        font-style: normal;
         color: rgba(255,255,255,0.6);
         font-size: 1.05rem;
         margin-bottom: 2.5rem;
@@ -8124,11 +8125,15 @@
 				const sb = window.supabase;
 				if (!sb) return;
 
-				const [r, j, c] = await Promise.all([
+				const [r, j, verifiedRaw, ptaCompanyNames] = await Promise.all([
 					sb.from('reviews').select('id', { count: 'exact', head: true }).eq('status', 'active').eq('practice_type', 'PTA'),
 					sb.from('jobs').select('id', { count: 'exact', head: true }).eq('status', 'active').eq('practice_type', 'PTA'),
-					sb.from('company_verifications').select('id', { count: 'exact', head: true }).eq('status', 'verified')
+					sb.from('company_verifications').select('company_name').eq('status', 'verified'),
+					sb.from('reviews').select('company_name').eq('status', 'active').eq('practice_type', 'PTA')
 				]);
+				const ptaNames = new Set((ptaCompanyNames.data || []).map(r => r.company_name.toLowerCase()));
+				const verifiedPtaCount = (verifiedRaw.data || []).filter(v => ptaNames.has(v.company_name.toLowerCase())).length;
+				const c = { count: verifiedPtaCount };
 
 				animateLandingStat('stat-reviews', r.count || 0);
 				animateLandingStat('stat-jobs', j.count || 0);
