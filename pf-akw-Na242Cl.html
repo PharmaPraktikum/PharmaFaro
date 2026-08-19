@@ -831,9 +831,16 @@
 					<p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Bestimmt die Gehalts-Labels (unter/über Tarif) auf der Website und den Tariffilter.</p>
 					
 					<div style="margin-bottom: 1rem;">
-						<label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Tarifgehalt (€/Monat brutto):</label>
-						<input type="number" id="tariff-salary-input" placeholder="z.B. 1800"
-							   style="padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; width: 250px; font-size: 1rem;">
+						<label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Standardtarif (€/Monat brutto, gilt für alle nicht gesondert aufgeführten Bundesländer):</label>
+						<div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+							<input type="number" id="tariff-salary-input" placeholder="z.B. 1800"
+								   style="padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; width: 200px; font-size: 1rem;">
+							<button type="button" onclick="window.addStateTariffField()"
+									style="padding:0.6rem 1rem;background:var(--pf-mid);color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;white-space:nowrap;">
+								+ Bundesland
+							</button>
+						</div>
+						<div id="state-tariff-fields" style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem;"></div>
 					</div>
 					
 					<div id="tariff-salary-current" style="padding: 0.75rem; background: #d4edda; border-radius: 8px; margin-bottom: 1rem; display: none; color: #155724; font-size: 0.95rem;"></div>
@@ -1399,13 +1406,20 @@
 				data.forEach(setting => {
 					if (setting.key === 'tariff_salary') {
 						const parsed = JSON.parse(setting.value);
-						window.tariffSalary = parsed.amount;
+						if (typeof parsed.default === 'number') {
+							currentTariffData = parsed;
+						} else {
+							currentTariffData = { default: parsed.amount || 0, states: [] };
+						}
+						window.tariffSalary = currentTariffData.default;
+						window.tariffSalaryData = currentTariffData;
 						const input = document.getElementById('tariff-salary-input');
-						if (input) input.value = parsed.amount;
+						if (input) input.value = currentTariffData.default;
+						renderStateTariffFields();
 						const currentDiv = document.getElementById('tariff-salary-current');
 						if (currentDiv) {
 							currentDiv.style.display = 'block';
-							currentDiv.innerHTML = `<strong>Aktuell gespeichertes Tarifgehalt:</strong> ${parsed.amount}€/Monat brutto`;
+							currentDiv.innerHTML = `<strong>Aktuell gespeichertes Standardtarif:</strong> ${currentTariffData.default}€/Monat brutto`;
 						}
 					}
 					if (setting.key === 'guide_content') {
@@ -1445,9 +1459,9 @@
 		window.saveTariffSalary = async function() {
 			const amount = document.getElementById('tariff-salary-input').value;
 			if (!amount || parseInt(amount) <= 0) { alert('Bitte gültiges Tarifgehalt eingeben.'); return; }
-			
+			currentTariffData.default = parseInt(amount);
 			const { error } = await supabase.from('site_settings')
-				.upsert({ key: 'tariff_salary', value: JSON.stringify({ amount: parseInt(amount) }) }, 
+				.upsert({ key: 'tariff_salary', value: JSON.stringify(currentTariffData) },
 						 { onConflict: 'key' });
 			
 			if (error) { alert('Fehler: ' + error.message); return; }
@@ -1477,6 +1491,83 @@
 			} else {
 				panel.style.display = 'none';
 			}
+		};
+
+		const ALL_STATES = [
+			'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg',
+			'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen',
+			'Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt',
+			'Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'
+		];
+
+		let currentTariffData = { default: 0, states: [] };
+
+		window.addStateTariffField = function() {
+			currentTariffData.states.push({ states: [], amount: 0 });
+			renderStateTariffFields();
+		};
+
+		function renderStateTariffFields() {
+			const container = document.getElementById('state-tariff-fields');
+			if (!container) return;
+			container.innerHTML = currentTariffData.states.map((sf, i) => `
+				<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+					<div style="position:relative;">
+						<button type="button" onclick="window.toggleStateDropdown(${i})"
+								style="padding:0.5rem 0.75rem;border:2px solid #e9ecef;border-radius:6px;background:white;cursor:pointer;font-size:0.88rem;min-width:220px;text-align:left;">
+							${sf.states.length > 0 ? sf.states.join(', ') : 'Bundesländer wählen ▾'}
+						</button>
+						<div id="sd-${i}" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e9ecef;border-radius:8px;z-index:100;min-width:240px;max-height:280px;overflow-y:auto;padding:0.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+							${ALL_STATES.map(s => `
+								<label style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;">
+									<input type="checkbox" ${sf.states.includes(s) ? 'checked' : ''}
+										   onchange="window.updateStateSelection(${i},'${s}',this.checked)">
+									${s}
+								</label>
+							`).join('')}
+							<div style="border-top:1px solid #eee;margin-top:0.25rem;padding-top:0.25rem;">
+								<button type="button" onclick="window.removeStateTariffField(${i})"
+										style="width:100%;padding:0.3rem;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">
+									Entfernen
+								</button>
+							</div>
+						</div>
+					</div>
+					<input type="number" value="${sf.amount || ''}"
+						   oninput="currentTariffData.states[${i}].amount=parseInt(this.value)||0"
+						   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:130px;"
+						   placeholder="Tarif €">
+					<span style="font-size:0.88rem;">€/Monat</span>
+					<button type="button" onclick="window.addStateTariffField()"
+							style="padding:0.5rem 0.75rem;background:var(--pf-mid);color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
+						+ Bundesland
+					</button>
+				</div>
+			`).join('');
+		}
+
+		window.toggleStateDropdown = function(i) {
+			document.querySelectorAll('[id^="sd-"]').forEach(d => { if (d.id !== 'sd-'+i) d.style.display='none'; });
+			const dd = document.getElementById('sd-'+i);
+			if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		};
+		document.addEventListener('click', function(e) {
+			if (!e.target.closest('[id^="sd-"]') && !e.target.closest('button[onclick*="toggleStateDropdown"]')) {
+				document.querySelectorAll('[id^="sd-"]').forEach(d => d.style.display='none');
+			}
+			if (!e.target.closest('[id^="hsd-"]') && !e.target.closest('button[onclick*="toggleHistoryStateDropdown"]')) {
+				document.querySelectorAll('[id^="hsd-"]').forEach(d => d.style.display='none');
+			}
+		});
+		window.updateStateSelection = function(i, state, checked) {
+			if (checked) { if (!currentTariffData.states[i].states.includes(state)) currentTariffData.states[i].states.push(state); }
+			else { currentTariffData.states[i].states = currentTariffData.states[i].states.filter(s => s !== state); }
+			const btn = document.querySelector(`button[onclick="window.toggleStateDropdown(${i})"]`);
+			if (btn) btn.textContent = currentTariffData.states[i].states.length > 0 ? currentTariffData.states[i].states.join(', ') : 'Bundesländer wählen ▾';
+		};
+		window.removeStateTariffField = function(i) {
+			currentTariffData.states.splice(i, 1);
+			renderStateTariffFields();
 		};
 
 		let tariffHistoryData = [];
