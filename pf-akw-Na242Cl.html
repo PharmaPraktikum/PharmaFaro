@@ -1558,6 +1558,9 @@
 			if (!e.target.closest('[id^="hsd-"]') && !e.target.closest('button[onclick*="toggleHistoryStateDropdown"]')) {
 				document.querySelectorAll('[id^="hsd-"]').forEach(d => d.style.display='none');
 			}
+			if (!e.target.closest('[id^="hdd-"]') && !e.target.closest('button[onclick*="toggleHistRow"]')) {
+				document.querySelectorAll('[id^="hdd-"]').forEach(d => d.style.display='none');
+			}
 		});
 		window.updateStateSelection = function(i, state, checked) {
 			if (checked) { if (!currentTariffData.states[i].states.includes(state)) currentTariffData.states[i].states.push(state); }
@@ -1587,34 +1590,57 @@
 		function renderTariffHistoryRows() {
 			const container = document.getElementById('tariff-history-rows');
 			if (!container) return;
-			
 			if (tariffHistoryData.length === 0) {
 				container.innerHTML = '<p style="color: #666; font-size: 0.9rem;">Noch keine Einträge. Klicke auf "Zeile hinzufügen".</p>';
 				return;
 			}
-			
-			container.innerHTML = tariffHistoryData.map((entry, i) => `
-				<div class="tariff-row" data-index="${i}" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
+			container.innerHTML = tariffHistoryData.map((entry, i) => {
+				const entryStates = entry.states || ['Alle'];
+				const allSelected = entryStates.includes('Alle') || entryStates.length === allStates.length;
+				const label = allSelected ? 'Alle Bundesländer' : entryStates.join(', ');
+				return `
+				<div class="tariff-row" data-index="${i}" style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap;">
 					<select onchange="window.updateTariffRow(${i}, 'from', this.value)"
-							style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 6px;">
+							style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;">
 						${generateYearOptions(entry.from, false)}
 					</select>
 					<span>bis</span>
 					<select onchange="window.updateTariffRow(${i}, 'to', this.value)"
-							style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 6px;">
+							style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;">
 						${generateYearOptions(entry.to, true)}
 					</select>
 					<span>:</span>
-					<input type="number" value="${entry.amount}" 
+					<input type="number" value="${entry.amount||''}"
 						   onchange="window.updateTariffRow(${i}, 'amount', this.value)"
-						   style="padding: 0.5rem; border: 2px solid #e9ecef; border-radius: 6px; width: 120px;">
-					<span>€ pro Monat brutto</span>
+						   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:120px;">
+					<span>€/Monat</span>
+					<div style="position:relative;">
+						<button type="button" onclick="window.toggleHistRow(${i})"
+								style="padding:0.4rem 0.75rem;border:2px solid #e9ecef;border-radius:6px;background:white;cursor:pointer;font-size:0.85rem;min-width:180px;text-align:left;">
+							${label} ▾
+						</button>
+						<div id="hdd-${i}" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e9ecef;border-radius:8px;z-index:200;min-width:220px;max-height:260px;overflow-y:auto;padding:0.4rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+							<label style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;font-weight:600;border-bottom:1px solid #eee;">
+								<input type="checkbox" ${allSelected ? 'checked' : ''}
+									   onchange="window.toggleAllHistStates(${i},this.checked)">
+								Alle
+							</label>
+							${allStates.map(s => `
+								<label style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;">
+									<input type="checkbox" ${allSelected || entryStates.includes(s) ? 'checked' : ''}
+										   onchange="window.updateHistState(${i},'${s}',this.checked)">
+									${s}
+								</label>
+							`).join('')}
+						</div>
+					</div>
 					<button onclick="window.deleteTariffRow(${i})"
-							style="background: #dc3545; color: white; padding: 0.4rem 0.75rem; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+							style="background:#dc3545;color:white;padding:0.4rem 0.75rem;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
 						Zeile löschen
 					</button>
-				</div>
-			`).join('');
+				</div>`;
+			}).join('');
 		}
 
 		window.updateTariffRow = function(index, field, value) {
@@ -1629,12 +1655,35 @@
 
 		window.addTariffHistoryRow = function() {
 			const currentYear = new Date().getFullYear();
-			tariffHistoryData.push({ from: currentYear, to: null, amount: window.tariffSalary || 1040 });
+			tariffHistoryData.push({ from: currentYear, to: null, amount: window.tariffSalary || 1040, states: ['Alle'] });
 			renderTariffHistoryRows();
 		};
 
 		window.deleteTariffRow = function(index) {
 			tariffHistoryData.splice(index, 1);
+			renderTariffHistoryRows();
+		};
+		window.toggleHistRow = function(i) {
+			document.querySelectorAll('[id^="hdd-"]').forEach(d => { if (d.id !== 'hdd-'+i) d.style.display='none'; });
+			const dd = document.getElementById('hdd-'+i);
+			if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		};
+		window.toggleAllHistStates = function(i, checked) {
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
+			tariffHistoryData[i].states = checked ? ['Alle'] : [];
+			renderTariffHistoryRows();
+		};
+		window.updateHistState = function(i, state, checked) {
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
+			if (!tariffHistoryData[i].states || tariffHistoryData[i].states.includes('Alle')) {
+				tariffHistoryData[i].states = checked ? allStates.filter(s => s !== state) : allStates.filter(s => s !== state);
+				if (checked) tariffHistoryData[i].states = [...allStates];
+				else tariffHistoryData[i].states = allStates.filter(s => s !== state);
+			} else {
+				if (checked) { if (!tariffHistoryData[i].states.includes(state)) tariffHistoryData[i].states.push(state); }
+				else { tariffHistoryData[i].states = tariffHistoryData[i].states.filter(s => s !== state); }
+			}
+			if (tariffHistoryData[i].states.length === allStates.length) tariffHistoryData[i].states = ['Alle'];
 			renderTariffHistoryRows();
 		};
 
