@@ -1598,8 +1598,12 @@
 						   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:130px;"
 						   placeholder="Gehalt €">
 					<span style="font-size:0.88rem;">€/Monat</span>
+					<button type="button" onclick="window.removePtaStateSalaryField(${i})"
+							style="padding:0.5rem 0.75rem;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
+						Zeile löschen
+					</button>
 					<button type="button" onclick="window.addPtaStateSalaryField()"
-							style="padding:0.5rem 0.75rem;background:#6b4f4a;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
+							style="padding:0.5rem 0.75rem;background:var(--pf-mid);color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
 						+ Bundesland
 					</button>
 				</div>
@@ -1661,67 +1665,77 @@
 				return;
 			}
 			const currentYear = new Date().getFullYear();
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
 			function genYears(sel, withAktuell) {
 				let h = withAktuell ? `<option value="null" ${sel === null ? 'selected' : ''}>Aktuell</option>` : '';
 				for (let y = currentYear; y >= 1970; y--) h += `<option value="${y}" ${sel === y ? 'selected' : ''}>${y}</option>`;
 				return h;
 			}
-			container.innerHTML = window.ptaSalaryHistoryData.map((e, i) => `
-				<div style="margin-bottom:1rem;padding:0.75rem;border:1px solid #e9ecef;border-radius:8px;">
-					<div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.5rem;">
-						<select onchange="window.ptaSalaryHistoryData[${i}].from=parseInt(this.value)"
-								style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;">${genYears(e.from, false)}</select>
-						<span>bis</span>
-						<select onchange="window.ptaSalaryHistoryData[${i}].to=this.value==='null'?null:parseInt(this.value)"
-								style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;">${genYears(e.to, true)}</select>
-						<span>:</span>
-						<input type="number" value="${e.default || e.amount || ''}"
-							   onchange="window.ptaSalaryHistoryData[${i}].default=parseInt(this.value)"
-							   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:120px;"
-							   placeholder="Standardgehalt">
-						<span>€ Standard</span>
-						<button onclick="window.ptaSalaryHistoryData.splice(${i},1);window.renderPtaSalaryHistoryRows()"
-								style="background:#dc3545;color:white;padding:0.4rem 0.75rem;border:none;border-radius:6px;cursor:pointer;">
-							Zeile löschen
+			container.innerHTML = window.ptaSalaryHistoryData.map((e, i) => {
+				const entryStates = e.states || ['Alle'];
+				const allSelected = entryStates.includes('Alle') || entryStates.length === allStates.length;
+				const label = allSelected ? 'Alle Bundesländer' : entryStates.join(', ');
+				return `
+				<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap;">
+					<select onchange="window.ptaSalaryHistoryData[${i}].from=parseInt(this.value)"
+							style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;">${genYears(e.from, false)}</select>
+					<span>bis</span>
+					<select onchange="window.ptaSalaryHistoryData[${i}].to=this.value==='null'?null:parseInt(this.value)"
+							style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;">${genYears(e.to, true)}</select>
+					<span>:</span>
+					<input type="number" value="${e.default || e.amount || ''}"
+						   onchange="window.ptaSalaryHistoryData[${i}].default=parseInt(this.value)"
+						   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:120px;"
+						   placeholder="Gehalt €">
+					<span>€/Monat</span>
+					<div style="position:relative;">
+						<button type="button" onclick="window.togglePtaHistRow(${i})"
+								style="padding:0.4rem 0.75rem;border:2px solid #e9ecef;border-radius:6px;background:white;cursor:pointer;font-size:0.85rem;min-width:180px;text-align:left;">
+							${label} ▾
 						</button>
-						<button onclick="window.addPtaHistoryStateSalary(${i})"
-								style="background:var(--pf-mid);color:white;padding:0.4rem 0.75rem;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
-							+ Bundesland
-						</button>
+						<div id="phdd-${i}" style="display:none;position:absolute;top:100%;left:0;background:white;border:1px solid #e9ecef;border-radius:8px;z-index:200;min-width:220px;max-height:260px;overflow-y:auto;padding:0.4rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+							<label style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;font-weight:600;border-bottom:1px solid #eee;">
+								<input type="checkbox" ${allSelected ? 'checked' : ''}
+									   onchange="window.toggleAllPtaHistStates(${i},this.checked)">
+								Alle
+							</label>
+							${allStates.map(s => `
+								<label style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;">
+									<input type="checkbox" ${allSelected || entryStates.includes(s) ? 'checked' : ''}
+										   onchange="window.updatePtaHistState(${i},'${s}',this.checked)">
+									${s}
+								</label>
+							`).join('')}
+						</div>
 					</div>
-					<div id="pta-hist-state-${i}" style="padding-left:1rem;display:flex;flex-direction:column;gap:0.5rem;">
-						${(e.states || []).map((sf, si) => `
-							<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-								<button type="button" onclick="window.togglePtaHistStateDropdown(${i},${si})"
-										style="padding:0.4rem 0.6rem;border:2px solid #e9ecef;border-radius:6px;background:white;cursor:pointer;font-size:0.85rem;min-width:180px;text-align:left;">
-									${(sf.states||[]).length > 0 ? sf.states.join(', ') : 'Bundesländer wählen ▾'}
-								</button>
-								<div id="phsd-${i}-${si}" style="display:none;position:absolute;background:white;border:1px solid #e9ecef;border-radius:8px;z-index:200;min-width:220px;max-height:240px;overflow-y:auto;padding:0.4rem;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-									${(window.ALL_STATES||[]).map(s => `
-										<label style="display:flex;align-items:center;gap:0.35rem;padding:0.25rem 0.4rem;cursor:pointer;font-size:0.83rem;">
-											<input type="checkbox" ${(sf.states||[]).includes(s)?'checked':''}
-												   onchange="window.updatePtaHistStateSelection(${i},${si},'${s}',this.checked)">
-											${s}
-										</label>
-									`).join('')}
-									<div style="border-top:1px solid #eee;padding-top:0.25rem;margin-top:0.25rem;">
-										<button type="button" onclick="window.removePtaHistStateSalary(${i},${si})"
-												style="width:100%;padding:0.3rem;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">
-											Entfernen
-										</button>
-									</div>
-								</div>
-								<input type="number" value="${sf.amount||''}"
-									   onchange="window.ptaSalaryHistoryData[${i}].states[${si}].amount=parseInt(this.value)||0"
-									   style="padding:0.4rem;border:2px solid #e9ecef;border-radius:6px;width:110px;"
-									   placeholder="Gehalt €">
-								<span>€</span>
-							</div>
-						`).join('')}
-					</div>
-				</div>
-			`).join('');
+					<button onclick="window.ptaSalaryHistoryData.splice(${i},1);window.renderPtaSalaryHistoryRows()"
+							style="background:#dc3545;color:white;padding:0.4rem 0.75rem;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
+						Zeile löschen
+					</button>
+				</div>`;
+			}).join('');
 		}
+
+		window.togglePtaHistRow = function(i) {
+			document.querySelectorAll('[id^="phdd-"]').forEach(d => { if (d.id !== 'phdd-'+i) d.style.display='none'; });
+			const dd = document.getElementById('phdd-'+i);
+			if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+		};
+		window.toggleAllPtaHistStates = function(i, checked) {
+			window.ptaSalaryHistoryData[i].states = checked ? ['Alle'] : [];
+			window.renderPtaSalaryHistoryRows();
+		};
+		window.updatePtaHistState = function(i, state, checked) {
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
+			if (!window.ptaSalaryHistoryData[i].states || window.ptaSalaryHistoryData[i].states.includes('Alle')) {
+				window.ptaSalaryHistoryData[i].states = checked ? [...allStates] : allStates.filter(s => s !== state);
+			} else {
+				if (checked) { if (!window.ptaSalaryHistoryData[i].states.includes(state)) window.ptaSalaryHistoryData[i].states.push(state); }
+				else { window.ptaSalaryHistoryData[i].states = window.ptaSalaryHistoryData[i].states.filter(s => s !== state); }
+			}
+			if (window.ptaSalaryHistoryData[i].states.length === allStates.length) window.ptaSalaryHistoryData[i].states = ['Alle'];
+			window.renderPtaSalaryHistoryRows();
+		};
 
 		window.ALL_STATES = window.ALL_STATES || [
 			'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg',
@@ -1844,6 +1858,9 @@ const ALL_STATES = [
 			}
 			if (!e.target.closest('[id^="hdd-"]') && !e.target.closest('button[onclick*="toggleHistRow"]')) {
 				document.querySelectorAll('[id^="hdd-"]').forEach(d => d.style.display='none');
+			}
+			if (!e.target.closest('[id^="phdd-"]') && !e.target.closest('button[onclick*="togglePtaHistRow"]')) {
+				document.querySelectorAll('[id^="phdd-"]').forEach(d => d.style.display='none');
 			}
 		});
 		window.updateStateSelection = function(i, state, checked) {
