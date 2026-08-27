@@ -1836,6 +1836,10 @@ const ALL_STATES = [
 						   style="padding:0.5rem;border:2px solid #e9ecef;border-radius:6px;width:130px;"
 						   placeholder="Tarif €">
 					<span style="font-size:0.88rem;">€/Monat</span>
+					<button type="button" onclick="window.removeStateTariffField(${i})"
+							style="padding:0.5rem 0.75rem;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
+						Zeile löschen
+					</button>
 					<button type="button" onclick="window.addStateTariffField()"
 							style="padding:0.5rem 0.75rem;background:var(--pf-mid);color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
 						+ Bundesland

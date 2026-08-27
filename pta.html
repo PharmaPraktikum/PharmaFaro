@@ -124,38 +124,53 @@
 		align-items: center;
 		margin-left: 0.5rem;
 	}
-	.mode-switcher-btn {
-		background: none;
-		border: none;
-		border-radius: 6px;
-		padding: 0.35rem 0.4rem;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		color: var(--mid);
-		transition: background 0.18s, color 0.18s;
-		line-height: 1;
-	}
-	.mode-switcher-btn:hover {
-		background: var(--red-light);
-		color: var(--red);
-		border-color: var(--red);
-	}
-	.mode-switcher-btn svg { flex-shrink: 0; }
-	.mode-dropdown {
-		display: none;
-		position: absolute;
-		top: calc(100% + 6px);
-		left: 0;
-		background: var(--bg-card);
-		min-width: 180px;
-		border: 1px solid var(--border);
-		border-radius: 10px;
-		z-index: 1002;
-		box-shadow: 0 8px 30px rgba(45,32,64,0.1);
-		overflow: hidden;
-	}
-	.mode-switcher.open .mode-dropdown { display: block; }
+    .mode-switcher-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.35rem 0.4rem;
+        display: flex;
+        align-items: center;
+        color: var(--mid);
+        border-radius: 6px;
+        transition: background 0.18s, color 0.18s;
+        line-height: 1;
+    }
+    @media (min-width: 900px) {
+        .mode-switcher-btn {
+            border: 1.5px solid var(--border-strong);
+            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            gap: 0.4rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .mode-switcher-btn::after {
+            content: 'Bereich wechseln';
+            white-space: nowrap;
+        }
+    }
+    .mode-switcher-btn:hover {
+        background: var(--red-light);
+        color: var(--red);
+        border-color: var(--red);
+    }
+    .mode-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        background: var(--bg-card);
+        min-width: 190px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        z-index: 1002;
+        box-shadow: 0 8px 30px rgba(42,18,16,0.1);
+        overflow: hidden;
+    }
+    .mode-switcher.open .mode-dropdown,
+    .mode-switcher:hover .mode-dropdown { display: block; }
 	.mode-dropdown-item {
 		padding: 0.85rem 1.25rem;
 		font-size: 0.88rem;
