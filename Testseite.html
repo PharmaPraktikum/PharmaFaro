@@ -137,16 +137,20 @@
         line-height: 1;
     }
     @media (min-width: 900px) {
+        .mode-switcher {
+            margin-left: 1.5rem;
+        }
         .mode-switcher-btn {
             border: 1.5px solid var(--border-strong);
             border-radius: 8px;
-            padding: 0.35rem 0.75rem;
+            padding: 0.5rem 0.85rem;
             gap: 0.4rem;
             font-family: 'DM Sans', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: 0.9rem;
+            font-weight: 500;
+            flex-direction: row-reverse;
         }
-        .mode-switcher-btn::after {
+        .mode-switcher-btn::before {
             content: 'Bereich wechseln';
             white-space: nowrap;
         }
@@ -169,8 +173,7 @@
         box-shadow: 0 8px 30px rgba(42,18,16,0.1);
         overflow: hidden;
     }
-    .mode-switcher.open .mode-dropdown,
-    .mode-switcher:hover .mode-dropdown { display: block; }
+    .mode-switcher.open .mode-dropdown { display: block; }
     .mode-dropdown-item {
         padding: 0.85rem 1.25rem;
         font-size: 0.88rem;
@@ -8386,6 +8389,20 @@
 				sw.classList.remove('open');
 			}
 		});
+		(function() {
+			const sw = document.getElementById('mode-switcher');
+			if (!sw) return;
+			let modeCloseTimeout;
+			sw.addEventListener('mouseenter', function() {
+				clearTimeout(modeCloseTimeout);
+				sw.classList.add('open');
+			});
+			sw.addEventListener('mouseleave', function() {
+				modeCloseTimeout = setTimeout(() => {
+					sw.classList.remove('open');
+				}, 250);
+			});
+		})();
 
 		function toggleMobileMenu() {
 			const btn = document.getElementById('hamburger-btn');
