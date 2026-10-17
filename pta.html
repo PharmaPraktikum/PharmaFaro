@@ -611,6 +611,7 @@
     .salary-tariff { background: #fff3cd; color: #856404; border: 1px solid rgba(133,100,4,0.2); }
 	.salary-above-tariff { background: #d1ecf1; color: #0c5460; border: 1px solid rgba(12,84,96,0.2); }
     .salary-adequate { background: #d4edda; color: #155724; border: 1px solid rgba(21,87,36,0.2); }
+    .salary-none { background: #eeeeee; color: #555; border: 1px solid rgba(0,0,0,0.1); }
     .salary-badge::before, .salary-badge::after { display: none; }
 
     .company-header {
@@ -1895,6 +1896,7 @@
 						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('awarded-companies'); closeMobileMenu(); return false;" style="display:none;">Ausgezeichnete Unternehmen</a>
 						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-guide'); closeMobileMenu(); return false;">Praktikumsrichtlinie</a>
 						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('internship-tips'); closeMobileMenu(); return false;">Tipps zur Praktikumssuche</a>
+						<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showSection('tariffs'); closeMobileMenu(); return false;">Tarifgehälter</a>
 					</div>
 				</div>
 			</div>
@@ -2483,6 +2485,11 @@
 							<div style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; letter-spacing: -0.01em;">Tipps zur Praktikumssuche</div>
 							<p style="color: var(--mid); font-size: 0.9rem; line-height: 1.6; margin: 0;">Praktische Ratschläge zur Bewerbung, Betriebsauswahl und optimalen Nutzung der Plattform.</p>
 						</div>
+						<div onclick="showSection('tariffs')" style="background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(42,18,16,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+							<div style="font-size: 2rem; margin-bottom: 1rem;">💶</div>
+							<div style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; letter-spacing: -0.01em;">Tarifgehälter</div>
+							<p style="color: var(--mid); font-size: 0.9rem; line-height: 1.6; margin: 0;">Übersicht der Tarifgehälter und ihrer Entwicklung, inklusive abweichender Regelungen einzelner Bundesländer.</p>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -2581,6 +2588,15 @@
 					<div id="awarded-years-content">
 						<!-- Wird dynamisch gefüllt -->
 					</div>
+				</div>
+			</div>
+
+			<!-- Tarifgehälter -->
+			<div id="tariffs-section" class="content-section">
+				<div class="container">
+					<h2>Tarifgehälter</h2>
+					<p style="color: #666; margin-bottom: 2rem;">Tarifliche Bruttogehälter pro Monat im zeitlichen Verlauf.</p>
+					<div id="tariffs-content"></div>
 				</div>
 			</div>
 
@@ -6707,7 +6723,7 @@
 				const to = entry.to;
 				return year >= from && (to === null || year <= to);
 			});
-			if (matching.length === 0) return getTariffForState(state);
+			if (matching.length === 0) return null;
 			matching.sort((a, b) => b.from - a.from);
 			const entry = matching[0];
 			// Bundesland-spezifischer Historien-Tarif?
@@ -6720,6 +6736,10 @@
 
 		function getSalaryBadge(salary, internshipYear, state) {
 			const tariff = internshipYear ? getTariffForYear(internshipYear, state) : getTariffForState(state);
+			if (tariff == null) {
+				return { class: 'salary-none', text: 'Kein Tarifgehalt zum Vergleich verfügbar' };
+			}
+
 			const note = internshipYear ? '\n(Zum Zeitpunkt des Praktikumsbeginns)' : '';
 
 			if (salary < tariff) {
@@ -7980,7 +8000,80 @@
 			}
 			isPopState = false;
 		});
-		
+
+		const TARIFF_GROUPS = [
+			{ title: 'PTA-Praktikant:innen', key: 'pta_tariff_history' },
+			{ title: 'Ausgebildete PTA', key: 'pta_employee_salary_history' }
+		];
+
+		let tariffsLoaded = false;
+
+		function buildTariffGroups(history) {
+			const groups = {};
+			const add = (states, from, to, amount) => {
+				const isAll = !states || !states.length || states.includes('Alle');
+				const list = isAll ? ['Alle'] : [...states].sort((a, b) => a.localeCompare(b, 'de'));
+				const key = list.join('|');
+				if (!groups[key]) groups[key] = { states: list, rows: [] };
+				groups[key].rows.push({ from, to, amount });
+			};
+			(history || []).forEach(e => {
+				const base = e.default ?? e.amount;
+				const st = e.states || ['Alle'];
+				const names = st.filter(s => typeof s === 'string');
+				const objs = st.filter(s => s && typeof s === 'object');
+				if (base != null) add(names.length ? names : ['Alle'], e.from, e.to, base);
+				objs.forEach(o => { if (o.amount) add(o.states, e.from, e.to, o.amount); });
+			});
+			const list = Object.values(groups);
+			list.forEach(g => g.rows.sort((a, b) => b.from - a.from));
+			list.sort((a, b) => {
+				const aAll = a.states[0] === 'Alle', bAll = b.states[0] === 'Alle';
+				if (aAll !== bAll) return aAll ? -1 : 1;
+				return b.rows.length - a.rows.length;
+			});
+			return list;
+		}
+
+		async function renderTariffTables() {
+			if (tariffsLoaded) return;
+			const box = document.getElementById('tariffs-content');
+			if (!box) return;
+			box.innerHTML = '<p style="color:#666;">Lade Tarifgehälter...</p>';
+			try {
+				const { data, error } = await window.supabase
+					.from('site_settings')
+					.select('key, value')
+					.in('key', TARIFF_GROUPS.map(g => g.key));
+				if (error) throw error;
+				const th = 'padding:0.5rem 0;border-bottom:1.5px solid var(--border);font-size:0.82rem;color:var(--mid);';
+				box.innerHTML = TARIFF_GROUPS.map(g => {
+					let history = [];
+					try { history = JSON.parse((data || []).find(d => d.key === g.key)?.value || '[]'); } catch (e) {}
+					const groups = buildTariffGroups(history);
+					const tables = groups.length === 0
+						? '<p style="color:#666;">Keine Einträge hinterlegt.</p>'
+						: groups.map(grp => `
+							<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
+								<h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">${grp.states[0] === 'Alle' ? 'Deutschlandweit' : escapeHtml(grp.states.join(', '))}</h4>
+								<table style="width:100%;border-collapse:collapse;">
+									<thead><tr><th style="text-align:left;${th}">Zeitraum</th><th style="text-align:right;${th}">Monatliches Bruttogehalt</th></tr></thead>
+									<tbody>${grp.rows.map(r => `
+										<tr>
+											<td style="padding:0.5rem 0;border-bottom:1px solid var(--border);">${r.to == null ? 'ab ' + r.from : (r.from === r.to ? r.from : r.from + ' – ' + r.to)}</td>
+											<td style="padding:0.5rem 0;border-bottom:1px solid var(--border);text-align:right;font-weight:600;">${Number(r.amount).toLocaleString('de-DE')} €</td>
+										</tr>`).join('')}
+									</tbody>
+								</table>
+							</div>`).join('');
+					return `<h3 style="margin:2rem 0 1rem;">${g.title}</h3>${tables}`;
+				}).join('');
+				tariffsLoaded = true;
+			} catch (e) {
+				box.innerHTML = '<p style="color:#dc3545;">Tarifgehälter konnten nicht geladen werden.</p>';
+			}
+		}
+
 		function showSection(section) {
 			if (section === 'landing') {
 				document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
@@ -8129,7 +8222,7 @@
 				navTabs[1].classList.add('active');
 			} else if (section === 'jobs') {
 				navTabs[2].classList.add('active');
-			} else if (['wissenswert', 'company-search', 'awarded-companies', 'internship-guide', 'internship-tips', 'company'].includes(section)) {
+			} else if (['wissenswert', 'company-search', 'awarded-companies', 'internship-guide', 'internship-tips', 'tariffs', 'company'].includes(section)) {
 				document.getElementById('wissenswert-tab').classList.add('active');
 				
 				const dropdownLinks = document.querySelectorAll('.dropdown-content a');
@@ -8137,6 +8230,7 @@
 				else if (section === 'awarded-companies') dropdownLinks[1].classList.add('active');
 				else if (section === 'internship-guide') dropdownLinks[2].classList.add('active');
 				else if (section === 'internship-tips') dropdownLinks[3].classList.add('active');
+				else if (section === 'tariffs') dropdownLinks[4].classList.add('active');
 			} else if (section === 'admin') {
 				navTabs[4].classList.add('active');
 			}
@@ -8184,7 +8278,9 @@
 					entries[i].remove();
 				}
 			}
-			
+
+			if (section === 'tariffs') renderTariffTables();
+
 			currentSection = section;
 			if (!isPopState) history.pushState({ section: section }, '', '#' + section);
 
