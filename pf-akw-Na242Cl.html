@@ -701,11 +701,19 @@
 				<!-- Neue Auszeichnung -->
 				<div style="background:white;border-radius:12px;padding:1.5rem;margin-bottom:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
 					<h3 style="margin-bottom:1rem;">Neue Auszeichnung hinzufügen</h3>
-					<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+					<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
 						<div>
 							<label style="display:block;margin-bottom:0.4rem;font-weight:600;">Jahr:</label>
 							<select id="admin-award-year"
 									style="width:100%;padding:0.75rem;border:2px solid #e9ecef;border-radius:8px;">
+							</select>
+						</div>
+						<div>
+							<label style="display:block;margin-bottom:0.4rem;font-weight:600;">Kategorie:</label>
+							<select id="admin-award-category"
+									style="width:100%;padding:0.75rem;border:2px solid #e9ecef;border-radius:8px;">
+								<option value="offizin">Offizin</option>
+								<option value="krankenhaus">Krankenhausapotheke</option>
 							</select>
 						</div>
 						<div>
@@ -727,7 +735,7 @@
 							   style="width:100%;padding:0.75rem;border:2px solid #e9ecef;border-radius:8px;">
 					</div>
 					<div style="margin-bottom:1rem;">
-						<label style="display:block;margin-bottom:0.4rem;font-weight:600;">Begründung: *</label>
+						<label style="display:block;margin-bottom:0.4rem;font-weight:600;">Begründung (optional):</label>
 						<textarea id="admin-award-reason" rows="3" placeholder="Grund für die Auszeichnung..."
 								  style="width:100%;padding:0.75rem;border:2px solid #e9ecef;border-radius:8px;resize:vertical;"></textarea>
 					</div>
@@ -2822,18 +2830,19 @@
 
 		window.addAward = async function() {
 			const year = parseInt(document.getElementById('admin-award-year').value);
+			const category = document.getElementById('admin-award-category').value;
 			const company = document.getElementById('admin-award-company').value.trim();
 			const address = document.getElementById('admin-award-address').value.trim();
 			const reason = document.getElementById('admin-award-reason').value.trim();
 			
-			if (!company || !reason) {
-				alert('Bitte Unternehmensname und Begründung ausfüllen.');
+			if (!company) {
+				alert('Bitte einen Unternehmensnamen eingeben.');
 				return;
 			}
 			
 			try {
 				const { error } = await supabase.from('bphd_awards')
-					.insert([{ year, company_name: company, company_address: address || null, reason }]);
+					.insert([{ year, company_name: company, company_address: address || null, category, reason: reason || null }]);
 				if (error) throw error;
 				
 				document.getElementById('admin-award-company').value = '';
@@ -2858,8 +2867,9 @@
 			
 			document.getElementById('admin-award-company').value = award.company_name;
 			document.getElementById('admin-award-address').value = award.company_address || '';
-			document.getElementById('admin-award-reason').value = award.reason;
+			document.getElementById('admin-award-reason').value = award.reason || '';
 			document.getElementById('admin-award-year').value = award.year;
+			document.getElementById('admin-award-category').value = award.category || 'offizin';
 			
 			window.deleteAward(award.id, award.company_name, award.year, true);
 			
