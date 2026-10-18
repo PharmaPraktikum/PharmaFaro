@@ -8083,215 +8083,32 @@
 
 		let tariffsLoaded = false;
 
-        function buildTariffGroups(history) {
-            const ALL_STATES = [
-                'Baden-Württemberg',
-                'Bayern',
-                'Berlin',
-                'Brandenburg',
-                'Bremen',
-                'Hamburg',
-                'Hessen',
-                'Mecklenburg-Vorpommern',
-                'Niedersachsen',
-                'Nordrhein-Westfalen',
-                'Rheinland-Pfalz',
-                'Saarland',
-                'Sachsen',
-                'Sachsen-Anhalt',
-                'Schleswig-Holstein',
-                'Thüringen'
-            ];
-
-            const TARGETS = [
-                {
-                    key: 'Nordrhein-Westfalen',
-                    title: 'Abweichungen Nordrhein',
-                    aliases: ['Nordrhein-Westfalen', 'Nordrhein', 'NRW']
-                },
-                {
-                    key: 'Sachsen',
-                    title: 'Abweichungen Sachsen',
-                    aliases: ['Sachsen']
-                }
-            ];
-
-            function normalizeStateName(state) {
-                if (typeof state !== 'string') return null;
-
-                const value = state.trim();
-
-                const aliases = {
-                    'Nordrhein': 'Nordrhein-Westfalen',
-                    'NRW': 'Nordrhein-Westfalen',
-                    'Nordrhein Westfalen': 'Nordrhein-Westfalen',
-                    'Mecklenburg Vorpommern': 'Mecklenburg-Vorpommern',
-                    'Rheinland Pfalz': 'Rheinland-Pfalz',
-                    'Sachsen Anhalt': 'Sachsen-Anhalt',
-                    'Schleswig Holstein': 'Schleswig-Holstein',
-                    'Baden Württemberg': 'Baden-Württemberg',
-                    'Thüringen': 'Thüringen'
-                };
-
-                return aliases[value] || value;
-            }
-
-            function setAmount(stateAmounts, states, amount) {
-                if (amount == null || Number.isNaN(Number(amount))) return;
-
-                const normalizedAmount = Number(amount);
-
-                states.forEach(state => {
-                    const normalizedState = normalizeStateName(state);
-
-                    if (ALL_STATES.includes(normalizedState)) {
-                        stateAmounts[normalizedState] = normalizedAmount;
-                    }
-                });
-            }
-
-            function getDominantAmount(stateAmounts, excludedState = null) {
-                const counts = new Map();
-
-                Object.entries(stateAmounts).forEach(([state, amount]) => {
-                    if (state === excludedState || amount == null) return;
-
-                    const key = String(amount);
-
-                    if (!counts.has(key)) {
-                        counts.set(key, {
-                            amount,
-                            count: 0
-                        });
-                    }
-
-                    counts.get(key).count++;
-                });
-
-                const dominant = [...counts.values()]
-                    .sort((a, b) => b.count - a.count)[0];
-
-                return dominant && dominant.count >= 8
-                    ? dominant
-                    : null;
-            }
-
-            const nationwideRows = [];
-            const deviationRows = {
-                'Nordrhein-Westfalen': [],
-                'Sachsen': []
-            };
-
-            (history || []).forEach(entry => {
-                const stateAmounts = {};
-                const rawStates = Array.isArray(entry.states) ? entry.states : [];
-
-                const namedStates = rawStates
-                    .filter(state => typeof state === 'string')
-                    .map(normalizeStateName)
-                    .filter(state => ALL_STATES.includes(state));
-
-                const objectStates = rawStates.filter(
-                    state => state && typeof state === 'object'
-                );
-
-                const baseAmount = entry.default ?? entry.amount;
-
-                /*
-                 * Der Standardbetrag gilt grundsätzlich deutschlandweit,
-                 * sofern kein konkreter Bundesländerbezug hinterlegt ist.
-                 */
-                if (baseAmount != null) {
-                    const appliesNationwide =
-                        namedStates.length === 0 ||
-                        namedStates.includes('Alle') ||
-                        entry.default != null;
-
-                    if (appliesNationwide) {
-                        setAmount(stateAmounts, ALL_STATES, baseAmount);
-                    } else {
-                        setAmount(stateAmounts, namedStates, baseAmount);
-                    }
-                }
-
-                /*
-                 * Einzelne Bundesländer mit abweichendem Betrag überschreiben
-                 * den deutschlandweiten Standardbetrag.
-                 */
-                objectStates.forEach(stateObject => {
-                    const states = Array.isArray(stateObject.states)
-                        ? stateObject.states
-                        : [];
-
-                    setAmount(stateAmounts, states, stateObject.amount);
-                });
-
-                /*
-                 * Der Betrag für "Deutschlandweit" wird aus dem Betrag ermittelt,
-                 * der in mindestens acht Bundesländern gilt.
-                 */
-                const nationwideAmount = getDominantAmount(stateAmounts);
-
-                if (!nationwideAmount) return;
-
-                nationwideRows.push({
-                    from: entry.from,
-                    to: entry.to,
-                    amount: nationwideAmount.amount
-                });
-
-                /*
-                 * Für Nordrhein und Sachsen werden ausschließlich solche Zeiträume
-                 * ausgegeben, in denen das jeweilige Bundesland vom großen Rest
-                 * abweicht. Der große Rest muss mindestens acht andere Länder umfassen.
-                 */
-                TARGETS.forEach(target => {
-                    const targetAmount = stateAmounts[target.key];
-
-                    if (targetAmount == null) return;
-
-                    const dominantAmongOtherStates = getDominantAmount(
-                        stateAmounts,
-                        target.key
-                    );
-
-                    if (!dominantAmongOtherStates) return;
-
-                    if (targetAmount !== dominantAmongOtherStates.amount) {
-                        deviationRows[target.key].push({
-                            from: entry.from,
-                            to: entry.to,
-                            amount: targetAmount
-                        });
-                    }
-                });
-            });
-
-            function sortRows(rows) {
-                return rows.sort((a, b) => {
-                    const fromA = Number(a.from) || 0;
-                    const fromB = Number(b.from) || 0;
-
-                    return fromB - fromA;
-                });
-            }
-
-            return [
-                {
-                    title: 'Deutschlandweit',
-                    rows: sortRows(nationwideRows)
-                },
-                {
-                    title: 'Abweichungen Nordrhein',
-                    rows: sortRows(deviationRows['Nordrhein-Westfalen'])
-                },
-                {
-                    title: 'Abweichungen Sachsen',
-                    rows: sortRows(deviationRows['Sachsen'])
-                }
-            ];
-        }
-
+		function buildTariffGroups(history) {
+			const groups = {};
+			const add = (states, from, to, amount) => {
+				const isAll = !states || !states.length || states.includes('Alle');
+				const list = isAll ? ['Alle'] : [...states].sort((a, b) => a.localeCompare(b, 'de'));
+				const key = list.join('|');
+				if (!groups[key]) groups[key] = { states: list, rows: [] };
+				groups[key].rows.push({ from, to, amount });
+			};
+			(history || []).forEach(e => {
+				const base = e.default ?? e.amount;
+				const st = e.states || ['Alle'];
+				const names = st.filter(s => typeof s === 'string');
+				const objs = st.filter(s => s && typeof s === 'object');
+				if (base != null) add(names.length ? names : ['Alle'], e.from, e.to, base);
+				objs.forEach(o => { if (o.amount) add(o.states, e.from, e.to, o.amount); });
+			});
+			const list = Object.values(groups);
+			list.forEach(g => g.rows.sort((a, b) => b.from - a.from));
+			list.sort((a, b) => {
+				const aAll = a.states[0] === 'Alle', bAll = b.states[0] === 'Alle';
+				if (aAll !== bAll) return aAll ? -1 : 1;
+				return b.rows.length - a.rows.length;
+			});
+			return list;
+		}
 
 		async function renderTariffTables() {
 			if (tariffsLoaded) return;
@@ -8313,7 +8130,7 @@
 						? '<p style="color:#666;">Keine Einträge hinterlegt.</p>'
 						: groups.map(grp => `
 							<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
-								<h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">${escapeHtml(grp.title)}</h4>
+								<h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">${grp.states[0] === 'Alle' ? 'Deutschlandweit' : escapeHtml(grp.states.join(', '))}</h4>
 								<table style="width:100%;border-collapse:collapse;">
 									<thead><tr><th style="text-align:left;${th}">Zeitraum</th><th style="text-align:right;${th}">Monatliches Bruttogehalt</th></tr></thead>
 									<tbody>${grp.rows.map(r => `
