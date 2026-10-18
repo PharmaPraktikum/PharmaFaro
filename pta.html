@@ -8028,134 +8028,199 @@
                 'Thüringen'
             ];
 
-            const TARGETS = [
-                {
-                    key: 'Nordrhein-Westfalen',
-                    title: 'Abweichungen Nordrhein',
-                    aliases: ['Nordrhein-Westfalen', 'Nordrhein', 'NRW']
-                },
-                {
-                    key: 'Sachsen',
-                    title: 'Abweichungen Sachsen',
-                    aliases: ['Sachsen']
-                }
-            ];
+            const STATE_ALIASES = {
+                'Baden Württemberg': 'Baden-Württemberg',
+                'Mecklenburg Vorpommern': 'Mecklenburg-Vorpommern',
+                'Nordrhein': 'Nordrhein-Westfalen',
+                'Nordrhein Westfalen': 'Nordrhein-Westfalen',
+                'NRW': 'Nordrhein-Westfalen',
+                'Rheinland Pfalz': 'Rheinland-Pfalz',
+                'Sachsen Anhalt': 'Sachsen-Anhalt',
+                'Schleswig Holstein': 'Schleswig-Holstein'
+            };
 
             function normalizeStateName(state) {
                 if (typeof state !== 'string') return null;
 
-                const value = state.trim();
+                const normalized = state.trim();
 
-                const aliases = {
-                    'Nordrhein': 'Nordrhein-Westfalen',
-                    'NRW': 'Nordrhein-Westfalen',
-                    'Nordrhein Westfalen': 'Nordrhein-Westfalen',
-                    'Mecklenburg Vorpommern': 'Mecklenburg-Vorpommern',
-                    'Rheinland Pfalz': 'Rheinland-Pfalz',
-                    'Sachsen Anhalt': 'Sachsen-Anhalt',
-                    'Schleswig Holstein': 'Schleswig-Holstein',
-                    'Baden Württemberg': 'Baden-Württemberg',
-                    'Thüringen': 'Thüringen'
-                };
+                if (normalized === 'Alle') return 'Alle';
 
-                return aliases[value] || value;
+                return STATE_ALIASES[normalized] || normalized;
             }
 
-            function setAmount(stateAmounts, states, amount) {
-                if (amount == null || Number.isNaN(Number(amount))) return;
+            function normalizeStates(states) {
+                if (!Array.isArray(states)) {
+                    states = states ? [states] : [];
+                }
 
-                const normalizedAmount = Number(amount);
+                return states
+                    .map(state => {
+                        if (typeof state === 'string') {
+                            return normalizeStateName(state);
+                        }
 
-                states.forEach(state => {
-                    const normalizedState = normalizeStateName(state);
+                        if (state && typeof state === 'object') {
+                            return normalizeStateName(
+                                state.state ||
+                                state.name ||
+                                state.bundesland ||
+                                state.title
+                            );
+                        }
 
-                    if (ALL_STATES.includes(normalizedState)) {
-                        stateAmounts[normalizedState] = normalizedAmount;
+                        return null;
+                    })
+                    .filter(Boolean);
+            }
+
+            function setAmountForStates(stateAmounts, states, amount) {
+                if (amount == null || amount === '') return;
+
+                const numericAmount = Number(amount);
+
+                if (Number.isNaN(numericAmount)) return;
+
+                const normalizedStates = normalizeStates(states);
+
+                if (
+                    normalizedStates.length === 0 ||
+                    normalizedStates.includes('Alle')
+                ) {
+                    ALL_STATES.forEach(state => {
+                        stateAmounts[state] = numericAmount;
+                    });
+
+                    return;
+                }
+
+                normalizedStates.forEach(state => {
+                    if (ALL_STATES.includes(state)) {
+                        stateAmounts[state] = numericAmount;
                     }
                 });
             }
 
-            function getDominantAmount(stateAmounts, excludedState = null) {
-                const counts = new Map();
+            function getMajorityAmount(stateAmounts, excludedState = null) {
+                const amountCounts = new Map();
 
                 Object.entries(stateAmounts).forEach(([state, amount]) => {
                     if (state === excludedState || amount == null) return;
 
-                    const key = String(amount);
+                    const amountKey = String(amount);
 
-                    if (!counts.has(key)) {
-                        counts.set(key, {
+                    if (!amountCounts.has(amountKey)) {
+                        amountCounts.set(amountKey, {
                             amount,
                             count: 0
                         });
                     }
 
-                    counts.get(key).count++;
+                    amountCounts.get(amountKey).count++;
                 });
 
-                const dominant = [...counts.values()]
+                const majority = [...amountCounts.values()]
                     .sort((a, b) => b.count - a.count)[0];
 
-                return dominant && dominant.count >= 8
-                    ? dominant
-                    : null;
+                /*
+                 * Der große Rest muss mindestens acht andere Bundesländer
+                 * mit demselben Betrag umfassen.
+                 */
+                if (!majority || majority.count < 8) {
+                    return null;
+                }
+
+                return majority;
             }
 
             const nationwideRows = [];
-            const deviationRows = {
-                'Nordrhein-Westfalen': [],
-                'Sachsen': []
-            };
+            const nordrheinRows = [];
+            const sachsenRows = [];
 
             (history || []).forEach(entry => {
                 const stateAmounts = {};
-                const rawStates = Array.isArray(entry.states) ? entry.states : [];
 
-                const namedStates = rawStates
-                    .filter(state => typeof state === 'string')
-                    .map(normalizeStateName)
-                    .filter(state => ALL_STATES.includes(state));
+                const rawStates = Array.isArray(entry.states)
+                    ? entry.states
+                    : [];
+
+                const stringStates = rawStates.filter(
+                    state => typeof state === 'string'
+                );
 
                 const objectStates = rawStates.filter(
                     state => state && typeof state === 'object'
                 );
 
-                const baseAmount = entry.default ?? entry.amount;
+                const defaultAmount = entry.default ?? entry.amount;
 
                 /*
-                 * Der Standardbetrag gilt grundsätzlich deutschlandweit,
-                 * sofern kein konkreter Bundesländerbezug hinterlegt ist.
+                 * Der Standardbetrag gilt deutschlandweit.
+                 *
+                 * Das ist wichtig, damit anschließend für jedes Bundesland
+                 * ein Vergleichswert vorhanden ist.
                  */
-                if (baseAmount != null) {
-                    const appliesNationwide =
-                        namedStates.length === 0 ||
-                        namedStates.includes('Alle') ||
-                        entry.default != null;
-
-                    if (appliesNationwide) {
-                        setAmount(stateAmounts, ALL_STATES, baseAmount);
-                    } else {
-                        setAmount(stateAmounts, namedStates, baseAmount);
-                    }
+                if (defaultAmount != null) {
+                    setAmountForStates(
+                        stateAmounts,
+                        ALL_STATES,
+                        defaultAmount
+                    );
                 }
 
                 /*
-                 * Einzelne Bundesländer mit abweichendem Betrag überschreiben
-                 * den deutschlandweiten Standardbetrag.
+                 * Falls ein Eintrag ausdrücklich nur bestimmten Bundesländern
+                 * zugeordnet ist, wird der Betrag nur dort gesetzt.
+                 */
+                if (
+                    defaultAmount != null &&
+                    stringStates.length > 0 &&
+                    !stringStates.map(normalizeStateName).includes('Alle')
+                ) {
+                    setAmountForStates(
+                        stateAmounts,
+                        stringStates,
+                        defaultAmount
+                    );
+                }
+
+                /*
+                 * Konkrete Länderbeträge überschreiben den Standardbetrag.
+                 *
+                 * Unterstützt werden unter anderem:
+                 *
+                 * {
+                 *     states: ['Nordrhein'],
+                 *     amount: 3500
+                 * }
+                 *
+                 * sowie:
+                 *
+                 * {
+                 *     state: 'Nordrhein',
+                 *     amount: 3500
+                 * }
                  */
                 objectStates.forEach(stateObject => {
-                    const states = Array.isArray(stateObject.states)
-                        ? stateObject.states
-                        : [];
+                    const objectStatesList =
+                        stateObject.states ||
+                        stateObject.state ||
+                        stateObject.bundesland ||
+                        stateObject.name ||
+                        [];
 
-                    setAmount(stateAmounts, states, stateObject.amount);
+                    setAmountForStates(
+                        stateAmounts,
+                        objectStatesList,
+                        stateObject.amount
+                    );
                 });
 
                 /*
-                 * Der Betrag für "Deutschlandweit" wird aus dem Betrag ermittelt,
-                 * der in mindestens acht Bundesländern gilt.
+                 * Deutschlandweiter Betrag:
+                 * Der Betrag muss in mindestens acht Bundesländern gelten.
                  */
-                const nationwideAmount = getDominantAmount(stateAmounts);
+                const nationwideAmount = getMajorityAmount(stateAmounts);
 
                 if (!nationwideAmount) return;
 
@@ -8166,38 +8231,58 @@
                 });
 
                 /*
-                 * Für Nordrhein und Sachsen werden ausschließlich solche Zeiträume
-                 * ausgegeben, in denen das jeweilige Bundesland vom großen Rest
-                 * abweicht. Der große Rest muss mindestens acht andere Länder umfassen.
+                 * Nordrhein-Westfalen:
+                 * Es wird nur dann eine Zeile erzeugt, wenn Nordrhein-Westfalen
+                 * vom Betrag von mindestens acht anderen Bundesländern abweicht.
                  */
-                TARGETS.forEach(target => {
-                    const targetAmount = stateAmounts[target.key];
+                const nordrheinAmount =
+                    stateAmounts['Nordrhein-Westfalen'];
 
-                    if (targetAmount == null) return;
+                const majorityWithoutNordrhein = getMajorityAmount(
+                    stateAmounts,
+                    'Nordrhein-Westfalen'
+                );
 
-                    const dominantAmongOtherStates = getDominantAmount(
-                        stateAmounts,
-                        target.key
-                    );
+                if (
+                    nordrheinAmount != null &&
+                    majorityWithoutNordrhein &&
+                    nordrheinAmount !== majorityWithoutNordrhein.amount
+                ) {
+                    nordrheinRows.push({
+                        from: entry.from,
+                        to: entry.to,
+                        amount: nordrheinAmount
+                    });
+                }
 
-                    if (!dominantAmongOtherStates) return;
+                /*
+                 * Sachsen:
+                 * Es wird nur dann eine Zeile erzeugt, wenn Sachsen
+                 * vom Betrag von mindestens acht anderen Bundesländern abweicht.
+                 */
+                const sachsenAmount = stateAmounts['Sachsen'];
 
-                    if (targetAmount !== dominantAmongOtherStates.amount) {
-                        deviationRows[target.key].push({
-                            from: entry.from,
-                            to: entry.to,
-                            amount: targetAmount
-                        });
-                    }
-                });
+                const majorityWithoutSachsen = getMajorityAmount(
+                    stateAmounts,
+                    'Sachsen'
+                );
+
+                if (
+                    sachsenAmount != null &&
+                    majorityWithoutSachsen &&
+                    sachsenAmount !== majorityWithoutSachsen.amount
+                ) {
+                    sachsenRows.push({
+                        from: entry.from,
+                        to: entry.to,
+                        amount: sachsenAmount
+                    });
+                }
             });
 
             function sortRows(rows) {
                 return rows.sort((a, b) => {
-                    const fromA = Number(a.from) || 0;
-                    const fromB = Number(b.from) || 0;
-
-                    return fromB - fromA;
+                    return Number(b.from || 0) - Number(a.from || 0);
                 });
             }
 
@@ -8208,54 +8293,130 @@
                 },
                 {
                     title: 'Abweichungen Nordrhein',
-                    rows: sortRows(deviationRows['Nordrhein-Westfalen'])
+                    rows: sortRows(nordrheinRows)
                 },
                 {
                     title: 'Abweichungen Sachsen',
-                    rows: sortRows(deviationRows['Sachsen'])
+                    rows: sortRows(sachsenRows)
                 }
             ];
         }
 
+        async function renderTariffTables() {
+            if (tariffsLoaded) return;
 
-		async function renderTariffTables() {
-			if (tariffsLoaded) return;
-			const box = document.getElementById('tariffs-content');
-			if (!box) return;
-			box.innerHTML = '<p style="color:#666;">Lade Tarifgehälter...</p>';
-			try {
-				const { data, error } = await window.supabase
-					.from('site_settings')
-					.select('key, value')
-					.in('key', TARIFF_GROUPS.map(g => g.key));
-				if (error) throw error;
-				const th = 'padding:0.5rem 0;border-bottom:1.5px solid var(--border);font-size:0.82rem;color:var(--mid);';
-				box.innerHTML = TARIFF_GROUPS.map(g => {
-					let history = [];
-					try { history = JSON.parse((data || []).find(d => d.key === g.key)?.value || '[]'); } catch (e) {}
-					const groups = buildTariffGroups(history);
-					const tables = groups.length === 0
-						? '<p style="color:#666;">Keine Einträge hinterlegt.</p>'
-						: groups.map(grp => `
-							<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
-								<h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">${escapeHtml(grp.title)}</h4>
-								<table style="width:100%;border-collapse:collapse;">
-									<thead><tr><th style="text-align:left;${th}">Zeitraum</th><th style="text-align:right;${th}">Monatliches Bruttogehalt</th></tr></thead>
-									<tbody>${grp.rows.map(r => `
-										<tr>
-											<td style="padding:0.5rem 0;border-bottom:1px solid var(--border);">${r.to == null ? 'ab ' + r.from : (r.from === r.to ? r.from : r.from + ' – ' + r.to)}</td>
-											<td style="padding:0.5rem 0;border-bottom:1px solid var(--border);text-align:right;font-weight:600;">${Number(r.amount).toLocaleString('de-DE')} €</td>
-										</tr>`).join('')}
-									</tbody>
-								</table>
-							</div>`).join('');
-					return `<h3 style="margin:2rem 0 1rem;">${g.title}</h3>${tables}`;
-				}).join('');
-				tariffsLoaded = true;
-			} catch (e) {
-				box.innerHTML = '<p style="color:#dc3545;">Tarifgehälter konnten nicht geladen werden.</p>';
-			}
-		}
+            const box = document.getElementById('tariffs-content');
+
+            if (!box) return;
+
+            box.innerHTML = '<p style="color:#666;">Lade Tarifgehälter...</p>';
+
+            try {
+                const { data, error } = await window.supabase
+                    .from('site_settings')
+                    .select('key, value')
+                    .in('key', TARIFF_GROUPS.map(g => g.key));
+
+                if (error) throw error;
+
+                const th = 'padding:0.5rem 0;border-bottom:1.5px solid var(--border);font-size:0.82rem;color:var(--mid);';
+
+                box.innerHTML = TARIFF_GROUPS.map(g => {
+                    let history = [];
+
+                    try {
+                        history = JSON.parse(
+                            (data || []).find(d => d.key === g.key)?.value || '[]'
+                        );
+                    } catch (e) {
+                        console.error('Tarifdaten konnten nicht verarbeitet werden:', e);
+                    }
+
+                    const groups = buildTariffGroups(history);
+
+                    const visibleGroups = groups.filter(grp => {
+                        /*
+                         * Deutschlandweit wird immer angezeigt.
+                         * Die beiden Abweichungstabellen werden nur angezeigt,
+                         * wenn sie mindestens eine Zeile enthalten.
+                         */
+                        return grp.title === 'Deutschlandweit' ||
+                            (
+                                grp.title === 'Abweichungen Nordrhein' &&
+                                grp.rows &&
+                                grp.rows.length > 0
+                            ) ||
+                            (
+                                grp.title === 'Abweichungen Sachsen' &&
+                                grp.rows &&
+                                grp.rows.length > 0
+                            );
+                    });
+
+                    const tables = visibleGroups.length === 0
+                        ? '<p style="color:#666;">Keine Einträge hinterlegt.</p>'
+                        : visibleGroups.map(grp => `
+                            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
+                                <h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">
+                                    ${escapeHtml(grp.title)}
+                                </h4>
+
+                                <table style="width:100%;border-collapse:collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:left;${th}">
+                                                Zeitraum
+                                            </th>
+
+                                            <th style="text-align:right;${th}">
+                                                Monatliches Bruttogehalt
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        ${(grp.rows || []).map(r => `
+                                            <tr>
+                                                <td style="padding:0.5rem 0;border-bottom:1px solid var(--border);">
+                                                    ${r.to == null
+                                                        ? 'ab ' + r.from
+                                                        : (
+                                                            r.from === r.to
+                                                                ? r.from
+                                                                : r.from + ' – ' + r.to
+                                                        )}
+                                                </td>
+
+                                                <td style="padding:0.5rem 0;border-bottom:1px solid var(--border);text-align:right;font-weight:600;">
+                                                    ${Number(r.amount).toLocaleString('de-DE')} €
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `).join('');
+
+                    return `
+                        <h3 style="margin:2rem 0 1rem;">
+                            ${escapeHtml(g.title)}
+                        </h3>
+
+                        ${tables}
+                    `;
+                }).join('');
+
+                tariffsLoaded = true;
+            } catch (e) {
+                console.error('Tarifgehälter konnten nicht geladen werden:', e);
+
+                box.innerHTML = `
+                    <p style="color:#dc3545;">
+                        Tarifgehälter konnten nicht geladen werden.
+                    </p>
+                `;
+            }
+        }
 
 		function showSection(section) {
 			if (section === 'landing') {
