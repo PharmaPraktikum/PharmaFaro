@@ -8029,11 +8029,11 @@
             ];
 
             const STATE_ALIASES = {
+                'Nordrhein': 'Nordrhein-Westfalen',
+                'NRW': 'Nordrhein-Westfalen',
+                'Nordrhein Westfalen': 'Nordrhein-Westfalen',
                 'Baden Württemberg': 'Baden-Württemberg',
                 'Mecklenburg Vorpommern': 'Mecklenburg-Vorpommern',
-                'Nordrhein': 'Nordrhein-Westfalen',
-                'Nordrhein Westfalen': 'Nordrhein-Westfalen',
-                'NRW': 'Nordrhein-Westfalen',
                 'Rheinland Pfalz': 'Rheinland-Pfalz',
                 'Sachsen Anhalt': 'Sachsen-Anhalt',
                 'Schleswig Holstein': 'Schleswig-Holstein'
@@ -8042,95 +8042,15 @@
             function normalizeStateName(state) {
                 if (typeof state !== 'string') return null;
 
-                const normalized = state.trim();
+                const value = state.trim();
 
-                if (normalized === 'Alle') return 'Alle';
-
-                return STATE_ALIASES[normalized] || normalized;
+                return STATE_ALIASES[value] || value;
             }
 
-            function normalizeStates(states) {
-                if (!Array.isArray(states)) {
-                    states = states ? [states] : [];
-                }
-
-                return states
-                    .map(state => {
-                        if (typeof state === 'string') {
-                            return normalizeStateName(state);
-                        }
-
-                        if (state && typeof state === 'object') {
-                            return normalizeStateName(
-                                state.state ||
-                                state.name ||
-                                state.bundesland ||
-                                state.title
-                            );
-                        }
-
-                        return null;
-                    })
-                    .filter(Boolean);
-            }
-
-            function setAmountForStates(stateAmounts, states, amount) {
-                if (amount == null || amount === '') return;
-
-                const numericAmount = Number(amount);
-
-                if (Number.isNaN(numericAmount)) return;
-
-                const normalizedStates = normalizeStates(states);
-
-                if (
-                    normalizedStates.length === 0 ||
-                    normalizedStates.includes('Alle')
-                ) {
-                    ALL_STATES.forEach(state => {
-                        stateAmounts[state] = numericAmount;
-                    });
-
-                    return;
-                }
-
-                normalizedStates.forEach(state => {
-                    if (ALL_STATES.includes(state)) {
-                        stateAmounts[state] = numericAmount;
-                    }
+            function includesState(states, targetState) {
+                return (states || []).some(state => {
+                    return normalizeStateName(state) === targetState;
                 });
-            }
-
-            function getMajorityAmount(stateAmounts, excludedState = null) {
-                const amountCounts = new Map();
-
-                Object.entries(stateAmounts).forEach(([state, amount]) => {
-                    if (state === excludedState || amount == null) return;
-
-                    const amountKey = String(amount);
-
-                    if (!amountCounts.has(amountKey)) {
-                        amountCounts.set(amountKey, {
-                            amount,
-                            count: 0
-                        });
-                    }
-
-                    amountCounts.get(amountKey).count++;
-                });
-
-                const majority = [...amountCounts.values()]
-                    .sort((a, b) => b.count - a.count)[0];
-
-                /*
-                 * Der große Rest muss mindestens acht andere Bundesländer
-                 * mit demselben Betrag umfassen.
-                 */
-                if (!majority || majority.count < 8) {
-                    return null;
-                }
-
-                return majority;
             }
 
             const nationwideRows = [];
@@ -8138,146 +8058,130 @@
             const sachsenRows = [];
 
             (history || []).forEach(entry => {
-                const stateAmounts = {};
-
+                const baseAmount = entry.default ?? entry.amount;
                 const rawStates = Array.isArray(entry.states)
                     ? entry.states
                     : [];
 
-                const stringStates = rawStates.filter(
-                    state => typeof state === 'string'
-                );
+                const namedStates = rawStates
+                    .filter(state => typeof state === 'string')
+                    .map(normalizeStateName);
 
-                const objectStates = rawStates.filter(
+                const deviationObjects = rawStates.filter(
                     state => state && typeof state === 'object'
                 );
 
-                const defaultAmount = entry.default ?? entry.amount;
-
                 /*
-                 * Der Standardbetrag gilt deutschlandweit.
-                 *
-                 * Das ist wichtig, damit anschließend für jedes Bundesland
-                 * ein Vergleichswert vorhanden ist.
+                 * Entsprechend der ursprünglichen Logik gilt der Grundbetrag
+                 * deutschlandweit, wenn keine konkreten Ländernamen oder
+                 * ausdrücklich "Alle" hinterlegt sind.
                  */
-                if (defaultAmount != null) {
-                    setAmountForStates(
-                        stateAmounts,
-                        ALL_STATES,
-                        defaultAmount
-                    );
+                const isNationwide = (
+                    namedStates.length === 0 ||
+                    namedStates.includes('Alle')
+                );
+
+                if (!isNationwide || baseAmount == null) {
+                    return;
+                }
+
+                const numericBaseAmount = Number(baseAmount);
+
+                if (Number.isNaN(numericBaseAmount)) {
+                    return;
                 }
 
                 /*
-                 * Falls ein Eintrag ausdrücklich nur bestimmten Bundesländern
-                 * zugeordnet ist, wird der Betrag nur dort gesetzt.
+                 * Alle Bundesländer, die in diesem Zeitraum ausdrücklich
+                 * einen abweichenden Betrag erhalten.
                  */
-                if (
-                    defaultAmount != null &&
-                    stringStates.length > 0 &&
-                    !stringStates.map(normalizeStateName).includes('Alle')
-                ) {
-                    setAmountForStates(
-                        stateAmounts,
-                        stringStates,
-                        defaultAmount
-                    );
-                }
+                const overriddenStates = new Set();
 
-                /*
-                 * Konkrete Länderbeträge überschreiben den Standardbetrag.
-                 *
-                 * Unterstützt werden unter anderem:
-                 *
-                 * {
-                 *     states: ['Nordrhein'],
-                 *     amount: 3500
-                 * }
-                 *
-                 * sowie:
-                 *
-                 * {
-                 *     state: 'Nordrhein',
-                 *     amount: 3500
-                 * }
-                 */
-                objectStates.forEach(stateObject => {
-                    const objectStatesList =
-                        stateObject.states ||
-                        stateObject.state ||
-                        stateObject.bundesland ||
-                        stateObject.name ||
-                        [];
+                deviationObjects.forEach(deviation => {
+                    const states = Array.isArray(deviation.states)
+                        ? deviation.states
+                        : [];
 
-                    setAmountForStates(
-                        stateAmounts,
-                        objectStatesList,
-                        stateObject.amount
-                    );
+                    states.forEach(state => {
+                        const normalizedState = normalizeStateName(state);
+
+                        if (ALL_STATES.includes(normalizedState)) {
+                            overriddenStates.add(normalizedState);
+                        }
+                    });
                 });
 
                 /*
-                 * Deutschlandweiter Betrag:
-                 * Der Betrag muss in mindestens acht Bundesländern gelten.
+                 * Der deutschlandweite Grundbetrag wird immer ausgegeben.
                  */
-                const nationwideAmount = getMajorityAmount(stateAmounts);
-
-                if (!nationwideAmount) return;
-
                 nationwideRows.push({
                     from: entry.from,
                     to: entry.to,
-                    amount: nationwideAmount.amount
+                    amount: numericBaseAmount
                 });
 
-                /*
-                 * Nordrhein-Westfalen:
-                 * Es wird nur dann eine Zeile erzeugt, wenn Nordrhein-Westfalen
-                 * vom Betrag von mindestens acht anderen Bundesländern abweicht.
-                 */
-                const nordrheinAmount =
-                    stateAmounts['Nordrhein-Westfalen'];
+                function addDeviationRow(targetState, targetRows) {
+                    const deviation = deviationObjects.find(object => {
+                        const states = Array.isArray(object.states)
+                            ? object.states
+                            : [];
 
-                const majorityWithoutNordrhein = getMajorityAmount(
-                    stateAmounts,
-                    'Nordrhein-Westfalen'
-                );
+                        return includesState(states, targetState);
+                    });
 
-                if (
-                    nordrheinAmount != null &&
-                    majorityWithoutNordrhein &&
-                    nordrheinAmount !== majorityWithoutNordrhein.amount
-                ) {
-                    nordrheinRows.push({
+                    if (!deviation || deviation.amount == null) {
+                        return;
+                    }
+
+                    const deviationAmount = Number(deviation.amount);
+
+                    if (Number.isNaN(deviationAmount)) {
+                        return;
+                    }
+
+                    /*
+                     * Der große Rest besteht aus den Bundesländern,
+                     * die nicht durch ein Abweichungsobjekt überschrieben werden.
+                     *
+                     * Das Zielbundesland selbst wird dabei nicht mitgezählt.
+                     */
+                    const otherStatesWithBaseAmount =
+                        ALL_STATES.filter(state => {
+                            return state !== targetState &&
+                                !overriddenStates.has(state);
+                        }).length;
+
+                    /*
+                     * Nur Abweichungen mit mindestens acht anderen
+                     * Bundesländern im großen Rest werden ausgegeben.
+                     */
+                    if (otherStatesWithBaseAmount < 8) {
+                        return;
+                    }
+
+                    /*
+                     * Gleicher Betrag wie deutschlandweit ist keine Abweichung.
+                     */
+                    if (deviationAmount === numericBaseAmount) {
+                        return;
+                    }
+
+                    targetRows.push({
                         from: entry.from,
                         to: entry.to,
-                        amount: nordrheinAmount
+                        amount: deviationAmount
                     });
                 }
 
-                /*
-                 * Sachsen:
-                 * Es wird nur dann eine Zeile erzeugt, wenn Sachsen
-                 * vom Betrag von mindestens acht anderen Bundesländern abweicht.
-                 */
-                const sachsenAmount = stateAmounts['Sachsen'];
-
-                const majorityWithoutSachsen = getMajorityAmount(
-                    stateAmounts,
-                    'Sachsen'
+                addDeviationRow(
+                    'Nordrhein-Westfalen',
+                    nordrheinRows
                 );
 
-                if (
-                    sachsenAmount != null &&
-                    majorityWithoutSachsen &&
-                    sachsenAmount !== majorityWithoutSachsen.amount
-                ) {
-                    sachsenRows.push({
-                        from: entry.from,
-                        to: entry.to,
-                        amount: sachsenAmount
-                    });
-                }
+                addDeviationRow(
+                    'Sachsen',
+                    sachsenRows
+                );
             });
 
             function sortRows(rows) {
@@ -8356,7 +8260,11 @@
 
                     const tables = visibleGroups.length === 0
                         ? '<p style="color:#666;">Keine Einträge hinterlegt.</p>'
-                        : visibleGroups.map(grp => `
+                        : visibleGroups.filter(grp => {
+                                            return grp.title === 'Deutschlandweit' ||
+                                                (grp.rows && grp.rows.length > 0);
+                                        })
+                                        .map(grp => `
                             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
                                 <h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">
                                     ${escapeHtml(grp.title)}
