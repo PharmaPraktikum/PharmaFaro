@@ -5,7 +5,7 @@
 	<link rel="icon" type="image/png" href="./favicon-apo.png">
     <link rel="apple-touch-icon" href="./favicon-512.png">
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src https://*.supabase.co; img-src 'self' data: https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src https://*.supabase.co; img-src 'self' data: https:;">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 	<!-- Supabase Backend Integration -->
 	<script type="module">
@@ -14,8 +14,9 @@
 		
 		window.supabase = supabase;
 		window.api = api;
-	</script>	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	</script>
+    <script src="./js/vendor/supabase.js"></script>
+    <script src="./js/vendor/jspdf.umd.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PharmaFaro - Bewertungsplattform für Pharmaziepraktika</title>
     <style>
@@ -3086,7 +3087,7 @@
 			<div class="modal-body">
 				<p><strong>PharmaFaro.de</strong></p>
 				<br>
-				<p><strong>Angaben gemäß § 5 TMG:</strong></p>
+				<p><strong>Angaben gemäß § 5 DDG:</strong></p>
 				<p>Marlon Krompholz<br>Davidstraße 5a<br>27313 Dörverden<br>Deutschland</p>
 				<br>
 				<p><strong>Kontakt:</strong></p>
@@ -3683,12 +3684,8 @@
 
 		function escapeAttr(str) {
 			if (!str) return '';
-			return String(str)
-				.replace(/\\/g, '\\\\')
-				.replace(/'/g, "\\'")
-				.replace(/"/g, '\\"')
-				.replace(/\n/g, '\\n')
-				.replace(/\r/g, '\\r');
+			const js = String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+			return escapeHtml(js);
 		}
 
 		function sanitizeUrl(url) {
@@ -3879,27 +3876,11 @@
 				console.error('Fehler bei Duplikat-Prüfung:', error);
 			}
 			
-			const result = await window.api.createReview(formData);
-			
+			const result = await window.api.createReview(formData, certificateFile);
 			if (!result.success) {
 				showToast('Fehler beim Einreichen der Bewertung: ' + result.error, 'error');
 				return null;
-			}			
-			
-			const uploadResult = await window.api.uploadCertificate(certificateFile, result.data.id);
-			
-			if (uploadResult.success) {
-				await window.supabase
-					.from('reviews')
-					.update({ 
-						pdf_url: uploadResult.path,
-						pdf_filename: certificateFile.name
-					})
-					.eq('id', result.data.id);
-			} else {
-				console.error('❌ PDF-Upload fehlgeschlagen:', uploadResult.error);
 			}
-			
 			return result.data;
 		}
 
@@ -4128,7 +4109,7 @@
 			
 			try {
 				const { data: existingJobs } = await window.supabase
-					.from('jobs')
+					.from('public_jobs')
 					.select('id')
 					.ilike('company_name', formData.companyName)
 					.ilike('address', formData.address)
@@ -4821,6 +4802,7 @@
             document.getElementById('report-modal').setAttribute('data-review-id', reviewId);
             document.getElementById('report-modal').style.display = 'block';
             document.getElementById('report-modal').style.zIndex = '9999';
+            showReportForm();
         }
 
         function showReportForm() {
@@ -6766,18 +6748,26 @@
             return hours * 60 + minutes;
         }
 
-		function getTariffForYear(year) {
+		function findTariffEntry(history, year, state) {
+			const st = state === 'Ausland' ? 'Außerhalb Deutschlands' : state;
+			const namesOf = e => {
+				const n = (e.states || []).filter(s => typeof s === 'string');
+				return n.length ? n : ['Alle'];
+			};
+			const inYear = history.filter(e => year >= e.from && (e.to === null || year <= e.to));
+			const explicit = inYear.filter(e => { const n = namesOf(e); return st && !n.includes('Alle') && n.includes(st); });
+			const general = inYear.filter(e => namesOf(e).includes('Alle'));
+			const list = explicit.length ? explicit : general;
+			list.sort((a, b) => b.from - a.from);
+			return list[0] || null;
+		}
+
+		function getTariffForYear(year, state) {
 			if (!year || !window.tariffHistory || window.tariffHistory.length === 0) {
 				return window.tariffSalary || 1040;
 			}
-			const matching = window.tariffHistory.filter(entry => {
-				const from = entry.from;
-				const to = entry.to;
-				return year >= from && (to === null || year <= to);
-			});
-			if (matching.length === 0) return null;
-			matching.sort((a, b) => b.from - a.from);
-			return matching[0].amount;
+			const entry = findTariffEntry(window.tariffHistory, year, state);
+			return entry ? (entry.default ?? entry.amount) : null;
 		}
 
 		function getPtaEmployeeForState(state) {
@@ -6793,15 +6783,8 @@
 			if (!year || !window.ptaEmployeeSalaryHistory || window.ptaEmployeeSalaryHistory.length === 0) {
 				return getPtaEmployeeForState(state);
 			}
-			const matching = window.ptaEmployeeSalaryHistory.filter(e => year >= e.from && (e.to === null || year <= e.to));
-			if (matching.length === 0) return null;
-			matching.sort((a, b) => b.from - a.from);
-			const entry = matching[0];
-			if (state && entry.states && entry.states.length > 0) {
-				const stateMatch = entry.states.find(sf => sf.states && sf.states.includes(state));
-				if (stateMatch) return stateMatch.amount;
-			}
-			return entry.default || entry.amount || getPtaEmployeeForState(state);
+			const entry = findTariffEntry(window.ptaEmployeeSalaryHistory, year, state);
+			return entry ? (entry.default ?? entry.amount) : null;
 		}
 
 		function getSalaryBadge(salary, internshipYear, hasPtaDegree, state) {
@@ -6809,7 +6792,7 @@
 			if (hasPtaDegree) {
 				tariff = internshipYear ? getPtaEmployeeTariffForYear(internshipYear, state) : getPtaEmployeeForState(state);
 			} else {
-				tariff = internshipYear ? getTariffForYear(internshipYear) : (window.tariffSalary || 1040);
+				tariff = internshipYear ? getTariffForYear(internshipYear, state) : (window.tariffSalary || 1040);
 			}
 			if (tariff == null) {
 				return { class: 'salary-none', text: 'Kein Tarifgehalt zum Vergleich verfügbar' };
@@ -8428,10 +8411,10 @@
 				if (!sb) return;
 
 				const [r, j, verifiedRaw, apoCompanyNames] = await Promise.all([
-					sb.from('reviews').select('id', { count: 'exact', head: true }).eq('status', 'active').eq('practice_type', 'Apo'),
-					sb.from('jobs').select('id', { count: 'exact', head: true }).eq('status', 'active').eq('practice_type', 'Apo'),
-					sb.from('company_verifications').select('company_name').eq('status', 'verified'),
-					sb.from('reviews').select('company_name').eq('status', 'active').eq('practice_type', 'Apo')
+					sb.from('public_reviews').select('id', { count: 'exact', head: true }).eq('practice_type', 'Apo'),
+					sb.from('public_jobs').select('id', { count: 'exact', head: true }).eq('practice_type', 'Apo'),
+					sb.from('public_company_profiles').select('company_name'),
+					sb.from('public_reviews').select('company_name').eq('practice_type', 'Apo')
 				]);
 				const apoNames = new Set((apoCompanyNames.data || []).map(r => r.company_name.toLowerCase()));
 				const verifiedApoCount = (verifiedRaw.data || []).filter(v => apoNames.has(v.company_name.toLowerCase())).length;
@@ -8475,7 +8458,7 @@
 				if (!sb) { renderLandingFallback(); return; }
 
 				const { data: reviews, error } = await sb
-					.from('reviews')
+					.from('public_reviews')
 					.select('company_name, state, category, ratings, highlights, feedback, tasks, address')
 					.eq('status', 'active')
 					.order('created_at', { ascending: false })
@@ -9060,9 +9043,8 @@
 				}
 
 				const { data, error } = await window.supabase
-					.from('company_verifications')
-					.select('company_name, company_description, company_website, company_logo_url, contact_person, contact_email, contact_phone')
-					.eq('status', 'verified');
+					.from('public_company_profiles')
+					.select('company_name, company_description, company_website, company_logo_url, contact_person, contact_email, contact_phone');
 				
 				if (error) throw error;
 				
@@ -9484,7 +9466,7 @@
 				
 				if (data) {
 					const parsed = JSON.parse(data.value);
-					window.tariffSalary = parsed.amount;
+					window.tariffSalary = parsed.default ?? parsed.amount;
 					try {
 						const { data: histData } = await window.supabase
 							.from('site_settings')
