@@ -9,7 +9,7 @@
 	<meta name="robots" content="noindex, nofollow">
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
 	<meta name="referrer" content="strict-origin-when-cross-origin">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src https://*.supabase.co; img-src 'self' data:;">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src https://*.supabase.co; img-src 'self' data:;">
     <title>PharmaFaro – Admin</title>
     
 	<style>
@@ -1052,7 +1052,8 @@
 	  window.SUPABASE_URL = 'https://wotwmwcgbihlhlcwlvbm.supabase.co';
 	  window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvdHdtd2NnYmlobGhsY3dsdmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc4MDcsImV4cCI6MjA4NjA1MzgwN30.Zwt-clrOnntZQZ_NvpKJVB5xBCZTl_PgzrC9F_7F-uU';
 	</script>
-	
+
+	<script src="./js/vendor/supabase.js"></script>
 	<script type="module">
 		import { supabase as anonSupabase } from './js/supabase-client.js';
 		const supabase = anonSupabase;

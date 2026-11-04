@@ -8365,7 +8365,7 @@
 				const sb = window.supabase;
 				if (!sb) return;
 
-				const [r, j, verifiedRaw, apoCompanyNames] = await Promise.all([
+				const [r, j, verifiedRaw, ptaCompanyNames] = await Promise.all([
 					sb.from('public_reviews').select('id', { count: 'exact', head: true }).eq('practice_type', 'PTA'),
 					sb.from('public_jobs').select('id', { count: 'exact', head: true }).eq('practice_type', 'PTA'),
 					sb.from('public_company_profiles').select('company_name'),
