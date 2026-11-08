@@ -1383,7 +1383,7 @@
 							}
 							${review.user_email ? 
 								`<button class="action-btn" 
-										 onclick="window.location.href='mailto:${review.user_email}?subject=${encodeURIComponent('Ihre Bewertung auf PharmaFaro.de - ID: ' + review.id.substring(0,8))}'"
+										 onclick="window.location.href='mailto:' + encodeURIComponent('${escapeAttr(review.user_email)}') + '?subject=' + encodeURIComponent('Ihre Bewertung auf PharmaFaro.de - ID: ${review.id.substring(0,8)}')"
 										 style="background:#1a4a7a;color:white;">
 									Kontaktieren
 								</button>` : ''
@@ -2233,6 +2233,12 @@ const ALL_STATES = [
 			return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 		}
 
+		function escapeAttr(str) {
+			if (!str) return '';
+			const js = String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+			return esc(js);
+		}
+
 		function renderCompaniesTable(companies, modeF) {
 			modeF = modeF || 'all';
 			const tbody = document.getElementById('companies-tbody');
@@ -2407,9 +2413,9 @@ const ALL_STATES = [
 						<div>
 							<strong style="font-size:1.05rem;">${esc(req.company_name)}</strong><br>
 							<span style="color:#666;font-size:0.9rem;line-height:1.8;">
-								${req.company_address ? `📍 ${req.company_address}<br>` : ''}
-								👤 ${req.contact_person || '–'} &nbsp;|&nbsp;
-								✉️ <a href="mailto:${req.contact_email}" style="color:#667eea;">${req.contact_email}</a><br>
+								${req.company_address ? `📍 ${esc(req.company_address)}<br>` : ''}
+								👤 ${esc(req.contact_person || '–')} &nbsp;|&nbsp;
+								✉️ <a href="mailto:${esc(req.contact_email)}" style="color:#667eea;">${esc(req.contact_email)}</a><br>
 								🕐 ${formatDate(req.created_at)}
 								${req.reviewed_at ? ` · Bearbeitet: ${formatDate(req.reviewed_at)}` : ''}
 							</span>
@@ -2667,12 +2673,12 @@ const ALL_STATES = [
 						<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.75rem;">
 							<div style="flex:1;">
 								<strong>${esc(r.company_name || reviewInfo.company_name || 'Unbekannt')}</strong>
-								${r.company_address ? `<span style="color:#888;margin-left:0.5rem;font-size:0.9rem;">📍 ${r.company_address}</span>` : ''}
+								${r.company_address ? `<span style="color:#888;margin-left:0.5rem;font-size:0.9rem;">📍 ${esc(r.company_address)}</span>` : ''}
 								<br>
 								<small style="color:#888;">
 									ID: <code>${r.review_id?.substring(0,8)}</code> &nbsp;|&nbsp;
 									Gemeldet: ${formatDate(r.reported_at)} &nbsp;|&nbsp;
-									Von: ${r.contact_name} (${r.contact_email})
+									Von: ${esc(r.contact_name)} (${esc(r.contact_email)})
 								</small>
 								<br>
 								<div style="margin-top:0.5rem;padding:0.5rem;background:#fff3cd;border-radius:6px;font-size:0.9rem;">
@@ -3120,9 +3126,9 @@ const ALL_STATES = [
 							<div style="background:#f8f9fa;border-radius:8px;padding:1rem;margin-bottom:0.75rem;
 										display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
 								<div style="flex:1;">
-									<strong>${award.company_name}</strong><br>
-									${award.company_address ? `<small style="color:#888;">📍 ${award.company_address}</small><br>` : ''}
-									<span style="color:#555;font-size:0.9rem;">${award.reason}</span><br>
+									<strong>${esc(award.company_name)}</strong><br>
+									${award.company_address ? `<small style="color:#888;">📍 ${esc(award.company_address)}</small><br>` : ''}
+									<span style="color:#555;font-size:0.9rem;">${esc(award.reason)}</span><br>
 									<small style="color:#aaa;">Eingetragen: ${formatDate(award.created_at)}</small>
 								</div>
 								<div style="display:flex;gap:0.4rem;flex-shrink:0;">
@@ -3130,7 +3136,7 @@ const ALL_STATES = [
 											style="padding:0.3rem 0.7rem;background:#ffc107;color:#333;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">
 										Bearbeiten
 									</button>
-									<button onclick="window.deleteAward('${award.id}', '${award.company_name.replace(/'/g,"\\'")}', ${award.year})"
+									<button onclick="window.deleteAward('${award.id}')"
 											style="padding:0.3rem 0.7rem;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;">
 										Löschen
 									</button>
@@ -3182,19 +3188,22 @@ const ALL_STATES = [
 			document.getElementById('admin-award-reason').value = award.reason;
 			document.getElementById('admin-award-year').value = award.year;
 			
-			window.deleteAward(award.id, award.company_name, award.year, true);
+			window.deleteAward(award.id, true);
 			
 			document.getElementById('admin-award-company').scrollIntoView({ behavior: 'smooth' });
 			document.getElementById('admin-award-company').focus();
 		};
 
-		window.deleteAward = async function(awardId, companyName, year, silent = false) {
-			if (!silent && !confirm(`Auszeichnung für "${companyName}" (${year}) wirklich löschen?`)) return;
+		window.deleteAward = async function(awardId, silent = false) {
+			const award = (typeof allAwards !== 'undefined' ? (allAwards || []).find(a => a.id === awardId) : null) || {};
+			const name = award.company_name || 'Unbekannt';
+			const year = award.year || '';
+			if (!silent && !confirm(`Auszeichnung für "${name}" (${year}) wirklich löschen?`)) return;
 			
 			try {
 				const { error } = await supabase.from('bphd_awards').delete().eq('id', awardId);
 				if (error) throw error;
-				if (!silent) showSuccess(`Auszeichnung für "${companyName}" gelöscht.`);
+				if (!silent) showSuccess(`Auszeichnung für "${name}" gelöscht.`);
 				await loadAwards();
 			} catch(err) {
 				showError('Fehler: ' + err.message);
@@ -3387,8 +3396,15 @@ const ALL_STATES = [
 		};
 		
 		window.viewReview = async function(reviewId) {
-			const review = allReviews.find(r => r.id === reviewId) || allReviewsForCompanies.find(r => r.id === reviewId);
-			if (!review) return;
+			const source = allReviews.find(r => r.id === reviewId) || allReviewsForCompanies.find(r => r.id === reviewId);
+			if (!source) return;
+
+			// XSS-Schutz: Kopie anlegen und alle nutzergesteuerten Felder escapen
+			// (Template-Texte tasks/feedback/highlights bleiben ausgespart, sie sind dort bereits mit esc() gerendert)
+			const review = Object.assign({}, source);
+			['company_name', 'address', 'state', 'country', 'area', 'benefits', 'specializations', 'customer_type', 'user_email', 'pdf_filename'].forEach(k => {
+				if (review[k] != null) review[k] = esc(String(review[k]));
+			});
 			
 			const modal = document.createElement('div');
 			modal.className = 'modal';
@@ -3586,8 +3602,15 @@ const ALL_STATES = [
 		};
 		
 		window.viewJob = async function(jobId) {
-			const job = allJobs.find(j => j.id === jobId) || allJobsForCompanies.find(j => j.id === jobId);
-			if (!job) return;
+			const source = allJobs.find(j => j.id === jobId) || allJobsForCompanies.find(j => j.id === jobId);
+			if (!source) return;
+
+			// XSS-Schutz: Kopie anlegen und alle nutzergesteuerten Felder escapen
+			// (description bleibt außen vor: im Template bereits mit esc(job.description) gerendert)
+			const job = Object.assign({}, source);
+			['company_name', 'address', 'state', 'category', 'area', 'contact_person', 'contact_email', 'earliest_start', 'application_notes', 'specializations', 'customer_type', 'benefits'].forEach(k => {
+				if (job[k] != null) job[k] = esc(String(job[k]));
+			});
 			
 			const modal = document.createElement('div');
 			modal.className = 'modal';

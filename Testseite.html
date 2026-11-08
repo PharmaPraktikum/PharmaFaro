@@ -18,6 +18,13 @@
     <script src="./js/vendor/supabase.js"></script>
     <script src="./js/vendor/jspdf.umd.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Geprüfte Bewertungen von Pharmaziepraktika und passende Stellenangebote. Jede Bewertung wird per Praktikumsbescheinigung verifiziert – von Studierenden, für Studierende.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PharmaFaro – Bewertungen für Pharmaziepraktika">
+    <meta property="og:description" content="Geprüfte Praktikumsbewertungen und Stellenangebote für Pharmaziestudierende.">
+    <meta property="og:url" content="https://pharmafaro.de/">
+    <meta property="og:image" content="https://pharmafaro.de/logo.png">
+    <meta name="twitter:card" content="summary">
     <title>PharmaFaro - Bewertungsplattform für Pharmaziepraktika</title>
     <style>
     @font-face {
@@ -1449,6 +1456,8 @@
 
     .landing-stat-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
 
+    .landing-stat-icon svg { width: 2rem; height: 2rem; display: block; margin: 0 auto 0.75rem; color: var(--red); }
+
     .landing-stat-number {
         font-family: 'Fraunces', serif;
         font-size: 3rem;
@@ -1532,6 +1541,8 @@
         font-size: 1.4rem;
         margin-bottom: 1.25rem;
     }
+
+    .landing-feature-icon svg { width: 22px; height: 22px; color: var(--red); }
 
     .landing-feature-title { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; letter-spacing: -0.01em; }
     .landing-feature-text { font-size: 0.9rem; color: var(--mid); line-height: 1.7; }
@@ -1905,8 +1916,8 @@
     <!-- Hero Banner -->
     <div class="hero">
         <div class="container">
-            <h1>Finde dein perfektes<br><em>Pharmaziepraktikum</em></h1>
-            <p>Bewerte deine Praktikumserfahrung oder entdecke Stellenangebote von Praktikumsbetrieben</p>
+            <h1>Echte Erfahrungsberichte<br>aus deinem <em>Pharmaziepraktikum</em></h1>
+            <p>Gehalt, Betreuung, Arbeitszeiten – von Studierenden bewertet, per Praktikumsbescheinigung geprüft. Dazu Stellenangebote direkt von den Betrieben.</p>
 			<div class="hero-buttons">
 				<button class="btn btn-primary hover-lift" onclick="showSection('write')" style="padding: 1rem 2rem; font-size: 1.1rem;">
 					Jetzt Praktikum bewerten
@@ -1940,58 +1951,62 @@
                 <!-- Live-Statistiken -->
 				<div class="landing-stats">
 					<div class="landing-stat-card" onclick="showSection('search')" style="cursor:pointer;">
-						<span class="landing-stat-icon">⭐</span>
+						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></span>
 						<div class="landing-stat-number" id="stat-reviews">—</div>
 						<div class="landing-stat-label">Verifizierte Bewertungen</div>
 					</div>
 					<div class="landing-stat-card" onclick="showSection('jobs')" style="cursor:pointer;">
-						<span class="landing-stat-icon">💼</span>
+						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
 						<div class="landing-stat-number" id="stat-jobs">—</div>
 						<div class="landing-stat-label">Aktive Stellenangebote</div>
 					</div>
 					<div class="landing-stat-card" onclick="(function(){ const cb = document.getElementById('verified-company-filter'); if(cb) cb.checked = true; showSection('company-search'); })()" style="cursor:pointer;">
-						<span class="landing-stat-icon">✓</span>
+						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95L12 22l-.34-.05C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
 						<div class="landing-stat-number" id="stat-companies">—</div>
 						<div class="landing-stat-label">Verifizierte Unternehmen</div>
 					</div>
 				</div>
 
+                <p style="text-align:center;color:var(--mid);font-size:0.85rem;margin:1.5rem auto 0;max-width:560px;line-height:1.6;">
+                    Jede Bewertung wird vor Veröffentlichung anhand einer Praktikumsbescheinigung geprüft – dadurch gibt es hier keine Fake-Berichte.
+                </p>
+
                 <!-- Features -->
                 <div class="landing-features">
                     <div class="landing-section-header">
-                        <span class="landing-eyebrow-sm">Was wir bieten</span>
-                        <h2 class="landing-section-title">Alles, was du für dein <em>Praktikum</em> brauchst</h2>
+                        <span class="landing-eyebrow-sm">So funktioniert PharmaFaro</span>
+                        <h2 class="landing-section-title">Warum du diesen Bewertungen <em>trauen</em> kannst</h2>
                     </div>
                     <div class="landing-features-grid">
 						<div class="landing-feature-card" onclick="showSection('search')" style="cursor:pointer;">
-                            <div class="landing-feature-icon">🔍</div>
-                            <div class="landing-feature-title">Detaillierte Bewertungen</div>
-                            <p class="landing-feature-text">Echte Erfahrungsberichte mit Bewertungen zu Betreuung, Gehalt, Arbeitszeiten, Atmosphäre und mehr.</p>
+                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95L12 22l-.34-.05C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div>
+                            <div class="landing-feature-title">Geprüft, nicht einfach gepostet</div>
+                            <p class="landing-feature-text">Vor jeder Veröffentlichung prüfen wir deine Praktikumsbescheinigung. Was du hier liest, hat jemand wirklich erlebt.</p>
                         </div>
 						<div class="landing-feature-card" onclick="showSection('search')" style="cursor:pointer;">
-                            <div class="landing-feature-icon">📍</div>
-                            <div class="landing-feature-title">Regionale Suche</div>
-                            <p class="landing-feature-text">Finde Praktikumsbetriebe nach Ort, PLZ, Bundesland oder per Umkreissuche – deutschlandweit und im Ausland.</p>
+                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></div>
+                            <div class="landing-feature-title">Acht Kategorien, ein Gesamtbild</div>
+                            <p class="landing-feature-text">Betreuung, Gehalt, Arbeitszeiten, Ausstattung und mehr – in acht Kategorien bewertet, inklusive Tarifvergleich.</p>
                         </div>
 						<div class="landing-feature-card" onclick="showSection('jobs')" style="cursor:pointer;">
-                            <div class="landing-feature-icon">💼</div>
-                            <div class="landing-feature-title">Aktuelle Stellenangebote</div>
-                            <p class="landing-feature-text">Direktangebote von Betrieben mit allen relevanten Informationen zu Vergütung, Arbeitszeiten und Benefits.</p>
+                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+                            <div class="landing-feature-title">Stellenangebote von den Betrieben</div>
+                            <p class="landing-feature-text">Apotheken, Kliniken und Industrie schreiben selbst aus – mit Gehalt, Arbeitszeiten und Ansprechperson.</p>
+                        </div>
+						<div class="landing-feature-card" onclick="showSection('search')" style="cursor:pointer;">
+                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                            <div class="landing-feature-title">Deutschlandweit auffindbar</div>
+                            <p class="landing-feature-text">Suche nach Ort, PLZ, Bundesland oder im Umkreis um dich herum – auch für Praktika im Ausland.</p>
                         </div>
 						<div class="landing-feature-card" onclick="(function(){ const cb=document.getElementById('verified-company-filter'); if(cb) cb.checked=true; showSection('company-search'); })()" style="cursor:pointer;">
-                            <div class="landing-feature-icon">✓</div>
-                            <div class="landing-feature-title">Verifizierte Unternehmen</div>
-                            <p class="landing-feature-text">Unternehmen können sich verifizieren lassen und ihr Profil mit Beschreibung, Kontakt und Logo pflegen.</p>
-                        </div>
-						<div class="landing-feature-card" onclick="showSection('awarded-companies')" style="cursor:pointer;">
-                            <div class="landing-feature-icon">🏆</div>
-                            <div class="landing-feature-title">BPhD-Auszeichnungen</div>
-                            <p class="landing-feature-text">Besonders hervorragende Betriebe, die vom BPhD für ihre Ausbildungsqualität ausgezeichnet wurden.</p>
+                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+                            <div class="landing-feature-title">Verifizierte Betriebe</div>
+                            <p class="landing-feature-text">Unternehmen bestätigen ihre Identität und pflegen Profil, Logo und Kontaktdaten selbst.</p>
                         </div>
 						<div class="landing-feature-card" onclick="showSection('internship-guide')" style="cursor:pointer;">
-                            <div class="landing-feature-icon">📄</div>
+                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
                             <div class="landing-feature-title">Praktikumsleitfaden</div>
-                            <p class="landing-feature-text">Alle wichtigen Informationen zum Pharmaziepraktikum – von Pflichten bis zu Rechten – kompakt zusammengefasst.</p>
+                            <p class="landing-feature-text">Rechte, Pflichten, Vergütung – alles Wichtige zum Pharmaziepraktikum, kompakt und aktuell gehalten.</p>
                         </div>
                     </div>
                 </div>
@@ -1999,8 +2014,8 @@
                 <!-- Highlight-Bewertungen -->
                 <div class="landing-reviews-section">
                     <div class="landing-section-header">
-                        <span class="landing-eyebrow-sm">Was Praktikant:innen sagen</span>
-                        <h2 class="landing-section-title">Besonders <em>hervorragende</em> Erfahrungen</h2>
+                        <span class="landing-eyebrow-sm">Aus den neuesten Bewertungen</span>
+                        <h2 class="landing-section-title">So klingt ein <em>gutes Praktikum</em></h2>
                     </div>
                     <div class="landing-reviews-grid" id="landing-highlight-reviews">
                         <div class="landing-review-skeleton"></div>
@@ -2012,8 +2027,8 @@
                 <!-- CTA -->
                 <div class="landing-cta">
                     <div class="landing-cta-inner">
-                        <h2 class="landing-cta-title">Deine Erfahrung zählt –<br><em>für alle, die nach dir kommen</em></h2>
-                        <p class="landing-cta-sub">Hilf anderen Pharmaziestudierenden, das richtige Praktikum zu finden. Deine Bewertung dauert nur wenige Minuten.</p>
+                        <h2 class="landing-cta-title">Dein Praktikum ist vorbei –<br><em>andere suchen gerade danach</em></h2>
+                        <p class="landing-cta-sub">Gehalt, Betreuung, Arbeitszeiten: Was du erlebt hast, sucht gerade jemand. Der Bericht dauert wenige Minuten – und wird von uns geprüft, bevor er erscheint.</p>
                         <div class="landing-buttons">
                             <button class="btn btn-primary hover-lift" onclick="showSection('write')" style="padding: 1rem 2.25rem; font-size: 1rem;">Jetzt Bewertung schreiben</button>
                             <button class="btn btn-secondary hover-lift" onclick="showSection('search')" style="padding: 1rem 2.25rem; font-size: 1rem;">Alle Bewertungen ansehen</button>
@@ -8500,7 +8515,7 @@
 							const tasksText = (r.tasks || '').trim();
 							const truncated = fullText.length > MAX_CHARS;
 							const displayText = truncated ? fullText.substring(0, MAX_CHARS).trimEnd() + '…' : fullText;
-							return `<div class="landing-highlight-card" style="display:flex;flex-direction:column;min-height:260px;" onclick="(function(){ showSection('search'); setTimeout(function(){ var inp=document.getElementById('company-name-filter'); if(inp) inp.value='${r.company_name.replace(/'/g,"\\'")}'; var loc=document.getElementById('location-filter'); if(loc) loc.value='${(r.address||'').split(',').pop().trim().replace(/'/g,"\\'")}'; var sal=document.getElementById('salary-filter'); if(sal) sal.value='${r.salary||''}'; var cat=document.getElementById('category-filter'); if(cat) cat.value='${r.category||''}'; minRatingFilter=Math.floor(${r.avgRating}); document.querySelectorAll('#min-rating-filter .star').forEach(function(s,i){ i<minRatingFilter ? s.classList.add('filled') : s.classList.remove('filled'); }); autoApplyFilters(); },300); })()">
+							return `<div class="landing-highlight-card" style="display:flex;flex-direction:column;min-height:260px;" onclick="(function(){ showSection('search'); setTimeout(function(){ var inp=document.getElementById('company-name-filter'); if(inp) inp.value='${escapeAttr(r.company_name)}'; var loc=document.getElementById('location-filter'); if(loc) loc.value='${escapeAttr((r.address||'').split(',').pop().trim())}'; var sal=document.getElementById('salary-filter'); if(sal) sal.value='${escapeAttr(String(r.salary||''))}'; var cat=document.getElementById('category-filter'); if(cat) cat.value='${r.category||''}'; minRatingFilter=Math.floor(${r.avgRating}); document.querySelectorAll('#min-rating-filter .star').forEach(function(s,i){ i<minRatingFilter ? s.classList.add('filled') : s.classList.remove('filled'); }); autoApplyFilters(); },300); })()">
 								<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
 									<div>
 										<div style="font-family:'DM Sans',sans-serif; font-size:1.05rem; font-weight:600; color:var(--dark); margin-bottom:0.2rem;">${esc(r.company_name)}</div>
