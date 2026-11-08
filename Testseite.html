@@ -1100,6 +1100,9 @@
     /* ── COMPANY SEARCH INPUT ── */
     #company-search:hover { background-color: var(--bg); }
     #company-search:focus { background-color: white; outline: none; border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(184,50,40,0.1); }
+    #company-search::placeholder {
+        text-align: center;
+    }
 
     @media (max-width: 768px) {
         .nav-tabs { flex-direction: column; gap: 0.5rem; }
@@ -1347,15 +1350,9 @@
 
     .landing-stat-card:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(42,18,16,0.14); }
 
-    .landing-stat-icon {
-        width: 56px; height: 56px;
-        background: var(--red-light);
-        border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 1rem;
-    }
+    .landing-stat-icon { display: block; margin: 0 auto 1rem; }
 
-    .landing-stat-icon svg { width: 26px; height: 26px; display: block; color: var(--red); }
+    .landing-stat-icon svg { width: 2rem; height: 2rem; display: block; margin: 0 auto; color: var(--red); }
 
     .landing-stat-number {
         font-family: 'Fraunces', serif;
@@ -1433,15 +1430,11 @@
     .landing-feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(42,18,16,0.08); }
 
     .landing-feature-icon {
-        width: 46px; height: 46px;
-        background: var(--red-light);
-        border-radius: 12px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 1.4rem;
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.1rem;
     }
 
-    .landing-feature-icon svg { width: 22px; height: 22px; color: var(--red); }
+    .landing-feature-icon svg { width: 24px; height: 24px; color: var(--red); }
 
     .landing-feature-title { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; letter-spacing: -0.01em; }
     .landing-feature-text { font-size: 0.9rem; color: var(--mid); line-height: 1.7; }
@@ -1850,7 +1843,7 @@
 					<div class="landing-stat-card" onclick="showSection('search')" style="cursor:pointer;">
 						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></span>
 						<div class="landing-stat-number" id="stat-reviews">—</div>
-						<div class="landing-stat-label">Verifizierte Bewertungen</div>
+						<div class="landing-stat-label">Geprüfte Bewertungen</div>
 					</div>
 					<div class="landing-stat-card" onclick="showSection('jobs')" style="cursor:pointer;">
 						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
