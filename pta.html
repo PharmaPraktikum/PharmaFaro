@@ -29,20 +29,6 @@
     <style>
     @font-face {
         font-family: 'Fraunces';
-        src: url('./fonts/fraunces-300.woff2') format('woff2');
-        font-weight: 300;
-        font-style: normal;
-        font-display: swap;
-    }
-    @font-face {
-        font-family: 'Fraunces';
-        src: url('./fonts/fraunces-300-italic.woff2') format('woff2');
-        font-weight: 300;
-        font-style: italic;
-        font-display: swap;
-    }
-    @font-face {
-        font-family: 'Fraunces';
         src: url('./fonts/fraunces-600.woff2') format('woff2');
         font-weight: 600;
         font-style: normal;
@@ -60,34 +46,6 @@
         src: url('./fonts/fraunces-400-italic.woff2') format('woff2');
         font-weight: 400;
         font-style: italic;
-        font-display: swap;
-    }
-    @font-face {
-        font-family: 'Lora';
-        src: url('./fonts/lora-500.woff2') format('woff2');
-        font-weight: 500;
-        font-style: normal;
-        font-display: swap;
-    }
-    @font-face {
-        font-family: 'Lora';
-        src: url('./fonts/lora-500-italic.woff2') format('woff2');
-        font-weight: 500;
-        font-style: italic;
-        font-display: swap;
-    }
-    @font-face {
-        font-family: 'Lora';
-        src: url('./fonts/lora-400-italic.woff2') format('woff2');
-        font-weight: 400;
-        font-style: italic;
-        font-display: swap;
-    }
-    @font-face {
-        font-family: 'DM Sans';
-        src: url('./fonts/dm-sans-300.woff2') format('woff2');
-        font-weight: 300;
-        font-style: normal;
         font-display: swap;
     }
     @font-face {
@@ -158,7 +116,7 @@
         border: 1px solid var(--border);
         border-radius: 10px;
         z-index: 1002;
-        box-shadow: 0 8px 30px rgba(42,18,16,0.1);
+        box-shadow: 0 8px 30px rgba(45,32,64,0.1);
         overflow: hidden;
     }
     .mode-switcher.open .mode-dropdown { display: block; }
@@ -526,6 +484,11 @@
         border-color: white;
     }
 
+    .btn:focus-visible, .nav-tab:focus-visible, .year-tab:focus-visible, .dropdown-content a:focus-visible {
+        outline: 3px solid var(--red);
+        outline-offset: 2px;
+    }
+
     /* ── CARDS ── */
 	.review-card, .job-card {
 		overflow: hidden;
@@ -562,7 +525,7 @@
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(42,18,16,0.04);
+        box-shadow: 0 2px 10px rgba(45,32,64,0.04);
     }
 
     #all-companies-container .review-card:hover,
@@ -648,10 +611,10 @@
 
     .review-text {
         color: var(--mid);
-        font-family: 'DM Sans', sans-serif;
+        font-family: 'Fraunces', serif;
         font-style: italic;
-        font-size: 0.95rem;
-        line-height: 1.75;
+        font-size: 1rem;
+        line-height: 1.7;
         margin-bottom: 0.75rem;
     }
 
@@ -1033,7 +996,7 @@
         border-top: 1px solid rgba(255,255,255,0.1);
         text-align: center;
         font-size: 0.8rem;
-        color: rgba(255,255,255,0.25);
+        color: rgba(255,255,255,0.45);
     }
 
     @media (max-width: 768px) {
@@ -1137,8 +1100,8 @@
     .working-time-row:first-child .remove-time-row { display: none; }
 
     /* ── COMPANY SEARCH INPUT ── */
-    #company-search:hover { background: var(--bg); }
-    #company-search:focus { background: white; outline: none; border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(184,50,40,0.1); }
+    #company-search:hover { background-color: var(--bg); }
+    #company-search:focus { background-color: white; outline: none; border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(184,50,40,0.1); }
 
     @media (max-width: 768px) {
         .nav-tabs { flex-direction: column; gap: 0.5rem; }
@@ -1256,7 +1219,7 @@
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 10px;
-        box-shadow: 0 1px 6px rgba(42,18,16,0.04);
+        box-shadow: 0 1px 6px rgba(45,32,64,0.04);
     }
 
     /* ── COMPANY SEARCH SECTION ── */
@@ -1360,76 +1323,6 @@
         padding: 0;
     }
 
-    .landing-hero {
-        background: linear-gradient(160deg, var(--dark) 0%, #1e1535 100%);
-        color: white;
-        padding: 5rem 2rem 4.5rem;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .landing-hero::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--red), #a78bfa, var(--red));
-    }
-
-    .landing-hero-bg-text {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        font-family: 'Fraunces', serif;
-        font-size: clamp(8rem, 20vw, 20rem);
-        font-weight: 700;
-        color: rgba(255,255,255,0.025);
-        white-space: nowrap;
-        letter-spacing: -0.05em;
-        pointer-events: none;
-        user-select: none;
-        line-height: 1;
-    }
-
-    .landing-hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
-
-    .landing-eyebrow {
-        font-family: 'Fraunces', serif;
-        font-style: italic;
-        font-weight: 300;
-        font-size: 1rem;
-        color: var(--accent);
-        letter-spacing: 0.04em;
-        display: block;
-        margin-bottom: 1.25rem;
-    }
-
-    .landing-h1 {
-        font-family: 'Fraunces', serif;
-        font-size: clamp(2.6rem, 5vw, 4.2rem);
-        font-weight: 700;
-        margin-bottom: 1.25rem;
-        letter-spacing: -0.03em;
-        line-height: 1.08;
-        color: white;
-    }
-
-    .landing-h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
-
-    .landing-sub {
-        font-family: 'Fraunces', serif;
-        font-style: italic;
-        font-weight: 300;
-        font-size: 1.15rem;
-        color: rgba(255,255,255,0.6);
-        margin-bottom: 2.5rem;
-        max-width: 580px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.6;
-    }
-
     .landing-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
     /* ── LIVE STATS ── */
@@ -1456,9 +1349,15 @@
 
     .landing-stat-card:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(45,32,64,0.14); }
 
-    .landing-stat-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+    .landing-stat-icon {
+        width: 56px; height: 56px;
+        background: var(--red-light);
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1rem;
+    }
 
-    .landing-stat-icon svg { width: 2rem; height: 2rem; display: block; margin: 0 auto 0.75rem; color: var(--red); }
+    .landing-stat-icon svg { width: 26px; height: 26px; display: block; color: var(--red); }
 
     .landing-stat-number {
         font-family: 'Fraunces', serif;
@@ -1483,7 +1382,7 @@
     .landing-features { padding: 4rem 2rem; max-width: 1240px; margin: 0 auto; }
 
     .landing-reviews-section {
-        background: linear-gradient(180deg, var(--bg) 0%, #f5ece6 100%);
+        background: linear-gradient(180deg, var(--bg) 0%, #efeaf8 100%);
         padding: 4rem 2rem;
         border-top: 1px solid var(--border);
     }
@@ -1529,7 +1428,7 @@
         border-radius: 14px;
         border: 1px solid var(--border);
         background: var(--bg-card);
-        box-shadow: 0 2px 12px rgba(42,18,16,0.04);
+        box-shadow: 0 2px 12px rgba(45,32,64,0.04);
         transition: transform 0.18s, box-shadow 0.18s;
     }
 
@@ -1603,7 +1502,7 @@
     .lhc-score-max { font-size: 0.7rem; opacity: 0.7; margin-top: 0.1rem; }
     .lhc-stars { color: var(--red); font-size: 1rem; letter-spacing: 1px; margin-bottom: 1rem; }
     .lhc-label { font-size: 0.72rem; font-weight: 700; color: var(--red); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 0.6rem; display: block; }
-    .lhc-text { font-family: 'DM Sans', sans-serif; font-style: italic; font-size: 0.92rem; line-height: 1.75; color: var(--mid); position: relative; z-index: 1; }
+    .lhc-text { font-family: 'Fraunces', serif; font-style: italic; font-size: 0.98rem; line-height: 1.7; color: var(--mid); position: relative; z-index: 1; }
 
     .landing-review-skeleton {
         background: var(--bg-card);
@@ -1655,10 +1554,8 @@
     }
 
     @media (max-width: 768px) {
-        .landing-stats { grid-template-columns: 1fr; margin-top: -1rem; }
+        .landing-stats { grid-template-columns: 1fr; margin-top: 1.25rem; }
         .landing-stat-number { font-size: 2.4rem; }
-        .landing-h1 { font-size: 2.2rem; }
-        .landing-hero { padding: 3.5rem 1.5rem 3rem; }
         .landing-reviews-grid { grid-template-columns: 1fr; }
         .landing-features-grid { grid-template-columns: 1fr; }
     }
@@ -1930,7 +1827,7 @@
 			</div>
 			<div style="margin-top: 2rem; position: relative; max-width: 600px; margin-left: auto; margin-right: auto; z-index: 100; background: white; border-radius: 50px;">
 				<input type="text" id="company-search" placeholder="Nach Unternehmen suchen" 
-					   style="width: 100%; padding: 1rem 1.5rem; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 10px; font-size: 1.1rem; text-align: center; background: white; position: relative; z-index: 101;"
+					   style="width: 100%; padding: 1.05rem 1.5rem 1.05rem 3.1rem; border: none; border-radius: 999px; font-size: 1.05rem; text-align: left; background-color: white; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%236b6080%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3ccircle cx=%2711%27 cy=%2711%27 r=%278%27/%3e%3cline x1=%2721%27 y1=%2721%27 x2=%2716.65%27 y2=%2716.65%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: 1.15rem center; background-size: 17px 17px; position: relative; z-index: 101;"
 					   oninput="searchCompanies(this.value)" 
 					   onfocus="this.select(); showSearchSuggestions(); this.parentElement.style.overflow='visible'; this.parentElement.style.background='transparent';"
 					   onclick="this.select()">
@@ -1963,7 +1860,7 @@
 						<div class="landing-stat-label">Aktive Stellenangebote</div>
 					</div>
 					<div class="landing-stat-card" onclick="(function(){ const cb = document.getElementById('verified-company-filter'); if(cb) cb.checked = true; showSection('company-search'); })()" style="cursor:pointer;">
-						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95L12 22l-.34-.05C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="var(--red)"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>
 						<div class="landing-stat-number" id="stat-companies">—</div>
 						<div class="landing-stat-label">Verifizierte Unternehmen</div>
 					</div>
@@ -1977,7 +1874,7 @@
                     </div>
                     <div class="landing-features-grid">
 						<div class="landing-feature-card" onclick="showSection('search')" style="cursor:pointer;">
-                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95L12 22l-.34-.05C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div>
+                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg></div>
                             <div class="landing-feature-title">Geprüft, nicht einfach gepostet</div>
                             <p class="landing-feature-text">Vor jeder Veröffentlichung prüfen wir anhand der Praktikumsbescheinigung, ob das Praktikum tatsächlich stattgefunden hat. Was du hier liest, hat jemand wirklich erlebt.</p>
                         </div>
@@ -1997,7 +1894,7 @@
                             <p class="landing-feature-text">Finde Praktika anhand von Ort, PLZ, Bundesland oder im Umkreis um dich herum – auch für Praktika im Ausland.</p>
                         </div>
 						<div class="landing-feature-card" onclick="(function(){ const cb=document.getElementById('verified-company-filter'); if(cb) cb.checked=true; showSection('company-search'); })()" style="cursor:pointer;">
-                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+                            <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="var(--red)"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
                             <div class="landing-feature-title">Verifizierte Betriebe</div>
                             <p class="landing-feature-text">Unternehmen bestätigen ihre Identität und pflegen Profil, Logo und Kontaktdaten selbst.</p>
                         </div>
@@ -2497,7 +2394,7 @@
 							<div style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; letter-spacing: -0.01em;">Tipps zur Praktikumssuche</div>
 							<p style="color: var(--mid); font-size: 0.9rem; line-height: 1.6; margin: 0;">Praktische Ratschläge zur Bewerbung, Betriebsauswahl und optimalen Nutzung der Plattform.</p>
 						</div>
-						<div onclick="showSection('tariffs')" style="background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(42,18,16,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+						<div onclick="showSection('tariffs')" style="background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(45,32,64,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
 							<div style="font-size: 2rem; margin-bottom: 1rem;">💶</div>
 							<div style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; letter-spacing: -0.01em;">Tarifgehälter</div>
 							<p style="color: var(--mid); font-size: 0.9rem; line-height: 1.6; margin: 0;">Übersicht der Tarifgehälter und ihrer Entwicklung, inklusive abweichender Regelungen einzelner Bundesländer.</p>
@@ -10768,7 +10665,7 @@
 
 			for (const block of blocks) {
 				let fontSize, fontStyle, textColor, spaceBefore, spaceAfter, indent;
-				if (block.type === 'h2') { fontSize=13; fontStyle='bold'; textColor=[42,18,16]; spaceBefore=6; spaceAfter=2; indent=0; }
+				if (block.type === 'h2') { fontSize=13; fontStyle='bold'; textColor=[45,32,64]; spaceBefore=6; spaceAfter=2; indent=0; }
 				else if (block.type === 'h3') { fontSize=11; fontStyle='bold'; textColor=[61,26,23]; spaceBefore=4; spaceAfter=1; indent=0; }
 				else if (block.type === 'li') { fontSize=10; fontStyle='normal'; textColor=[30,30,30]; spaceBefore=1; spaceAfter=1; indent=4; }
 				else { fontSize=10; fontStyle='normal'; textColor=[30,30,30]; spaceBefore=2; spaceAfter=2; indent=0; }
@@ -10863,7 +10760,7 @@
 
 			for (const block of blocks) {
 				let fontSize, fontStyle, textColor, spaceBefore, spaceAfter, indent;
-				if (block.type === 'h2') { fontSize=13; fontStyle='bold'; textColor=[42,18,16]; spaceBefore=6; spaceAfter=2; indent=0; }
+				if (block.type === 'h2') { fontSize=13; fontStyle='bold'; textColor=[45,32,64]; spaceBefore=6; spaceAfter=2; indent=0; }
 				else if (block.type === 'h3') { fontSize=11; fontStyle='bold'; textColor=[61,26,23]; spaceBefore=4; spaceAfter=1; indent=0; }
 				else if (block.type === 'li') { fontSize=10; fontStyle='normal'; textColor=[30,30,30]; spaceBefore=1; spaceAfter=1; indent=4; }
 				else { fontSize=10; fontStyle='normal'; textColor=[30,30,30]; spaceBefore=2; spaceAfter=2; indent=0; }
