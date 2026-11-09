@@ -7,6 +7,7 @@
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src https://*.supabase.co; img-src 'self' data: https:;">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="robots" content="noindex, nofollow">
 	<!-- Supabase Backend Integration -->
 	<script type="module">
 		import { supabase } from './js/supabase-client.js';
@@ -7960,78 +7961,87 @@
 			isPopState = false;
 		});
 
-		const TARIFF_GROUPS = [
-			{ title: 'Pharmaziepraktikant:innen', key: 'tariff_history' },
-			{ title: 'Ausgebildete PTA', key: 'pta_employee_salary_history' }
-		];
+        const TARIFF_GROUPS = [
+            { title: 'Pharmaziepraktikant:innen', key: 'tariff_history' }
+        ];
+        const TARIFF_SPECIAL_STATES = ['Nordrhein-Westfalen', 'Sachsen'];
 
-		let tariffsLoaded = false;
+        let tariffsLoaded = false;
+        let tariffsLoading = false;
 
-		function buildTariffGroups(history) {
-			const groups = {};
-			const add = (states, from, to, amount) => {
-				const isAll = !states || !states.length || states.includes('Alle');
-				const list = isAll ? ['Alle'] : [...states].sort((a, b) => a.localeCompare(b, 'de'));
-				const key = list.join('|');
-				if (!groups[key]) groups[key] = { states: list, rows: [] };
-				groups[key].rows.push({ from, to, amount });
-			};
-			(history || []).forEach(e => {
-				const base = e.default ?? e.amount;
-				const st = e.states || ['Alle'];
-				const names = st.filter(s => typeof s === 'string');
-				const objs = st.filter(s => s && typeof s === 'object');
-				if (base != null) add(names.length ? names : ['Alle'], e.from, e.to, base);
-				objs.forEach(o => { if (o.amount) add(o.states, e.from, e.to, o.amount); });
-			});
-			const list = Object.values(groups);
-			list.forEach(g => g.rows.sort((a, b) => b.from - a.from));
-			list.sort((a, b) => {
-				const aAll = a.states[0] === 'Alle', bAll = b.states[0] === 'Alle';
-				if (aAll !== bAll) return aAll ? -1 : 1;
-				return b.rows.length - a.rows.length;
-			});
-			return list;
-		}
+        // Sortiert die Historie in Tabellen: NRW/Sachsen nur, wenn der Eintrag ausschließlich diese
+        // Bundesländer betrifft; alles andere gilt deutschlandweit.
+        function buildTariffTables(history) {
+            const tables = { 'Deutschlandweit': [], 'Nordrhein-Westfalen': [], 'Sachsen': [] };
+            const add = (states, from, to, amount) => {
+                const names = (states || []).filter(s => typeof s === 'string');
+                const special = names.length > 0 && !names.includes('Alle') && names.every(s => TARIFF_SPECIAL_STATES.includes(s));
+                const row = { from, to, amount };
+                if (special) names.forEach(s => tables[s].push(row));
+                else tables['Deutschlandweit'].push(row);
+            };
+            (history || []).forEach(e => {
+                const base = e.default ?? e.amount;
+                const st = e.states || ['Alle'];
+                const names = st.filter(s => typeof s === 'string');
+                const objs = st.filter(s => s && typeof s === 'object');
+                if (base != null) add(names.length ? names : ['Alle'], e.from, e.to, base);
+                objs.forEach(o => { if (o.amount) add(o.states, e.from, e.to, o.amount); });
+            });
+            Object.values(tables).forEach(rows => rows.sort((a, b) => b.from - a.from));
+            return tables;
+        }
 
-		async function renderTariffTables() {
-			if (tariffsLoaded) return;
-			const box = document.getElementById('tariffs-content');
-			if (!box) return;
-			box.innerHTML = '<p style="color:#666;">Lade Tarifgehälter...</p>';
-			try {
-				const { data, error } = await window.supabase
-					.from('site_settings')
-					.select('key, value')
-					.in('key', TARIFF_GROUPS.map(g => g.key));
-				if (error) throw error;
-				const th = 'padding:0.5rem 0;border-bottom:1.5px solid var(--border);font-size:0.82rem;color:var(--mid);';
-				box.innerHTML = TARIFF_GROUPS.map(g => {
-					let history = [];
-					try { history = JSON.parse((data || []).find(d => d.key === g.key)?.value || '[]'); } catch (e) {}
-					const groups = buildTariffGroups(history);
-					const tables = groups.length === 0
-						? '<p style="color:#666;">Keine Einträge hinterlegt.</p>'
-						: groups.map(grp => `
-							<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
-								<h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">${grp.states[0] === 'Alle' ? 'Deutschlandweit' : escapeHtml(grp.states.join(', '))}</h4>
-								<table style="width:100%;border-collapse:collapse;">
-									<thead><tr><th style="text-align:left;${th}">Zeitraum</th><th style="text-align:right;${th}">Monatliches Bruttogehalt</th></tr></thead>
-									<tbody>${grp.rows.map(r => `
-										<tr>
-											<td style="padding:0.5rem 0;border-bottom:1px solid var(--border);">${r.to == null ? 'ab ' + r.from : (r.from === r.to ? r.from : r.from + ' – ' + r.to)}</td>
-											<td style="padding:0.5rem 0;border-bottom:1px solid var(--border);text-align:right;font-weight:600;">${Number(r.amount).toLocaleString('de-DE')} €</td>
-										</tr>`).join('')}
-									</tbody>
-								</table>
-							</div>`).join('');
-					return `<h3 style="margin:2rem 0 1rem;">${g.title}</h3>${tables}`;
-				}).join('');
-				tariffsLoaded = true;
-			} catch (e) {
-				box.innerHTML = '<p style="color:#dc3545;">Tarifgehälter konnten nicht geladen werden.</p>';
-			}
-		}
+        async function renderTariffTables() {
+            if (tariffsLoaded || tariffsLoading) return;
+            const box = document.getElementById('tariffs-content');
+            if (!box) return;
+            tariffsLoading = true;
+            box.innerHTML = '<p style="color:#666;">Lade Tarifgehälter...</p>';
+            try {
+                const { data, error } = await window.supabase
+                    .from('site_settings')
+                    .select('key, value')
+                    .in('key', TARIFF_GROUPS.map(g => g.key));
+                if (error) throw error;
+                const th = 'padding:0.5rem 0;border-bottom:1.5px solid var(--border);font-size:0.82rem;color:var(--mid);';
+                const period = r => r.to == null ? 'ab ' + r.from : (r.from === r.to ? String(r.from) : r.from + ' – ' + r.to);
+                const tableHtml = (title, rows, emptyText) => `
+                    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
+                        <h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">${title}</h4>
+                        ${rows.length === 0 ? `<p style="color:#666;margin:0;font-size:0.9rem;">${emptyText}</p>` : `
+                        <table style="width:100%;border-collapse:collapse;">
+                            <thead><tr><th style="text-align:left;${th}">Zeitraum</th><th style="text-align:right;${th}">Monatliches Bruttogehalt</th></tr></thead>
+                            <tbody>${rows.map(r => `
+                                <tr>
+                                    <td style="padding:0.5rem 0;border-bottom:1px solid var(--border);">${period(r)}</td>
+                                    <td style="padding:0.5rem 0;border-bottom:1px solid var(--border);text-align:right;font-weight:600;">${Number(r.amount).toLocaleString('de-DE')} €</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>`}
+                    </div>`;
+                box.innerHTML = TARIFF_GROUPS.map(g => {
+                    let history = [];
+                    try { history = JSON.parse((data || []).find(d => d.key === g.key)?.value || '[]'); } catch (e) {}
+                    const t = buildTariffTables(history);
+                    return `<h3 style="margin:2rem 0 1rem;">${g.title}</h3>`
+                        + tableHtml('Deutschlandweit', t['Deutschlandweit'], 'Keine Einträge hinterlegt.')
+                        + tableHtml('Nordrhein-Westfalen', t['Nordrhein-Westfalen'], 'Keine abweichenden Regelungen hinterlegt.')
+                        + tableHtml('Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.');
+                }).join('');
+                tariffsLoaded = true;
+            } catch (e) {
+                box.innerHTML = '<p style="color:#dc3545;">Tarifgehälter konnten nicht geladen werden.</p>';
+            } finally {
+                tariffsLoading = false;
+            }
+        }
+
+        // Beim Seitenstart im Hintergrund vorladen, damit der Reiter ohne Verzögerung erscheint
+        (function preloadTariffs() {
+            if (window.supabase && typeof window.supabase.from === 'function') renderTariffTables();
+            else setTimeout(preloadTariffs, 150);
+        })();
 
 		function showSection(section) {
 			if (section === 'landing') {
@@ -9875,23 +9885,29 @@
 
 				const deleteToken = urlParams.get('delete_review');
                 if (deleteToken) {
-                    try {
-                        const res = await fetch(`${window.SUPABASE_URL}/functions/v1/delete-review`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ token: deleteToken })
-                        });
-                        const result = await res.json();
-                        if (result.success) {
-                            showToast('Deine Bewertung wurde erfolgreich gelöscht.', 'success');
-                        } else {
-                            showToast('Bewertung konnte nicht gelöscht werden.', 'error');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    showConfirmModal(
+                        'Bewertung löschen?',
+                        'Möchtest du deine Bewertung wirklich endgültig löschen? Auch deine hochgeladene Praktikumsbestätigung wird dabei entfernt. Dieser Schritt kann nicht rückgängig gemacht werden.',
+                        async function() {
+                            try {
+                                const res = await fetch(`${window.SUPABASE_URL}/functions/v1/delete-review`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ token: deleteToken })
+                                });
+                                const result = await res.json();
+                                if (result.success) {
+                                    showSuccessModal('Bewertung gelöscht', 'Deine Bewertung wurde erfolgreich gelöscht.', false);
+                                    setTimeout(() => window.location.reload(), 2000);
+                                } else {
+                                    showToast('Bewertung konnte nicht gelöscht werden.', 'error');
+                                }
+                            } catch(e) {
+                                showToast('Fehler beim Löschen der Bewertung.', 'error');
+                            }
                         }
-                    } catch(e) {
-                        showToast('Fehler beim Löschen der Bewertung.', 'error');
-                    }
-                    // Token aus URL entfernen
-                    window.history.replaceState({}, '', window.location.pathname);
+                    );
                 }
 
 				const deactivateToken = urlParams.get('deactivate_job');
