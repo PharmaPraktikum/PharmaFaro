@@ -7235,6 +7235,7 @@
                 await sendConfirmationEmail('admin_new_review', {
 					email: 'admin@pharmafaro.de',
 					companyName: formData.companyName,
+                    id: typeof reviewId === 'string' ? reviewId.substring(0, 8) : reviewId,
 					reason: `Kategorie: ${formData.category} | Bundesland: ${formData.state}`,
 					practiceType: 'PTA'
 				});
@@ -7283,6 +7284,7 @@
                     await sendConfirmationEmail('admin_new_job', {
 						email: 'admin@pharmafaro.de',
 						companyName: jobFormData.companyName,
+                        id: typeof jobId === 'string' ? jobId.substring(0, 8) : jobId,
 						reason: `Kontakt: ${contactEmail}`,
 						practiceType: 'PTA'
 					});
@@ -10104,6 +10106,7 @@
                 await window.sendConfirmationEmail('admin_new_verification', {
 					email: 'admin@pharmafaro.de',
 					companyName: companyName,
+                    id: result.data.id,
 					reason: `Antragsteller: ${contactPerson} (${contactEmail})`,
 					practiceType: 'PTA'
 				});
