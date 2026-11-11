@@ -3652,7 +3652,7 @@
 
 		window.sendConfirmationEmail = async function(type, data) {
 			try {
-				const baseUrl = 'https://pharmafaro.de/jolimarl';
+                const baseUrl = 'https://pharmafaro.de/pta.html';
 				
 				const response = await fetch(`${window.SUPABASE_URL}/functions/v1/send-mail`, {
 					method: 'POST',
@@ -5046,7 +5046,7 @@
 		}
 
 		function createMiniReviewCard(reviewData) {
-			const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.state);
+            const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.state, reviewData.address);
 			const overallRating = calculateOverallRating(reviewData.ratings);
 			
 			const miniSafeCompany = escapeHtml(reviewData.companyName);
@@ -6589,38 +6589,70 @@
             return hours * 60 + minutes;
         }
 
-		function getTariffForState(state) {
-			const data = window.tariffSalaryData || { default: window.tariffSalary || 1040, states: [] };
-			if (state && data.states && data.states.length > 0) {
-				const match = data.states.find(sf => sf.states && sf.states.includes(state));
-				if (match) return match.amount;
-			}
-			return data.default || window.tariffSalary || 1040;
-		}
+        const NRW_NORDRHEIN_PLZ2 = ['40','41','42','47','50','51','52','53'];
+        const NRW_NORDRHEIN_PLZ3 = ['450','451','452','453','454','460','461','464','465'];
+        const NRW_WESTFALEN_PLZ5 = ['46414','46419'];
 
-        function findTariffEntry(history, year, state) {
-			const st = state === 'Ausland' ? 'Außerhalb Deutschlands' : state;
-			const namesOf = e => {
-				const n = (e.states || []).filter(s => typeof s === 'string');
-				return n.length ? n : ['Alle'];
-			};
-			const inYear = history.filter(e => year >= e.from && (e.to === null || year <= e.to));
-			const explicit = inYear.filter(e => { const n = namesOf(e); return st && !n.includes('Alle') && n.includes(st); });
-			const general = inYear.filter(e => namesOf(e).includes('Alle'));
-			const list = explicit.length ? explicit : general;
-			list.sort((a, b) => b.from - a.from);
-			return list[0] || null;
-		}
+        function resolveTariffRegion(state, address) {
+            if (state !== 'Nordrhein-Westfalen') return state;
+            const m = String(address || '').match(/(\d{5})/);
+            if (!m) return 'Nordrhein-Westfalen';
+            const plz = m[1];
+            if (NRW_WESTFALEN_PLZ5.includes(plz)) return 'NRW-Westfalen-Lippe';
+            if (NRW_NORDRHEIN_PLZ3.includes(plz.substring(0, 3))) return 'NRW-Nordrhein';
+            if (NRW_NORDRHEIN_PLZ2.includes(plz.substring(0, 2))) return 'NRW-Nordrhein';
+            return 'NRW-Westfalen-Lippe';
+        }
 
-		function getTariffForYear(year, state) {
-			if (!year || !window.tariffHistory || window.tariffHistory.length === 0) {
-				return getTariffForState(state);
-			}
-			const entry = findTariffEntry(window.tariffHistory, year, state);
-			return entry ? (entry.default ?? entry.amount) : null;
-		}
+        function tariffKeysFor(state, address) {
+            const region = resolveTariffRegion(state, address);
+            if (region === 'NRW-Nordrhein') return ['NRW-Nordrhein', 'Nordrhein-Westfalen'];
+            if (region === 'NRW-Westfalen-Lippe') return ['NRW-Westfalen-Lippe'];
+            return [region === 'Ausland' ? 'Außerhalb Deutschlands' : region];
+        }
 
-		function getSalaryBadge(salary, internshipYear, state) {
+        function getTariffForState(state, address) {
+            const data = window.tariffSalaryData || { default: window.tariffSalary || 1040, states: [] };
+            const keys = tariffKeysFor(state, address);
+            if (data.states && data.states.length > 0) {
+                for (const k of keys) {
+                    const match = data.states.find(sf => sf.states && sf.states.includes(k));
+                    if (match) return match.amount;
+                }
+            }
+            return data.default || window.tariffSalary || 1040;
+        }
+
+        function findTariffEntry(history, year, state, address) {
+            const keys = tariffKeysFor(state, address);
+            const namesOf = e => {
+                const names = (e.states || []).filter(s => typeof s === 'string');
+                return names.length ? names : ['Alle'];
+            };
+            const inYear = history.filter(e => year >= e.from && (e.to === null || year <= e.to));
+            const explicit = inYear.filter(e => {
+                const names = namesOf(e);
+                return keys[0] && !names.includes('Alle') && keys.some(k => names.includes(k));
+            });
+            const general = inYear.filter(e => namesOf(e).includes('Alle'));
+            const list = explicit.length ? explicit : general;
+            list.sort((a, b) => b.from - a.from);
+            return list[0] || null;
+        }
+
+        function getTariffForYear(year, state, address) {
+            if (!year || !window.tariffHistory || window.tariffHistory.length === 0) {
+                return getTariffForState(state, address);
+            }
+            const entry = findTariffEntry(window.tariffHistory, year, state, address);
+            if (!entry) return null;
+            const objs = (entry.states || []).filter(s => s && typeof s === 'object');
+            const keys = tariffKeysFor(state, address);
+            const obj = objs.find(o => o.amount && (o.states || []).some(s => keys.includes(s)));
+            return obj ? obj.amount : (entry.default ?? entry.amount);
+        }
+
+        function getSalaryBadge(salary, internshipYear, state, address) {
 			const tariff = internshipYear ? getTariffForYear(internshipYear, state) : getTariffForState(state);
 			if (tariff == null) {
 				return { class: 'salary-none', text: 'Kein Tarifgehalt zum Vergleich verfügbar' };
@@ -6717,7 +6749,7 @@
             const safeTasks = escapeHtml(reviewData.tasks);
             const safeFeedback = escapeHtml(reviewData.feedback);
             const safeHighlights = escapeHtml(reviewData.highlights);
-            const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.state);
+            const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.state, reviewData.address);
 			const overallRating = calculateOverallRating(reviewData.ratings);
 			const sortedWorkingHours = sortWorkingHours([...reviewData.workingHours]);
             
@@ -7893,7 +7925,7 @@
 			{ title: 'PTA-Praktikant:innen', key: 'pta_tariff_history' },
 			{ title: 'Ausgebildete PTA', key: 'pta_employee_salary_history' }
 		];
-        const TARIFF_SPECIAL_STATES = ['Nordrhein-Westfalen', 'Sachsen'];
+        const TARIFF_SPECIAL_STATES = ['Nordrhein-Westfalen', 'NRW-Nordrhein', 'NRW-Westfalen-Lippe', 'Sachsen'];
 
         let tariffsLoaded = false;
         let tariffsLoading = false;
@@ -7901,7 +7933,7 @@
         // Sortiert die Historie in Tabellen: NRW/Sachsen nur, wenn der Eintrag ausschließlich diese
         // Bundesländer betrifft; alles andere gilt deutschlandweit.
         function buildTariffTables(history) {
-            const tables = { 'Deutschlandweit': [], 'Nordrhein-Westfalen': [], 'Sachsen': [] };
+            const tables = { 'Deutschlandweit': [], 'Nordrhein-Westfalen': [], 'NRW-Nordrhein': [], 'NRW-Westfalen-Lippe': [], 'Sachsen': [] };
             const add = (states, from, to, amount) => {
                 const names = (states || []).filter(s => typeof s === 'string');
                 const special = names.length > 0 && !names.includes('Alle') && names.every(s => TARIFF_SPECIAL_STATES.includes(s));
@@ -7956,7 +7988,9 @@
                     return `<h3 style="margin:2rem 0 1rem;">${g.title}</h3>`
                         + tableHtml('Deutschlandweit', t['Deutschlandweit'], 'Keine Einträge hinterlegt.')
                         + tableHtml('Nordrhein-Westfalen', t['Nordrhein-Westfalen'], 'Keine abweichenden Regelungen hinterlegt.')
-                        + tableHtml('Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.');
+                        + tableHtml('Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.')
+                        + (t['NRW-Nordrhein'].length ? tableHtml('NRW (Verband Nordrhein)', t['NRW-Nordrhein'], 'Keine abweichenden Regelungen hinterlegt.') : '')
+                        + (t['NRW-Westfalen-Lippe'].length ? tableHtml('NRW (Verband Westfalen-Lippe)', t['NRW-Westfalen-Lippe'], 'Keine abweichenden Regelungen hinterlegt.') : '');
                 }).join('');
                 tariffsLoaded = true;
             } catch (e) {

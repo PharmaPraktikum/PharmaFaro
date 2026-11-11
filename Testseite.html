@@ -3714,7 +3714,7 @@
 
 		window.sendConfirmationEmail = async function(type, data) {
 			try {
-				const baseUrl = 'https://pharmafaro.de/jolimarl';
+                const baseUrl = 'https://pharmafaro.de/Testseite.html';
 				
 				const response = await fetch(`${window.SUPABASE_URL}/functions/v1/send-mail`, {
 					method: 'POST',
@@ -5104,7 +5104,7 @@
 		}
 
 		function createMiniReviewCard(reviewData) {
-			const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.hasPtaDegree, reviewData.state);
+            const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.hasPtaDegree, reviewData.state, reviewData.address);
 			const overallRating = calculateOverallRating(reviewData.ratings);
 			
 			const miniSafeCompany = escapeHtml(reviewData.companyName);
@@ -6650,55 +6650,108 @@
             return hours * 60 + minutes;
         }
 
-		function findTariffEntry(history, year, state) {
-			const st = state === 'Ausland' ? 'Außerhalb Deutschlands' : state;
-			const namesOf = e => {
-				const n = (e.states || []).filter(s => typeof s === 'string');
-				return n.length ? n : ['Alle'];
-			};
-			const inYear = history.filter(e => year >= e.from && (e.to === null || year <= e.to));
-			const explicit = inYear.filter(e => { const n = namesOf(e); return st && !n.includes('Alle') && n.includes(st); });
-			const general = inYear.filter(e => namesOf(e).includes('Alle'));
-			const list = explicit.length ? explicit : general;
-			list.sort((a, b) => b.from - a.from);
-			return list[0] || null;
-		}
+        const NRW_NORDRHEIN_PLZ2 = ['40','41','42','47','50','51','52','53'];
+        const NRW_NORDRHEIN_PLZ3 = ['450','451','452','453','454','460','461','464','465'];
+        const NRW_WESTFALEN_PLZ5 = ['46414','46419'];
 
-		function getTariffForYear(year, state) {
-			if (!year || !window.tariffHistory || window.tariffHistory.length === 0) {
-				return window.tariffSalary || 1040;
-			}
-			const entry = findTariffEntry(window.tariffHistory, year, state);
-			return entry ? (entry.default ?? entry.amount) : null;
-		}
+        function resolveTariffRegion(state, address) {
+            if (state !== 'Nordrhein-Westfalen') return state;
+            const m = String(address || '').match(/(\d{5})/);
+            if (!m) return 'Nordrhein-Westfalen';
+            const plz = m[1];
+            if (NRW_WESTFALEN_PLZ5.includes(plz)) return 'NRW-Westfalen-Lippe';
+            if (NRW_NORDRHEIN_PLZ3.includes(plz.substring(0, 3))) return 'NRW-Nordrhein';
+            if (NRW_NORDRHEIN_PLZ2.includes(plz.substring(0, 2))) return 'NRW-Nordrhein';
+            return 'NRW-Westfalen-Lippe';
+        }
 
-		function getPtaEmployeeForState(state) {
-			const data = window.ptaEmployeeSalaryData || { default: window.ptaEmployeeSalary || 2200, states: [] };
-			if (state && data.states && data.states.length > 0) {
-				const match = data.states.find(sf => sf.states && sf.states.includes(state));
-				if (match) return match.amount;
-			}
-			return data.default || window.ptaEmployeeSalary || 2200;
-		}
+        function tariffKeysFor(state, address) {
+            const region = resolveTariffRegion(state, address);
+            if (region === 'NRW-Nordrhein') return ['NRW-Nordrhein', 'Nordrhein-Westfalen'];
+            if (region === 'NRW-Westfalen-Lippe') return ['NRW-Westfalen-Lippe'];
+            return [region === 'Ausland' ? 'Außerhalb Deutschlands' : region];
+        }
 
-		function getPtaEmployeeTariffForYear(year, state) {
-			if (!year || !window.ptaEmployeeSalaryHistory || window.ptaEmployeeSalaryHistory.length === 0) {
-				return getPtaEmployeeForState(state);
-			}
-			const entry = findTariffEntry(window.ptaEmployeeSalaryHistory, year, state);
-			return entry ? (entry.default ?? entry.amount) : null;
-		}
+        function getTariffForState(state, address) {
+            const data = window.tariffSalaryData || { default: window.tariffSalary || 1040, states: [] };
+            const keys = tariffKeysFor(state, address);
+            if (data.states && data.states.length > 0) {
+                for (const k of keys) {
+                    const match = data.states.find(sf => sf.states && sf.states.includes(k));
+                    if (match) return match.amount;
+                }
+            }
+            return data.default || window.tariffSalary || 1040;
+        }
 
-		function getSalaryBadge(salary, internshipYear, hasPtaDegree, state) {
-			let tariff;
-			if (hasPtaDegree) {
-				tariff = internshipYear ? getPtaEmployeeTariffForYear(internshipYear, state) : getPtaEmployeeForState(state);
-			} else {
-				tariff = internshipYear ? getTariffForYear(internshipYear, state) : (window.tariffSalary || 1040);
-			}
-			if (tariff == null) {
-				return { class: 'salary-none', text: 'Kein Tarifgehalt zum Vergleich verfügbar' };
-			}
+        function findTariffEntry(history, year, state, address) {
+            const keys = tariffKeysFor(state, address);
+            const namesOf = e => {
+                const names = (e.states || []).filter(s => typeof s === 'string');
+                return names.length ? names : ['Alle'];
+            };
+            const inYear = history.filter(e => year >= e.from && (e.to === null || year <= e.to));
+            const explicit = inYear.filter(e => {
+                const names = namesOf(e);
+                return keys[0] && !names.includes('Alle') && keys.some(k => names.includes(k));
+            });
+            const general = inYear.filter(e => namesOf(e).includes('Alle'));
+            const list = explicit.length ? explicit : general;
+            list.sort((a, b) => b.from - a.from);
+            return list[0] || null;
+        }
+
+        function getTariffForYear(year, state, address) {
+            if (!year || !window.tariffHistory || window.tariffHistory.length === 0) {
+                return getTariffForState(state, address);
+            }
+            const entry = findTariffEntry(window.tariffHistory, year, state, address);
+            return entry ? (entry.default ?? entry.amount) : null;
+        }
+
+        function getPtaEmployeeForState(state, address) {
+            const data = window.ptaEmployeeSalaryData || { default: window.ptaEmployeeSalary || 2200, states: [] };
+            const keys = tariffKeysFor(state, address);
+            if (data.states && data.states.length > 0) {
+                for (const k of keys) {
+                    const match = data.states.find(sf => sf.states && sf.states.includes(k));
+                    if (match) return match.amount;
+                }
+            }
+            return data.default || window.ptaEmployeeSalary || 2200;
+        }
+
+        function getPtaEmployeeTariffForYear(year, state, address) {
+            if (!year || !window.ptaEmployeeSalaryHistory || window.ptaEmployeeSalaryHistory.length === 0) {
+                return getPtaEmployeeForState(state, address);
+            }
+            const entry = findTariffEntry(window.ptaEmployeeSalaryHistory, year, state, address);
+            return entry ? (entry.default ?? entry.amount) : null;
+        }
+
+        function getSalaryBadge(salary, internshipYear, hasPtaDegree, state, address) {
+            let tariff;
+            if (hasPtaDegree) {
+                tariff = internshipYear ? getPtaEmployeeTariffForYear(internshipYear, state, address) : getPtaEmployeeForState(state, address);
+            } else {
+                tariff = internshipYear ? getTariffForYear(internshipYear, state, address) : getTariffForState(state, address);
+            }
+            if (tariff == null) {
+                return { class: 'salary-none', text: 'Kein Tarifgehalt zum Vergleich verfügbar' };
+            }
+
+            const note = internshipYear ? '\n(Zum Zeitpunkt des Praktikumsbeginns)' : '';
+
+            if (salary < tariff) {
+                return { class: 'salary-under-tariff', text: 'Untertarifliche Bezahlung' + note };
+            } else if (salary <= tariff * 1.05) {
+                return { class: 'salary-tariff', text: 'Tarifliches Mindestgehalt' + note };
+            } else if (salary >= tariff * 1.2) {
+                return { class: 'salary-above-tariff', text: 'Bezahlung deutlich über Tarif' + note };
+            } else {
+                return { class: 'salary-adequate', text: 'Angemessenes Gehalt' + note };
+            }
+        }
 
 			const note = internshipYear ? '\n(Zum Zeitpunkt des Praktikumsbeginns)' : '';
 
@@ -6791,7 +6844,7 @@
             const safeTasks = escapeHtml(reviewData.tasks);
             const safeFeedback = escapeHtml(reviewData.feedback);
             const safeHighlights = escapeHtml(reviewData.highlights);
-            const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.hasPtaDegree, reviewData.state);
+            const salaryBadge = getSalaryBadge(reviewData.salary, reviewData.internshipYear, reviewData.hasPtaDegree, reviewData.state, reviewData.address);
             const overallRating = calculateOverallRating(reviewData.ratings);
             const sortedWorkingHours = sortWorkingHours([...reviewData.workingHours]);
             
@@ -6869,7 +6922,7 @@
             const safeArea = escapeHtml(jobData.area);
             const safeCustomerType = escapeHtml(jobData.customerType);
             const safeBenefits = escapeHtml(jobData.benefits);
-            const salaryBadge = getSalaryBadge(jobData.salary);
+            const salaryBadge = getSalaryBadge(jobData.salary, null, false, jobData.state, jobData.address);
             const sortedWorkingHours = sortWorkingHours([...jobData.workingHours]);
             
 			return `

@@ -1109,6 +1109,7 @@
 						email: result.data.contact_email,
 						companyName: result.data.company_name,
 						contactPerson: result.data.contact_person,
+                        id: typeof result.data.id === 'string' ? result.data.id.substring(0, 8) : result.data.id,
 						editToken: result.data.edit_token
 					});
 				}
@@ -1121,6 +1122,7 @@
 						email: result.data.contact_email,
 						companyName: result.data.company_name,
 						contactPerson: result.data.contact_person,
+                        id: typeof result.data.id === 'string' ? result.data.id.substring(0, 8) : result.data.id,
 						reason
 					});
 				}
@@ -1665,7 +1667,7 @@
 				return;
 			}
 			const currentYear = new Date().getFullYear();
-			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','NRW-Nordrhein','NRW-Westfalen-Lippe','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
 			function genYears(sel, withAktuell) {
 				let h = withAktuell ? `<option value="null" ${sel === null ? 'selected' : ''}>Aktuell</option>` : '';
 				for (let y = currentYear; y >= 1970; y--) h += `<option value="${y}" ${sel === y ? 'selected' : ''}>${y}</option>`;
@@ -1726,7 +1728,7 @@
 			window.renderPtaSalaryHistoryRows();
 		};
 		window.updatePtaHistState = function(i, state, checked) {
-			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','NRW-Nordrhein','NRW-Westfalen-Lippe','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
 			if (!window.ptaSalaryHistoryData[i].states || window.ptaSalaryHistoryData[i].states.includes('Alle')) {
 				window.ptaSalaryHistoryData[i].states = checked ? [...allStates] : allStates.filter(s => s !== state);
 			} else {
@@ -1739,7 +1741,7 @@
 
 		window.ALL_STATES = window.ALL_STATES || [
 			'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg',
-			'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen',
+			'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','NRW-Nordrhein','NRW-Westfalen-Lippe',
 			'Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt',
 			'Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'
 		];
@@ -1792,7 +1794,7 @@
 
 const ALL_STATES = [
 			'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg',
-			'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen',
+			'Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','NRW-Nordrhein','NRW-Westfalen-Lippe',
 			'Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt',
 			'Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'
 		];
@@ -1920,7 +1922,7 @@ const ALL_STATES = [
 				container.innerHTML = '<p style="color: #666; font-size: 0.9rem;">Noch keine Einträge. Klicke auf "Zeile hinzufügen".</p>';
 				return;
 			}
-			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','NRW-Nordrhein','NRW-Westfalen-Lippe','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
 			container.innerHTML = tariffHistoryData.map((entry, i) => {
 				const entryStates = entry.states || ['Alle'];
 				const allSelected = entryStates.includes('Alle') || entryStates.length === allStates.length;
@@ -2000,7 +2002,7 @@ const ALL_STATES = [
 			renderTariffHistoryRows();
 		};
 		window.updateHistState = function(i, state, checked) {
-			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
+			const allStates = ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','NRW-Nordrhein','NRW-Westfalen-Lippe','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen','Außerhalb Deutschlands'];
 			if (!tariffHistoryData[i].states || tariffHistoryData[i].states.includes('Alle')) {
 				tariffHistoryData[i].states = checked ? [...allStates] : allStates.filter(s => s !== state);
 			} else {
