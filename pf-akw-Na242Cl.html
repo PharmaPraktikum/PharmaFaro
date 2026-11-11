@@ -10,6 +10,9 @@
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
 	<meta name="referrer" content="strict-origin-when-cross-origin">
 	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src https://*.supabase.co; img-src 'self' data:;">
+    <script>
+        if (window.top !== window.self) { window.top.location = window.self.location; }
+    </script>
     <title>PharmaFaro – Admin</title>
     
 	<style>
@@ -1394,7 +1397,7 @@
 							}
 							${job.contact_email ? 
 								`<button class="action-btn"
-										 onclick="window.location.href='mailto:${job.contact_email}?subject=${encodeURIComponent('Ihr Stellenangebot auf PharmaFaro.de - ID: ' + job.id.substring(0,8))}'"
+										 onclick="window.location.href='mailto:' + encodeURIComponent('${escapeAttr(job.contact_email)}') + '?subject=' + encodeURIComponent('Ihr Stellenangebot auf PharmaFaro.de - ID: ' + job.id.substring(0,8))"
 										 style="background:#1a4a7a;color:white;">
 									Kontaktieren
 								</button>` : ''
@@ -2486,7 +2489,7 @@
 			modal.innerHTML = `
 				<div style="max-width:800px;width:90%;margin:2rem auto;background:white;border-radius:12px;">
 					<div style="padding:1.5rem;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center;">
-						<h2 style="margin:0;">Reviews: ${name} (${reviews.length})</h2>
+						<h2 style="margin:0;">Reviews: ${esc(name)} (${reviews.length})</h2>
 						<button onclick="this.closest('.modal').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
 					</div>
 					<div style="padding:1.5rem;">
@@ -2503,7 +2506,7 @@
 												class="action-btn btn-view">Ansehen</button>
 										<button onclick="window.toggleStatus('${r.id}','inactive');this.closest('.modal').remove();" 
 												class="action-btn btn-deactivate">Deaktivieren</button>
-										${r.user_email ? `<button onclick="window.location.href='mailto:${r.user_email}?subject=${encodeURIComponent('Ihre Bewertung auf PharmaFaro.de - ID: ' + r.id.substring(0,8))}'"
+										${r.user_email ? `<button onclick="window.location.href='mailto:' + encodeURIComponent('${escapeAttr(r.user_email)}') + '?subject=' + encodeURIComponent('Ihre Bewertung auf PharmaFaro.de - ID: ' + r.id.substring(0,8))"
 												class="action-btn" style="background:#1a4a7a;color:white;">Kontaktieren</button>` : ''}
 									</div>
 								</div>
@@ -2531,7 +2534,7 @@
 			modal.innerHTML = `
 				<div style="max-width:800px;width:90%;margin:2rem auto;background:white;border-radius:12px;">
 					<div style="padding:1.5rem;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center;">
-						<h2 style="margin:0;">Jobs: ${name} (${jobs.length})</h2>
+						<h2 style="margin:0;">Jobs: ${esc(name)} (${jobs.length})</h2>
 						<button onclick="this.closest('.modal').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
 					</div>
 					<div style="padding:1.5rem;">
@@ -2551,7 +2554,7 @@
 												class="action-btn ${j.status === 'active' ? 'btn-deactivate' : 'btn-activate'}">
 											${j.status === 'active' ? 'Deaktivieren' : 'Aktivieren'}
 										</button>
-										${j.contact_email ? `<button onclick="window.location.href='mailto:${j.contact_email}?subject=${encodeURIComponent('Ihr Stellenangebot auf PharmaFaro.de - ID: ' + j.id.substring(0,8))}'"
+										${j.contact_email ? `<button onclick="window.location.href='mailto:' + encodeURIComponent('${escapeAttr(j.contact_email)}') + '?subject=' + encodeURIComponent('Ihr Stellenangebot auf PharmaFaro.de - ID: ' + j.id.substring(0,8))"
 												class="action-btn" style="background:#1a4a7a;color:white;">Kontaktieren</button>` : ''}
 									</div>
 								</div>
@@ -2580,13 +2583,13 @@
 			modal.innerHTML = `
 				<div style="max-width:700px;width:90%;margin:2rem auto;background:white;border-radius:12px;">
 					<div style="padding:1.5rem;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center;">
-						<h2 style="margin:0;">Zusammenführen: "${sourceName}"</h2>
+						<h2 style="margin:0;">Zusammenführen: "${esc(sourceName)}"</h2>
 						<button onclick="this.closest('.modal').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
 					</div>
 					<div style="padding:1.5rem;">
 						<div style="background:#fff3cd;padding:1rem;border-left:4px solid #ffc107;border-radius:4px;margin-bottom:1.5rem;">
-							<strong>Hinweis:</strong> "${sourceName}" wird in das Ziel-Unternehmen überführt. 
-							Alle Reviews und Jobs werden dem Ziel zugewiesen. "${sourceName}" wird anschließend gelöscht.
+							<strong>Hinweis:</strong> "${esc(sourceName)}" wird in das Ziel-Unternehmen überführt.
+							Alle Reviews und Jobs werden dem Ziel zugewiesen. "${esc(sourceName)}" wird anschließend gelöscht.
 						</div>
 						<p style="margin-bottom:0.75rem;color:#666;">Ziel-Unternehmen wählen:</p>
 						<input type="text" id="merge-search" placeholder="Nach Name oder Adresse filtern..."

@@ -6,6 +6,9 @@
     <link rel="apple-touch-icon" href="./favicon-512.png">
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src https://*.supabase.co; img-src 'self' data: https:;">
+    <script>
+        if (window.top !== window.self) { window.top.location = window.self.location; }
+    </script>
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="robots" content="noindex, nofollow">
 	<!-- Supabase Backend Integration -->
@@ -4941,11 +4944,11 @@
 					</div>
 					<div style="flex: 1;">
 						<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-							<h1 style="margin: 0; font-size: 2.5rem;">${company.name}</h1>
+							<h1 style="margin: 0; font-size: 2.5rem;">${escapeHtml(company.name)}</h1>
 							${company.verified ? '<div class="verified-badge" data-tooltip="Verifiziertes Unternehmen"><svg width="38" height="38" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0;"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>' : ''}
 						</div>
-						<p style="margin: 0; color: #666; font-size: 1.1rem;">${company.address}, ${getStateLabel(company.state)}${company.country ? ', ' + company.country : ''}</p>
-						${company.website ? `<p style="margin: 0.5rem 0 0 0; color: var(--red); font-size: 1rem;"><a href="${sanitizeUrl(company.website)}" target="_blank" style="color: var(--red); text-decoration: none;">${company.website}</a></p>` : ''}
+						<p style="margin: 0; color: #666; font-size: 1.1rem;">${escapeHtml(company.address)}, ${escapeHtml(getStateLabel(company.state))}${company.country ? ', ' + escapeHtml(company.country) : ''}</p>
+						${company.website ? `<p style="margin: 0.5rem 0 0 0; color: var(--red); font-size: 1rem;"><a href="${sanitizeUrl(company.website)}" target="_blank" style="color: var(--red); text-decoration: none;">${escapeHtml(company.website)}</a></p>` : ''}
 						<div style="margin-top: 0.5rem;">
 							<div class="category-badge" style="font-size: 0.9rem; padding: 0.4rem 1rem;">${getCategoryLabel(company.category)}</div>
 							<div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="showAllReviewsModal('${escapeAttr(company.name)}')">
@@ -4964,7 +4967,7 @@
 				<div style="margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06);">
 					<div style="margin-bottom: 2rem;">
 						<h3 style="margin-top: 0; margin-bottom: 1rem; color: #333;">Über uns</h3>
-						<p style="margin: 0; line-height: 1.8; color: #555; white-space: pre-wrap;">${company.description || 'Dieses Unternehmen hat noch keine eigene Beschreibung hinzugefügt.'}</p>
+						<p style="margin: 0; line-height: 1.8; color: #555; white-space: pre-wrap;">${escapeHtml(company.description || 'Dieses Unternehmen hat noch keine eigene Beschreibung hinzugefügt.')}</p>
 					</div>
 				</div>
 				` : ''}
@@ -7356,7 +7359,7 @@
 
 				showSuccessModal(
 					'Bewertung eingereicht!',
-					`Vielen Dank! Sie erhalten in Kürze eine Bestätigungs-E-Mail an ${formData.email}.<br><br>Die Bewertung wird nach Prüfung durch den Seitenbetreiber freigeschaltet.`,
+					`Vielen Dank! Sie erhalten in Kürze eine Bestätigungs-E-Mail an ${escapeHtml(formData.email)}.; Suchstelle Bestätigungs-E-Mail an ${contactEmail}.<br><br>Die Bewertung wird nach Prüfung durch den Seitenbetreiber freigeschaltet.`,
 					true
 				);
 
@@ -8698,7 +8701,7 @@
 				card.innerHTML = `
 
 					<div style="display: flex; align-items: center; gap: 1.25rem;">
-						<img src="${company.profileImage}" style="width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0; object-fit: cover;">
+						<img src="${escapeHtml(company.profileImage)}" style="width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0; object-fit: cover;">
 						<div style="flex: 1;">
 							<h4 style="margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; line-height: 1.4;">${company.name}${company.verified ? '&nbsp;<span class="verified-badge" data-tooltip="Verifiziertes Unternehmen" style="display:inline-flex;vertical-align:middle;position:relative;top:-1px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>' : ''}</h4>
 							<p style="margin: 0.5rem 0; color: #666;">${company.address}, ${company.state}</p>
@@ -9351,46 +9354,6 @@
 			}
 		}
 
-		async function saveGuideContent() {
-			const content = document.getElementById('guide-content').value;
-			
-			try {
-				const { error } = await window.supabase
-					.from('site_settings')
-					.upsert({ key: 'guide_content', value: content }, { onConflict: 'key' });
-				
-				if (error) throw error;
-				
-				const contentDiv = document.querySelector('#internship-guide-section .container div[style*="background: white; padding: 3rem"]');
-				if (contentDiv) contentDiv.innerHTML = content;
-
-				alert('Praktikumsleitfaden gespeichert! Die Website zeigt jetzt den neuen Inhalt an.');
-				
-			} catch (error) {
-				alert('Fehler: ' + error.message);
-			}
-		}
-
-		async function saveTipsContent() {
-			const content = document.getElementById('tips-content').value;
-			
-			try {
-				const { error } = await window.supabase
-					.from('site_settings')
-					.upsert({ key: 'tips_content', value: content }, { onConflict: 'key' });
-				
-				if (error) throw error;
-				
-				const contentDiv = document.querySelector('#internship-tips-section .container div[style*="display: grid"]');
-				if (contentDiv) contentDiv.innerHTML = content;
-
-				alert('Tipps gespeichert! Die Website zeigt jetzt den neuen Inhalt an.');
-				
-			} catch (error) {
-				alert('Fehler: ' + error.message);
-			}
-		}
-
 		async function loadTipsContent() {
 			try {
 				const { data } = await window.supabase
@@ -9906,8 +9869,8 @@
 				modal.id = 'pf-confirm-overlay';
 				modal.innerHTML = '<div style="background:white;padding:2rem;border-radius:16px;max-width:500px;width:90%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.2);">' +
 					'<div style="width:60px;height:60px;background:#ffc107;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 30,28 2,28" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="14.5" y="13" width="3" height="7" rx="1.5" fill="#ffc107"/><circle cx="16" cy="24" r="1.5" fill="#ffc107"/></svg></div>' +
-					'<h2 style="margin:0 0 1rem;color:#333;font-size:1.5rem;">' + title + '</h2>' +
-					'<p style="margin:0 0 2rem;color:#666;line-height:1.6;">' + message + '</p>' +
+					'<h2 style="margin:0 0 1rem;color:#333;font-size:1.5rem;">' + escapeHtml(title) + '</h2>' +
+					'<p style="margin:0 0 2rem;color:#666;line-height:1.6;">' + escapeHtml(message) + '</p>' +
 					'<div style="display:flex;gap:1rem;justify-content:center;">' +
 					'<button id="pf-cancel-btn" style="flex:1;background:#e0e0e0;color:#333;border:none;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;cursor:pointer;">Abbrechen</button>' +
 					'<button id="pf-confirm-btn" style="flex:1;background:#b83228;color:white;border:none;padding:0.75rem 1.5rem;border-radius:8px;font-weight:600;cursor:pointer;">Bestätigen</button>' +
@@ -10255,14 +10218,15 @@
 			modal.id = 'company-edit-modal';
 			modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;overflow-y:auto;';
 			
-			const description = company.company_description || '';
-			const website = company.company_website || '';
-			const contactPerson = company.contact_person || '';
-			const contactEmail = company.contact_email || '';
-			const phone = company.contact_phone || '';
-			const logoUrl = company.company_logo_url || '';
-			const companyName = company.company_name || '';
-			const initial = companyName.charAt(0).toUpperCase();
+            const rawName = company.company_name || '';
+            const initial = rawName.charAt(0).toUpperCase();
+            const companyName = escapeHtml(rawName);
+            const description = escapeHtml(company.company_description || '');
+            const website = escapeHtml(company.company_website || '');
+            const contactPerson = escapeHtml(company.contact_person || '');
+            const contactEmail = escapeHtml(company.contact_email || '');
+            const phone = escapeHtml(company.contact_phone || '');
+            const logoUrl = escapeHtml(company.company_logo_url || '');
 
 			const htmlContent = 
 				'<div style="background:var(--bg);border-radius:16px;max-width:640px;width:95%;max-height:95vh;overflow-y:auto;margin:1rem auto;border:1px solid var(--border);box-shadow:0 20px 60px rgba(42,18,16,0.14);display:flex;flex-direction:column;">' +
