@@ -6740,19 +6740,6 @@
                 return { class: 'salary-none', text: 'Kein Tarifgehalt zum Vergleich verfügbar' };
             }
 
-            const note = internshipYear ? '\n(Zum Zeitpunkt des Praktikumsbeginns)' : '';
-
-            if (salary < tariff) {
-                return { class: 'salary-under-tariff', text: 'Untertarifliche Bezahlung' + note };
-            } else if (salary <= tariff * 1.05) {
-                return { class: 'salary-tariff', text: 'Tarifliches Mindestgehalt' + note };
-            } else if (salary >= tariff * 1.2) {
-                return { class: 'salary-above-tariff', text: 'Bezahlung deutlich über Tarif' + note };
-            } else {
-                return { class: 'salary-adequate', text: 'Angemessenes Gehalt' + note };
-            }
-        }
-
 			const note = internshipYear ? '\n(Zum Zeitpunkt des Praktikumsbeginns)' : '';
 
 			if (salary < tariff) {
