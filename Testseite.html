@@ -8088,8 +8088,12 @@
             else setTimeout(preloadTariffs, 150);
         })();
 
-		function showSection(section) {
-			if (section === 'landing') {
+        function showSection(section) {
+            const allowedSections = ['search', 'write', 'wissenswert', 'company-search', 'awarded-companies', 'tariffs', 'internship-guide', 'internship-tips', 'jobs'];
+            if (section !== 'landing' && !allowedSections.includes(section)) {
+                section = 'landing';
+            }
+            if (section === 'landing') {
 				document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
 				document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 				document.querySelectorAll('.dropdown-content a').forEach(a => a.classList.remove('active'));
