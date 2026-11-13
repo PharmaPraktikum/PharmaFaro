@@ -4005,7 +4005,6 @@
         let addressValidationTimeout;
         let addressValidationController;
         const addressValidationCache = new Map();
-		let jobAddressValidationTimeout; 
 
 		async function validateAddress(address, targetId) {
 			clearTimeout(addressValidationTimeout);
@@ -4905,7 +4904,7 @@
 							${company.verified ? '<div class="verified-badge" data-tooltip="Verifiziertes Unternehmen"><svg width="38" height="38" viewBox="0 0 24 24" fill="var(--red)" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0;"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>' : ''}
 						</div>
 						<p style="margin: 0; color: #666; font-size: 1.1rem;">${escapeHtml(company.address)}, ${escapeHtml(getStateLabel(company.state))}${company.country ? ', ' + escapeHtml(company.country) : ''}</p>
-						${company.website ? `<p style="margin: 0.5rem 0 0 0; color: var(--red); font-size: 1rem;"><a href="${sanitizeUrl(company.website)}" target="_blank" style="color: var(--red); text-decoration: none;">${escapeHtml(company.website)}</a></p>` : ''}
+						${company.website ? `<p style="margin: 0.5rem 0 0 0; color: var(--red); font-size: 1rem;"><a href="${sanitizeUrl(company.website)}" target="_blank" rel="noopener" style="color: var(--red); text-decoration: none;">${escapeHtml(company.website)}</a></p>` : ''}
 						<div style="margin-top: 0.5rem;">
 							<div class="category-badge" style="font-size: 0.9rem; padding: 0.4rem 1rem;">${getCategoryLabel(company.category)}</div>
 							<div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="showAllReviewsModal('${escapeAttr(company.name)}')">
@@ -5053,7 +5052,7 @@
 				contactHTML += '<div style="margin:1rem 0;display:flex;align-items:center;gap:0.75rem;">';
 				contactHTML += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;display:block;">';
 				contactHTML += '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
-				contactHTML += '<div style="min-width:0;"><strong>Website:</strong><br><a href="' + websiteUrl + '" target="_blank" style="color:var(--red);">' + escapeHtml(company.website) + '</a></div>';
+				contactHTML += '<div style="min-width:0;"><strong>Website:</strong><br><a href="' + websiteUrl + '" target="_blank" rel="noopener" style="color:var(--red);">' + escapeHtml(company.website) + '</a></div>';
 				contactHTML += '</div>';
 			}
 			
@@ -9100,158 +9099,6 @@
 			return `<span id="truncated-${elementId}">${truncated}... <span style="color: var(--red); cursor: pointer; text-decoration: underline;" onclick="document.getElementById('truncated-${elementId}').style.display='none'; document.getElementById('full-${elementId}').style.display='inline';">Mehr anzeigen</span></span><span id="full-${elementId}" style="display: none;">${safe} <span style="color: var(--red); cursor: pointer; text-decoration: underline;" onclick="document.getElementById('full-${elementId}').style.display='none'; document.getElementById('truncated-${elementId}').style.display='inline';">Weniger anzeigen</span></span>`;
 		}
 
-		function populateYearSelect() {
-			const select = document.getElementById('award-year-select');
-			if (!select) return;
-			
-			const currentYear = new Date().getFullYear();
-			const years = [];
-			
-			for (let year = currentYear; year >= 2000; year--) {
-				years.push(year);
-			}
-			
-			select.innerHTML = years.map(year => 
-				`<option value="${year}">${year}</option>`
-			).join('');
-		}
-
-		function addBphdAward() {
-			const year = parseInt(document.getElementById('award-year-select').value);
-			const companyName = document.getElementById('award-company-name').value.trim();
-			const companyAddress = document.getElementById('award-company-address').value.trim();
-			const reason = document.getElementById('award-reason').value.trim();
-			
-			if (!companyName || !companyAddress || !reason) {
-				showToast('Bitte füllen Sie alle Felder aus.', 'warning');
-				return;
-			}
-			
-			let company = Object.values(companiesData).find(c => 
-				c.name.toLowerCase() === companyName.toLowerCase()
-			);
-			
-			if (!company) {
-				const addressParts = companyAddress.split(',');
-				const street = addressParts[0] ? addressParts[0].trim() : '';
-				const plzOrt = addressParts[1] ? addressParts[1].trim() : '';
-				
-				let state = 'Berlin';
-				if (plzOrt) {
-					const plzMatch = plzOrt.match(/(\d{5})/);
-					if (plzMatch) {
-						const plz = parseInt(plzMatch[1]);
-						if (plz >= 10000 && plz <= 14999) state = 'Berlin';
-						else if (plz >= 20000 && plz <= 21999) state = 'Hamburg';
-						else if (plz >= 30000 && plz <= 38999) state = 'Niedersachsen';
-						else if (plz >= 80000 && plz <= 87999) state = 'Bayern';
-					}
-				}
-				
-				company = getOrCreateCompany(companyName, street, state, '', 'offizin');
-				alert(`Neue Unternehmensseite für "${companyName}" wurde erstellt.`);
-			}
-			
-			if (!company.bphdAwards) {
-				company.bphdAwards = [];
-			}
-			if (!company.bphdAwards.includes(year)) {
-				company.bphdAwards.push(year);
-				company.bphdAwards.sort((a, b) => b - a);
-			}
-			
-			if (!bphdAwardsDatabase[year]) {
-				bphdAwardsDatabase[year] = [];
-			}
-			
-			bphdAwardsDatabase[year].push({ 
-				companyName: company.name, 
-				companyAddress: companyAddress,
-				reason 
-			});
-			
-			document.getElementById('award-company-name').value = '';
-			document.getElementById('award-company-address').value = '';
-			document.getElementById('award-reason').value = '';
-			
-			renderAwardedYearTabs();
-			refreshAwardsList();
-			
-			alert(`Auszeichnung für ${company.name} (${year}) hinzugefügt!`);
-		}
-
-		function refreshAwardsList() {
-			const container = document.getElementById('awards-list');
-			if (!container) return;
-			
-			const year = parseInt(document.getElementById('award-year-select').value);
-			const awards = bphdAwardsDatabase[year] || [];
-			
-			if (awards.length === 0) {
-				container.innerHTML = '<p style="color: #666; padding: 1rem; background: #f8f9fa; border-radius: 8px;">Keine Auszeichnungen für dieses Jahr.</p>';
-				return;
-			}
-			
-			container.innerHTML = `
-				<h5 style="margin-bottom: 1rem;">Auszeichnungen ${year}</h5>
-				${awards.map((award, index) => `
-					<div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
-						<div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
-							<div style="flex: 1;">
-								<strong>${award.companyName}</strong><br>
-								<small style="color: #666;">${award.companyAddress || 'Keine Adresse'}</small><br>
-								<small style="margin-top: 0.5rem; display: block;">${award.reason}</small>
-							</div>
-							<div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
-								<button class="btn btn-secondary" onclick="editBphdAward(${year}, ${index})" style="padding: 0.5rem 1rem;">Bearbeiten</button>
-								<button class="btn" onclick="removeBphdAward(${year}, ${index})" style="padding: 0.5rem 1rem; background: #dc3545; color: white;">Entfernen</button>
-							</div>
-						</div>
-					</div>
-				`).join('')}
-			`;
-		}
-
-		function editBphdAward(year, index) {
-			const award = bphdAwardsDatabase[year][index];
-			
-			document.getElementById('award-company-name').value = award.companyName;
-			document.getElementById('award-company-address').value = award.companyAddress || '';
-			document.getElementById('award-reason').value = award.reason;
-			
-			removeBphdAward(year, index, true);
-			
-			alert('Auszeichnung wurde in das Formular geladen. Bearbeiten Sie die Felder und klicken Sie auf "Hinzufügen".');
-		}
-
-		function removeBphdAward(year, index, silent = false) {
-			if (!silent && !confirm('Auszeichnung wirklich entfernen?')) {
-				return;
-			}
-			
-			const award = bphdAwardsDatabase[year][index];
-			
-			bphdAwardsDatabase[year].splice(index, 1);
-			
-			const company = Object.values(companiesData).find(c => 
-				c.name.toLowerCase() === award.companyName.toLowerCase()
-			);
-			if (company && company.bphdAwards) {
-				const yearIndex = company.bphdAwards.indexOf(year);
-				if (yearIndex > -1) {
-					company.bphdAwards.splice(yearIndex, 1);
-				}
-			}
-			
-			renderAwardedCompanies(year);
-			renderAwardedYearTabs();
-			refreshAwardsList();
-			
-			if (!silent) {
-				alert('Auszeichnung entfernt.');
-			}
-		}
-
 		async function loadGuideContent() {
 			try {
 				const { data } = await window.supabase
@@ -9264,8 +9111,6 @@
 					if (contentDiv) {
 						contentDiv.innerHTML = sanitizeAdminHTML(data.value);
 					}
-					const ta = document.getElementById('guide-content');
-					if (ta) ta.value = data.value;
 				}
 				try {
 					const { data: dateData } = await window.supabase
@@ -9286,14 +9131,14 @@
 				const { data } = await window.supabase.storage
 					.from('site-assets')
 					.createSignedUrl('guide.pdf', 3600);
-				if (data && data.signedUrl) {
-					window.open(data.signedUrl, '_blank');
-				} else {
-					alert('Kein PDF verfügbar.');
-				}
-			} catch(e) {
-				alert('PDF nicht verfügbar.');
-			}
+                if (data && data.signedUrl) {
+                    window.open(data.signedUrl, '_blank');
+                } else {
+                    showToast('Kein PDF verfügbar.', 'error');
+                }
+            } catch(e) {
+                showToast('PDF nicht verfügbar.', 'error');
+            }
 		}
 
 		async function loadTipsContent() {
@@ -9356,41 +9201,6 @@
 				}
 			} catch (error) {
 				window.tariffSalary = 1040;
-			}
-		}
-
-		async function saveTariffSalary() {
-			const amountInput = document.getElementById('tariff-salary-input');
-			if (!amountInput) return;
-			const amount = amountInput.value;
-			
-			if (!amount || parseInt(amount) <= 0) {
-				alert('Bitte gültiges Tarifgehalt eingeben.');
-				return;
-			}
-			
-			try {
-				const { error } = await window.supabase
-					.from('site_settings')
-					.upsert({ 
-						key: 'pta_tariff_salary', 
-						value: JSON.stringify({ amount: parseInt(amount) })
-					}, { onConflict: 'key' });
-				
-				if (error) throw error;
-				
-				window.tariffSalary = parseInt(amount);
-				
-				const currentDiv = document.getElementById('tariff-salary-current');
-				if (currentDiv) {
-					currentDiv.style.display = 'block';
-					currentDiv.innerHTML = `<strong>Aktuell gespeichert:</strong> ${amount}€/Monat brutto`;
-				}
-				
-				alert('Tarifgehalt gespeichert! Gehalts-Labels werden neu berechnet.');
-				
-			} catch (error) {
-				alert('Fehler: ' + error.message);
 			}
 		}
 
@@ -9463,105 +9273,6 @@
 					</div>
 				`;
 			}).join('');
-		}
-
-		function downloadPraktikumsleitfaden() {
-			const pdfData = localStorage.getItem('internship-guide-pdf');
-			
-			if (pdfData) {
-				const link = document.createElement('a');
-				link.href = pdfData;
-				link.download = 'Praktikumsrichtlinie.pdf';
-				document.body.appendChild(link);
-				link.click();
-				document.body.removeChild(link);
-			} else {
-				const content = document.querySelector('#internship-guide-section .container > div').innerHTML;
-				
-				const pdfContent = `
-					<!DOCTYPE html>
-					<html>
-					<head>
-						<meta charset="UTF-8">
-						<title>Praktikumsrichtlinie</title>
-						<style>
-							body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; }
-							h1, h2, h3 { color: #333; }
-							p { margin-bottom: 1em; }
-						</style>
-					</head>
-					<body>
-						${content}
-					</body>
-					</html>
-				`;
-				
-				const blob = new Blob([pdfContent], { type: 'text/html' });
-				const url = URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = url;
-				a.download = 'Praktikumsleitfaden.html';
-				document.body.appendChild(a);
-				a.click();
-				document.body.removeChild(a);
-				URL.revokeObjectURL(url);
-			}
-		}
-
-		function previewGuideContent() {
-			const content = document.getElementById('guide-content').value;
-			
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 900px; width: 90%; max-height: 90vh;">
-					<div class="modal-header">
-						<h2>Vorschau: Praktikumsrichtlinie</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body" style="overflow-y: auto;">
-						<div id="guide-content-display" style="background: white; padding: 3rem; border-radius: 10px; line-height: 1.6;">
-							${content}
-						</div>
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef;">
-						<button class="btn btn-primary" onclick="document.getElementById('guide-content').focus(); this.closest('.modal').remove()">Weiter bearbeiten</button>
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove(); saveGuideContent();" style="margin-left: 1rem;">Speichern & Schließen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
-		}
-
-		function previewTipsContent() {
-			const content = document.getElementById('tips-content').value;
-			
-			const modal = document.createElement('div');
-			modal.className = 'modal';
-			modal.style.display = 'block';
-			
-			modal.innerHTML = `
-				<div class="modal-content" style="max-width: 900px; width: 90%; max-height: 90vh;">
-					<div class="modal-header">
-						<h2>Vorschau: Tipps zur Praktikumssuche</h2>
-						<button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
-					</div>
-					<div class="modal-body" style="overflow-y: auto;">
-						<div style="display: grid; gap: 2rem;">
-							${content}
-						</div>
-					</div>
-					<div style="padding: 1.5rem; text-align: center; border-top: 1px solid #e9ecef;">
-						<button class="btn btn-primary" onclick="document.getElementById('tips-content').focus(); this.closest('.modal').remove()">Weiter bearbeiten</button>
-						<button class="btn btn-secondary" onclick="this.closest('.modal').remove(); saveTipsContent();" style="margin-left: 1rem;">Speichern & Schließen</button>
-					</div>
-				</div>
-			`;
-			
-			document.body.appendChild(modal);
 		}
 
 		function setupCompanyAutocomplete(inputId, suggestionsDivId) {
@@ -10022,20 +9733,9 @@
 				});
 			}	
 
-			renderAwardedYearTabs();	
-
-			populateYearSelect();	
+			renderAwardedYearTabs();
 			
 			populateInternshipYearDropdown();
-
-			setTimeout(() => {
-				const yearSelect = document.getElementById('award-year-select');
-				if (yearSelect && yearSelect.value) {
-					refreshAwardsList();
-				}
-			}, 100);
-		
-			setupCompanyAutocomplete('award-company-name', 'company-suggestions');
 
 			['benefits-sonstige-field', 'job-benefits-sonstige-field',
 			 'spec-sonstige-field', 'job-spec-sonstige-field'].forEach(id => {
@@ -10421,7 +10121,7 @@
 			const previewModal = document.createElement('div');
 			previewModal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10001;';
 			
-			const websiteLink = website ? '<p style="margin:0.25rem 0;color:var(--red);"><a href="' + sanitizeUrl(website) + '" target="_blank">' + escapeHtml(website) + '</a></p>' : '';
+			const websiteLink = website ? '<p style="margin:0.25rem 0;color:var(--red);"><a href="' + sanitizeUrl(website) + '" target="_blank" rel="noopener">' + escapeHtml(website) + '</a></p>' : '';
 			const descBlock = description ? '<div style="background:#f8f9fa;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;"><h4 style="margin-top:0;">Über uns</h4><p style="margin:0;line-height:1.6;">' + escapeHtml(description) + '</p></div>' : '';
 			const cpBlock = contactPerson ? '<p style="margin:0.5rem 0;"><strong>Ansprechperson:</strong> ' + escapeHtml(contactPerson) + '</p>' : '';
 			const ceBlock = contactEmail ? '<p style="margin:0.5rem 0;"><strong>E-Mail:</strong> <a href="mailto:' + escapeHtml(contactEmail) + '">' + escapeHtml(contactEmail) + '</a></p>' : '';
