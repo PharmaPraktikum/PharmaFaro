@@ -681,7 +681,7 @@
 							<tr>
 								<td colspan="11" style="text-align: center; padding: 2rem; color: #666;">
 									<div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-										<div class="spinner" style="width: 30px; height: 30px; border: 3px solid #e9ecef; border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+										<div class="spinner" style="width: 30px; height: 30px; border: 3px solid #e9ecef; border-top-color: var(--pf-red); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
 										<p>Lade Unternehmen...</p>
 									</div>
 								</td>
@@ -930,7 +930,7 @@
 					
 					<textarea id="tips-content" 
 							  style="width: 100%; height: 400px; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"
-							  placeholder="HTML-Inhalt, z.B.:&#10;&lt;div style=&quot;background: white; padding: 2rem; border-radius: 10px;&quot;&gt;&#10;  &lt;h3 style=&quot;color: #667eea;&quot;&gt;💡 Tipp&lt;/h3&gt;&#10;  &lt;p&gt;Text...&lt;/p&gt;&#10;&lt;/div&gt;"></textarea>
+							  placeholder="HTML-Inhalt, z.B.:&#10;&lt;div style=&quot;background: white; padding: 2rem; border-radius: 10px;&quot;&gt;&#10;  &lt;h3 style=&quot;color: var(--pf-red);&quot;&gt;💡 Tipp&lt;/h3&gt;&#10;  &lt;p&gt;Text...&lt;/p&gt;&#10;&lt;/div&gt;"></textarea>
 					
 					<div id="tips-save-feedback" style="display: none; padding: 0.75rem; background: #d4edda; border-radius: 8px; margin-bottom: 1rem; color: #155724;"></div>
 					
@@ -1961,7 +1961,7 @@
 							: '<span style="color:#aaa;">–</span>'}
 					</td>
 					<td style="padding: 0.75rem; text-align:center; font-size:0.85rem;">
-						<span style="cursor:pointer;color:#667eea;font-weight:600;"
+						<span style="cursor:pointer;color:var(--pf-red);font-weight:600;"
 							  onclick="window.showCompanyReviews('${c.name.replace(/'/g, "\\'")}', '${c.address.replace(/'/g, "\\'")}')">
 							${modeF === 'pta' ? (c.reviewCountPta > 0 ? c.reviewCountPta : '–')
 							: modeF === 'apo' ? (c.reviewCountApo > 0 ? c.reviewCountApo : '–')
@@ -1969,7 +1969,7 @@
 						</span>
 					</td>
 					<td style="padding: 0.75rem; text-align:center; font-size:0.85rem;">
-						<span style="cursor:pointer;color:#667eea;font-weight:600;"
+						<span style="cursor:pointer;color:var(--pf-red);font-weight:600;"
 							  onclick="window.showCompanyJobs('${c.name.replace(/'/g, "\\'")}', '${c.address.replace(/'/g, "\\'")}')">
 							${modeF === 'pta' ? (c.activeJobCountPta > 0 ? c.activeJobCountPta : '–')
 							: modeF === 'apo' ? (c.activeJobCountApo > 0 ? c.activeJobCountApo : '–')
@@ -2108,7 +2108,7 @@
 							<span style="color:#666;font-size:0.9rem;line-height:1.8;">
 								${req.company_address ? `📍 ${esc(req.company_address)}<br>` : ''}
 								👤 ${esc(req.contact_person || '–')} &nbsp;|&nbsp;
-								✉️ <a href="mailto:${esc(req.contact_email)}" style="color:#667eea;">${esc(req.contact_email)}</a><br>
+								✉️ <a href="mailto:${esc(req.contact_email)}" style="color:var(--pf-red);">${esc(req.contact_email)}</a><br>
 								🕐 ${formatDate(req.created_at)}
 								${req.reviewed_at ? ` · Bearbeitet: ${formatDate(req.reviewed_at)}` : ''}
 							</span>
@@ -2380,7 +2380,7 @@
 							</div>
 							<div style="display:flex;flex-direction:column;gap:0.4rem;flex-shrink:0;">
 								<button onclick="window.viewReview('${r.review_id}')"
-										style="padding:0.4rem 0.9rem;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+										style="padding:0.4rem 0.9rem;background:var(--pf-red);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.85rem;">
 									👁 Bewertung anzeigen
 								</button>
 								${currentReportsTab === 'open' ? `
@@ -2657,7 +2657,7 @@
 							<small style="color:#666;">${src?.address}</small><br>
 							<small style="color:#999;">${src?.reviewCount || 0} Bewertungen · ${src?.activeJobCount || 0} Jobs</small>
 						</div>
-						<div style="text-align:center;font-size:1.5rem;color:#667eea;margin:0.5rem 0;">↓</div>
+						<div style="text-align:center;font-size:1.5rem;color:var(--pf-red);margin:0.5rem 0;">↓</div>
 						<div style="background:#d4edda;padding:1rem;border-radius:8px;border:2px solid #28a745;">
 							<strong>Ziel:</strong> ${tgt?.name}<br>
 							<small style="color:#666;">${tgt?.address}</small><br>
@@ -2811,7 +2811,7 @@
 				.sort((a, b) => b - a)
 				.map(year => `
 					<div style="margin-bottom:1.5rem;">
-						<h4 style="color:#667eea;border-bottom:2px solid #e9ecef;padding-bottom:0.5rem;margin-bottom:1rem;">
+						<h4 style="color:var(--pf-red);border-bottom:2px solid #e9ecef;padding-bottom:0.5rem;margin-bottom:1rem;">
 							🏆 ${year} — ${byYear[year].length} Auszeichnung${byYear[year].length !== 1 ? 'en' : ''}
 						</h4>
 						${byYear[year].map(award => `
@@ -3043,7 +3043,7 @@
 			const content = document.getElementById(type === 'guide' ? 'guide-content' : 'tips-content').value;
 			const title = type === 'guide' ? 'Praktikumsleitfaden Vorschau' : 'Tipps Vorschau';
 			const html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>${title}</title>
-				<style>body{font-family:-apple-system,sans-serif;max-width:900px;margin:2rem auto;padding:2rem;line-height:1.6;}h3{color:#667eea;margin-top:1.5rem;}p{margin-bottom:1rem;}</style>
+				<style>body{font-family:-apple-system,sans-serif;max-width:900px;margin:2rem auto;padding:2rem;line-height:1.6;}h3{color:var(--pf-red);margin-top:1.5rem;}p{margin-bottom:1rem;}</style>
 				</head><body><h2>${title}</h2><hr>${content}</body></html>`;
 			const blob = new Blob([html], { type: 'text/html' });
 			const url = URL.createObjectURL(blob);
@@ -3195,21 +3195,21 @@
 							
 							${review.tasks ? `
 								<div style="margin-bottom: 1.5rem;">
-									<strong style="color: #667eea;">Absolvierte Aufgaben:</strong>
+									<strong style="color: var(--pf-red);">Absolvierte Aufgaben:</strong>
 									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.tasks)}</p>
 								</div>
 							` : ''}
 							
 							${review.feedback ? `
 								<div style="margin-bottom: 1.5rem;">
-									<strong style="color: #667eea;">Lob/Kritik:</strong>
+									<strong style="color: var(--pf-red);">Lob/Kritik:</strong>
 									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.feedback)}</p>
 								</div>
 							` : ''}
 							
 							${review.highlights ? `
 								<div style="margin-bottom: 1.5rem;">
-									<strong style="color: #667eea;">Besonders hervorzuheben:</strong>
+									<strong style="color: var(--pf-red);">Besonders hervorzuheben:</strong>
 									<p style="margin-top: 0.5rem; line-height: 1.6;">${esc(review.highlights)}</p>
 								</div>
 							` : ''}

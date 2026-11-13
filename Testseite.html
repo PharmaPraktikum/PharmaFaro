@@ -745,7 +745,12 @@
 		margin: 0.5rem 0 0.85rem 1.5rem;
 		line-height: 1.75;
 	}
-
+    #agb-content-display, #privacy-content-display,
+    #review-guidelines-content-display, #job-guidelines-content-display {
+        text-align: justify;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+    }
     .close-btn {
         background: none; border: none; font-size: 1.5rem;
         cursor: pointer; color: white; opacity: 0.7; transition: opacity 0.2s;
@@ -4058,7 +4063,9 @@
 			}
 		}
 
-		let addressValidationTimeout;
+        let addressValidationTimeout;
+        let addressValidationController;
+        const addressValidationCache = new Map();
 		let jobAddressValidationTimeout; 
 
 		async function validateAddress(address, targetId) {
@@ -4089,20 +4096,27 @@
 						searchQuery = address + ', Deutschland';
 					}
 
-					const url = `${window.SUPABASE_URL}/functions/v1/geocode?q=${encodeURIComponent(searchQuery)}&countrycodes=de,at,ch&limit=30`;
-					const response = await fetch(url, {
-						headers: {
-							'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
-							'apikey': window.SUPABASE_ANON_KEY
-						}
-					});
-					
-					if (!response.ok) {
-						validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Suche fehlgeschlagen.</span>';
-						return;
-					}
-					
-					const data = await response.json();
+                    let data;
+                    if (addressValidationCache.has(searchQuery)) {
+                        data = addressValidationCache.get(searchQuery);
+                    } else {
+                        if (addressValidationController) addressValidationController.abort();
+                        addressValidationController = new AbortController();
+                        const url = `${window.SUPABASE_URL}/functions/v1/geocode?q=${encodeURIComponent(searchQuery)}&countrycodes=de,at,ch&limit=8`;
+                        const response = await fetch(url, {
+                            headers: {
+                                'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+                                'apikey': window.SUPABASE_ANON_KEY
+                            },
+                            signal: addressValidationController.signal
+                        });
+                        if (!response.ok) {
+                            validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Suche fehlgeschlagen.</span>';
+                            return;
+                        }
+                        data = await response.json();
+                        addressValidationCache.set(searchQuery, data);
+                    }
 					
 					if (!data || data.length === 0) {
 						validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Keine Adresse gefunden.</span>';
@@ -4229,11 +4243,12 @@
 						validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Keine passende Adresse gefunden.</span>';
 					}
 					
-				} catch (error) {
-					console.error('Adressvalidierung Fehler:', error);
-					validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Prüfung fehlgeschlagen.</span>';
-				}
-			}, 1200);
+                } catch (error) {
+                    if (error && error.name === 'AbortError') return;
+                    console.error('Adressvalidierung Fehler:', error);
+                    validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Prüfung fehlgeschlagen.</span>';
+                }
+			}, 350);
 		}
         
 		let jobLocationTimeout;
@@ -8009,7 +8024,7 @@
         const TARIFF_GROUPS = [
             { title: 'Pharmaziepraktikant:innen', key: 'tariff_history' }
         ];
-        const TARIFF_SPECIAL_STATES = ['Nordrhein-Westfalen', 'Sachsen'];
+        const TARIFF_SPECIAL_STATES = ['Nordrhein-Westfalen', 'NRW-Nordrhein', 'NRW-Westfalen-Lippe', 'Sachsen'];
 
         let tariffsLoaded = false;
         let tariffsLoading = false;
@@ -8017,7 +8032,7 @@
         // Sortiert die Historie in Tabellen: NRW/Sachsen nur, wenn der Eintrag ausschließlich diese
         // Bundesländer betrifft; alles andere gilt deutschlandweit.
         function buildTariffTables(history) {
-            const tables = { 'Deutschlandweit': [], 'Nordrhein-Westfalen': [], 'Sachsen': [] };
+            const tables = { 'Deutschlandweit': [], 'Nordrhein-Westfalen': [], 'NRW-Nordrhein': [], 'NRW-Westfalen-Lippe': [], 'Sachsen': [] };
             const add = (states, from, to, amount) => {
                 const names = (states || []).filter(s => typeof s === 'string');
                 const special = names.length > 0 && !names.includes('Alle') && names.every(s => TARIFF_SPECIAL_STATES.includes(s));
@@ -8051,9 +8066,10 @@
                 if (error) throw error;
                 const th = 'padding:0.5rem 0;border-bottom:1.5px solid var(--border);font-size:0.82rem;color:var(--mid);';
                 const period = r => r.to == null ? 'ab ' + r.from : (r.from === r.to ? String(r.from) : r.from + ' – ' + r.to);
-                const tableHtml = (title, rows, emptyText) => `
+                const tableHtml = (title, rows, emptyText, note) => `
                     <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;">
                         <h4 style="margin:0 0 0.75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;">${title}</h4>
+                        ${note ? `<p style="margin:0 0 0.75rem;color:var(--mid);font-size:0.85rem;">${note}</p>` : ''}
                         ${rows.length === 0 ? `<p style="color:#666;margin:0;font-size:0.9rem;">${emptyText}</p>` : `
                         <table style="width:100%;border-collapse:collapse;">
                             <thead><tr><th style="text-align:left;${th}">Zeitraum</th><th style="text-align:right;${th}">Monatliches Bruttogehalt</th></tr></thead>
@@ -8071,8 +8087,10 @@
                     const t = buildTariffTables(history);
                     return `<h3 style="margin:2rem 0 1rem;">${g.title}</h3>`
                         + tableHtml('Deutschlandweit', t['Deutschlandweit'], 'Keine Einträge hinterlegt.')
-                        + tableHtml('Nordrhein-Westfalen', t['Nordrhein-Westfalen'], 'Keine abweichenden Regelungen hinterlegt.')
-                        + tableHtml('Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.');
+                        + tableHtml('Tarifgebiet Nordrhein', t['Nordrhein-Westfalen'], 'Keine abweichenden Regelungen hinterlegt.', 'Gilt als Vergleichswert für alle Apotheken im Tarifgebiet Nordrhein (Lohnabrechnungsverband Nordrhein). Apotheken im übrigen NRW (Westfalen-Lippe) folgen dem Tarif Deutschlandweit.')
+                        + tableHtml('Tarifgebiet Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.', 'Gilt als Vergleichswert für alle Apotheken im Freistaat Sachsen.')
+                        + (t['NRW-Nordrhein'].length ? tableHtml('NRW (Verband Nordrhein)', t['NRW-Nordrhein'], 'Keine abweichenden Regelungen hinterlegt.') : '')
+                        + (t['NRW-Westfalen-Lippe'].length ? tableHtml('NRW (Verband Westfalen-Lippe)', t['NRW-Westfalen-Lippe'], 'Keine abweichenden Regelungen hinterlegt.') : '');
                 }).join('');
                 tariffsLoaded = true;
             } catch (e) {
@@ -10608,7 +10626,7 @@
 		}
 		
 		function createConfetti() {
-			const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+			const colors = ['#b83228', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
 			const confettiCount = 50;
 			
 			for (let i = 0; i < confettiCount; i++) {

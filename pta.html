@@ -434,7 +434,7 @@
     .filter-group input:focus, .filter-group select:focus {
         outline: none;
         border-color: var(--red);
-        box-shadow: 0 0 0 3px rgba(184,50,40,0.08);
+        box-shadow: 0 0 0 3px rgba(109,40,217,0.08);
     }
 
     /* ── BUTTONS ── */
@@ -747,7 +747,12 @@
 		margin: 0.5rem 0 0.85rem 1.5rem;
 		line-height: 1.75;
 	}
-
+    #agb-content-display, #privacy-content-display,
+    #review-guidelines-content-display, #job-guidelines-content-display {
+        text-align: justify;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+    }
     .close-btn {
         background: none; border: none; font-size: 1.5rem;
         cursor: pointer; color: white; opacity: 0.7; transition: opacity 0.2s;
@@ -789,7 +794,7 @@
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
         outline: none;
         border-color: var(--red);
-        box-shadow: 0 0 0 3px rgba(184,50,40,0.08);
+        box-shadow: 0 0 0 3px rgba(109,40,217,0.08);
     }
 
     .form-section {
@@ -900,7 +905,7 @@
     }
 
     .hover-lift { transition: all 0.18s; }
-    .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(184,50,40,0.2); }
+    .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(109,40,217,0.2); }
 
     .verification-note { font-size: 0.82rem; color: var(--mid); margin-top: 0.5rem; }
 
@@ -1105,7 +1110,7 @@
 
     /* ── COMPANY SEARCH INPUT ── */
     #company-search:hover { background-color: var(--bg); }
-    #company-search:focus { background-color: white; outline: none; border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(184,50,40,0.1); }
+    #company-search:focus { background-color: white; outline: none; border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(109,40,217,0.1); }
     #company-search::placeholder {
         text-align: center;
     }
@@ -1305,7 +1310,7 @@
     /* ── STATUS BADGES (Admin) ── */
     .status-pending { background: #fff3cd; color: #856404; border: 1px solid rgba(133,100,4,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
     .status-active { background: #d4edda; color: #155724; border: 1px solid rgba(21,87,36,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
-    .status-inactive { background: var(--red-light); color: var(--red); border: 1px solid rgba(184,50,40,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+    .status-inactive { background: var(--red-light); color: var(--red); border: 1px solid rgba(109,40,217,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
 
     /* ── RANGE SLIDERS ── */
     input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 5px; background: var(--border); outline: none; }
@@ -1318,7 +1323,7 @@
     }
 
     .error-message {
-        background: var(--red-light); border: 1px solid rgba(184,50,40,0.25);
+        background: var(--red-light); border: 1px solid rgba(109,40,217,0.25);
         color: var(--red); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;
     }
 
@@ -3997,7 +4002,9 @@
 			}
 		}
 
-		let addressValidationTimeout;
+        let addressValidationTimeout;
+        let addressValidationController;
+        const addressValidationCache = new Map();
 		let jobAddressValidationTimeout; 
 
 		async function validateAddress(address, targetId) {
@@ -4028,20 +4035,27 @@
 						searchQuery = address + ', Deutschland';
 					}
 
-					const url = `${window.SUPABASE_URL}/functions/v1/geocode?q=${encodeURIComponent(searchQuery)}&countrycodes=de,at,ch&limit=30`;
-					const response = await fetch(url, {
-						headers: {
-							'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
-							'apikey': window.SUPABASE_ANON_KEY
-						}
-					});
-					
-					if (!response.ok) {
-						validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Suche fehlgeschlagen.</span>';
-						return;
-					}
-					
-					const data = await response.json();
+                    let data;
+                    if (addressValidationCache.has(searchQuery)) {
+                        data = addressValidationCache.get(searchQuery);
+                    } else {
+                        if (addressValidationController) addressValidationController.abort();
+                        addressValidationController = new AbortController();
+                        const url = `${window.SUPABASE_URL}/functions/v1/geocode?q=${encodeURIComponent(searchQuery)}&countrycodes=de,at,ch&limit=8`;
+                        const response = await fetch(url, {
+                            headers: {
+                                'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+                                'apikey': window.SUPABASE_ANON_KEY
+                            },
+                            signal: addressValidationController.signal
+                        });
+                        if (!response.ok) {
+                            validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Suche fehlgeschlagen.</span>';
+                            return;
+                        }
+                        data = await response.json();
+                        addressValidationCache.set(searchQuery, data);
+                    }
 					
 					if (!data || data.length === 0) {
 						validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Keine Adresse gefunden.</span>';
@@ -4168,11 +4182,12 @@
 						validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Keine passende Adresse gefunden.</span>';
 					}
 					
-				} catch (error) {
-					console.error('Adressvalidierung Fehler:', error);
-					validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Prüfung fehlgeschlagen.</span>';
-				}
-			}, 1200);
+                } catch (error) {
+                    if (error && error.name === 'AbortError') return;
+                    console.error('Adressvalidierung Fehler:', error);
+                    validationDiv.innerHTML = '<span style="color: #dc3545;">✗ Prüfung fehlgeschlagen.</span>';
+                }
+			}, 350);
 		}
         
 		let jobLocationTimeout;
@@ -7990,8 +8005,8 @@
                     const t = buildTariffTables(history);
                     return `<h3 style="margin:2rem 0 1rem;">${g.title}</h3>`
                         + tableHtml('Deutschlandweit', t['Deutschlandweit'], 'Keine Einträge hinterlegt.')
-                        + tableHtml('Nordrhein-Westfalen', t['Nordrhein-Westfalen'], 'Keine abweichenden Regelungen hinterlegt.')
-                        + tableHtml('Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.')
+                        + tableHtml('Tarifgebiet Nordrhein', t['Nordrhein-Westfalen'], 'Keine abweichenden Regelungen hinterlegt.')
+                        + tableHtml('Tarifgebiet Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.')
                         + (t['NRW-Nordrhein'].length ? tableHtml('NRW (Verband Nordrhein)', t['NRW-Nordrhein'], 'Keine abweichenden Regelungen hinterlegt.') : '')
                         + (t['NRW-Westfalen-Lippe'].length ? tableHtml('NRW (Verband Westfalen-Lippe)', t['NRW-Westfalen-Lippe'], 'Keine abweichenden Regelungen hinterlegt.') : '');
                 }).join('');
@@ -10206,7 +10221,7 @@
 				'<input type="tel" id="company-contact-phone" value="' + phone + '" placeholder="030/12345678" style="width:100%;padding:0.75rem;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">' +
 				'</div></div></div>' +
 				'<div style="display:flex;flex-direction:column;gap:0.75rem;">' +
-				'<button type="submit" style="width:100%;background:var(--red);color:white;padding:0.875rem;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:1rem;font-family:\'DM Sans\',sans-serif;box-shadow:0 3px 12px rgba(184,50,40,0.25);">Änderungen speichern</button>' +
+				'<button type="submit" style="width:100%;background:var(--red);color:white;padding:0.875rem;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:1rem;font-family:\'DM Sans\',sans-serif;box-shadow:0 3px 12px rgba(109,40,217,0.25);">Änderungen speichern</button>' +
 				'<button type="button" onclick="closeCompanyEditModal()" style="width:100%;background:white;color:var(--dark);padding:0.875rem;border:1.5px solid var(--border);border-radius:10px;font-weight:600;cursor:pointer;font-size:1rem;font-family:\'DM Sans\',sans-serif;">Abbrechen</button>' +
 				'</div></form></div></div>';
 			
@@ -10507,7 +10522,7 @@
 						font-weight: 600;
 						cursor: pointer;
 						transition: transform 0.2s, box-shadow 0.2s;
-					" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(184,50,40,0.35);'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+					" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(109,40,217,0.35);'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
 						Verstanden
 					</button>
 				</div>
@@ -10521,7 +10536,7 @@
 		}
 		
 		function createConfetti() {
-			const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+			const colors = ['#6d28d9', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
 			const confettiCount = 50;
 			
 			for (let i = 0; i < confettiCount; i++) {
