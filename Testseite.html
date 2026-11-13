@@ -8087,8 +8087,8 @@
                     const t = buildTariffTables(history);
                     return `<h3 style="margin:2rem 0 1rem;">${g.title}</h3>`
                         + tableHtml('Deutschlandweit', t['Deutschlandweit'], 'Keine Einträge hinterlegt.')
-                        + tableHtml('Tarifgebiet Nordrhein', t['Nordrhein-Westfalen'], 'Keine abweichenden Regelungen hinterlegt.', 'Gilt als Vergleichswert für alle Apotheken im Tarifgebiet Nordrhein (Lohnabrechnungsverband Nordrhein). Apotheken im übrigen NRW (Westfalen-Lippe) folgen dem Tarif Deutschlandweit.')
-                        + tableHtml('Tarifgebiet Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.', 'Gilt als Vergleichswert für alle Apotheken im Freistaat Sachsen.')
+                        + tableHtml('Tarifgebiet Nordrhein', t['Nordrhein-Westfalen'], 'Keine abweichenden Regelungen hinterlegt.')
+                        + tableHtml('Tarifgebiet Sachsen', t['Sachsen'], 'Keine abweichenden Regelungen hinterlegt.')
                         + (t['NRW-Nordrhein'].length ? tableHtml('NRW (Verband Nordrhein)', t['NRW-Nordrhein'], 'Keine abweichenden Regelungen hinterlegt.') : '')
                         + (t['NRW-Westfalen-Lippe'].length ? tableHtml('NRW (Verband Westfalen-Lippe)', t['NRW-Westfalen-Lippe'], 'Keine abweichenden Regelungen hinterlegt.') : '');
                 }).join('');
