@@ -1,0 +1,41 @@
+/* Admin-Modus-Switcher */
+.admin-mode-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.admin-mode-btn {
+    background: none;
+    border: none;
+    padding: 0.3rem 0.4rem;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+}
+
+.admin-mode-btn::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid currentColor;
+    margin-left: 0.3rem;
+}
+
+.admin-mode-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: white;
+    min-width: 190px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    z-index: 1002;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
