@@ -4943,7 +4943,7 @@
 				<!-- Header -->
 				<div class="company-header-box" style="position: relative; display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(42,18,16,0.06); overflow: visible;">
 					<div class="profile-img-wrapper" style="flex-shrink: 0; width: 140px; height: 140px;">
-						<img src="${company.profileImage}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;" alt="Profilbild">
+                        <img src="${escapeHtml(company.profileImage)}" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;" alt="Profilbild" onerror="this.src='${generateProfileImage(company.name)}'">
 						${company.bphdAwards && company.bphdAwards.length > 0 ? `
 						<div class="bphd-badge-container" style="position: absolute; top: -20px; right: 0px; cursor: pointer; z-index: 5;" onclick="showBphdAwardsModal('${escapeAttr(company.name)}')">						
 							<svg width="90" height="100" viewBox="0 0 90 100">
@@ -9233,8 +9233,6 @@
 					if (contentDiv) {
 						contentDiv.innerHTML = sanitizeAdminHTML(data.value);
 					}
-					const ta = document.getElementById('tips-content');
-					if (ta) ta.value = data.value;
 				}
 			} catch(e) { /* Kein gespeicherter Inhalt, Standard bleibt */ }
 		}
@@ -9321,7 +9319,7 @@
 							 onmouseenter="this.style.transform='translateY(-3px)'"
 							 onmouseleave="this.style.transform='translateY(0)'">
 							<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-								<img src="${company.profileImage}" style="width: 60px; height: 60px; border-radius: 50%;">
+                                <img src="${escapeHtml(company.profileImage)}" style="width: 60px; height: 60px; border-radius: 50%;" alt="" onerror="this.src='${generateProfileImage(company.name)}'">
 								<div style="flex: 1;">
 									<div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
 										<h4 style="margin: 0;">${company.name}</h4>
@@ -9347,7 +9345,7 @@
 				return `
 					<div class="awarded-company-card" style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(45,32,64,0.06);">
 						<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-							<img src="${profileImage}" style="width: 60px; height: 60px; border-radius: 50%;">
+                            <img src="${escapeHtml(profileImage)}" style="width: 60px; height: 60px; border-radius: 50%;" alt="">
 							<div style="flex: 1;">
 								<div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
 									<h4 style="margin: 0;">${award.companyName}</h4>
