@@ -473,9 +473,6 @@
 			cursor: default;
 		}
 
-    .verified-badge::before { display: none; }
-    .verified-badge::after { display: none; }
-
     .salary-badge {
         display: inline-flex;
         align-items: center;
@@ -801,7 +798,14 @@
     }
 
     /* ── SORT CONTROLS ── */
-    .sort-controls { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .sort-controls {
+        display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+        padding: 0.75rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: 0 1px 6px rgba(var(--dark-rgb),0.04);
+    }
     .sort-label { font-size: 0.83rem; font-weight: 600; color: var(--dark); }
 
     .sort-controls select {
@@ -859,8 +863,6 @@
         gap: 2rem;
         align-items: start;
     }
-
-    .footer-brand { }
 
     .footer-brand h3 {
         font-family: 'Fraunces', serif;
@@ -1128,20 +1130,10 @@
     .rating-item-stars .star { font-size: 0.9rem; }
 
 	.overall-rating { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 0; justify-content: flex-start; }
-    .rating-number { font-weight: 700; font-size: 1.75rem; color: var(--dark); }
 
     .stars { display: flex; gap: 2px; margin-top: 0.2rem; margin-bottom: 0; justify-content: center; }
     .star { color: var(--red); font-size: 1rem; }
     .star.empty { color: var(--border-strong); }
-
-    /* ── SORT CONTROLS (missing bg) ── */
-    .sort-controls {
-        padding: 0.75rem 1rem;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        box-shadow: 0 1px 6px rgba(var(--dark-rgb),0.04);
-    }
 
     /* ── COMPANY SEARCH SECTION ── */
     #company-search-section h2 {
@@ -1389,10 +1381,6 @@
 	.landing-highlight-card.fading {
 		opacity: 0;
 		transform: translateY(6px);
-	}
-
-	.landing-highlight-card::before {
-		content: '';
 	}
 
 	.landing-highlight-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(var(--dark-rgb),0.12); }
