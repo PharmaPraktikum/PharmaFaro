@@ -6253,12 +6253,17 @@
             }
         });
 
-		document.getElementById('verification-file').addEventListener('change', function() {
-			const fileDisplay = document.getElementById('file-name-display');
-			const removeBtn = document.getElementById('remove-file-btn');
+        document.getElementById('verification-file').addEventListener('change', function() {
+            const fileDisplay = document.getElementById('file-name-display');
+            const removeBtn = document.getElementById('remove-file-btn');
 
-			if (this.files.length > 0) {
-				fileDisplay.textContent = this.files[0].name;
+            if (this.files.length > 0) {
+                if (this.files[0].size > 10 * 1024 * 1024) {
+                    showToast('Die Datei ist zu groß (max. 10 MB). Bitte verkleinere die Bescheinigung.', 'warning');
+                    this.value = '';
+                    return;
+                }
+                fileDisplay.textContent = this.files[0].name;
 				if (window.innerWidth <= 600) {
 					const removeBtn = document.getElementById('remove-file-btn');
 					fileDisplay.style.display = 'block';
