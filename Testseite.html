@@ -5,7 +5,7 @@
 	<link rel="icon" type="image/png" href="./favicon-apo.png">
     <link rel="apple-touch-icon" href="./favicon-apo.png">
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src https://*.supabase.co; img-src 'self' data: https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src https://*.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';">
     <script>
         if (window.top !== window.self) { window.top.location = window.self.location; }
     </script>
@@ -2061,28 +2061,14 @@
 				return null;
 			}
 
-			const email = document.getElementById('reviewer-email').value.toLowerCase();
-			const companyName = document.getElementById('company-name').value;
-
-			try {
-				const { data: existingReviews } = await window.supabase
-					.from('reviews')
-					.select('id')
-					.ilike('user_email', email)
-					.ilike('company_name', companyName)
-					.neq('status', 'deleted');
-
-				if (existingReviews && existingReviews.length > 0) {
-					showToast('Sie haben bereits eine Bewertung für dieses Unternehmen abgegeben. Mehrfachbewertungen sind nicht zulässig.', 'warning');
-					return null;
-				}
-			} catch (error) {
-				console.error('Fehler bei Duplikat-Prüfung:', error);
-			}
-
 			const result = await window.api.createReview(formData, certificateFile);
 			if (!result.success) {
-				showToast('Fehler beim Einreichen der Bewertung: ' + result.error, 'error');
+				const errText = String(result.error || '');
+				if (errText.includes('unique_email_company') || errText.includes('reviews_email_company_unique') || errText.includes('duplicate key')) {
+					showToast('Sie haben bereits eine Bewertung für dieses Unternehmen abgegeben. Mehrfachbewertungen sind nicht zulässig.', 'warning');
+				} else {
+					showToast('Fehler beim Einreichen der Bewertung: ' + result.error, 'error');
+				}
 				return null;
 			}
 			return result.data;
@@ -7996,6 +7982,7 @@
 				if (editToken) {
 					try {
 						const result = await window.api.getCompanyByEditToken(editToken);
+						window.history.replaceState({}, document.title, window.location.pathname);
 
 						if (!result.success) {
 							showToast('Unternehmen nicht gefunden oder nicht verifiziert.', 'error');
