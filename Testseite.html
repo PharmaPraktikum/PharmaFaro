@@ -73,8 +73,8 @@
                         <span style="display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;"></span>
                     </button>
                     <div class="mode-dropdown" id="mode-dropdown">
-                        <div class="mode-dropdown-item active" onclick="toggleModeSwitcher(event)">Pharmaziepraktika</div>
-                        <div class="mode-dropdown-item" onclick="selectPtaMode()">PTA-Praktika</div>
+                        <div class="mode-dropdown-item active" role="button" tabindex="0" onclick="toggleModeSwitcher(event)">Pharmaziepraktika</div>
+                        <div class="mode-dropdown-item" role="button" tabindex="0" onclick="selectPtaMode()">PTA-Praktika</div>
                     </div>
                 </div>
             </div>
@@ -136,17 +136,17 @@
 
                 <!-- Live-Statistiken -->
 				<div class="landing-stats">
-					<div class="landing-stat-card" onclick="showSection('search')" style="cursor:pointer;">
+					<div class="landing-stat-card" role="button" tabindex="0" onclick="showSection('search')" style="cursor:pointer;">
 						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></span>
 						<div class="landing-stat-number" id="stat-reviews">—</div>
 						<div class="landing-stat-label">Geprüfte Bewertungen</div>
 					</div>
-					<div class="landing-stat-card" onclick="showSection('jobs')" style="cursor:pointer;">
+					<div class="landing-stat-card" role="button" tabindex="0" onclick="showSection('jobs')" style="cursor:pointer;">
 						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
 						<div class="landing-stat-number" id="stat-jobs">—</div>
 						<div class="landing-stat-label">Aktive Stellenangebote</div>
 					</div>
-					<div class="landing-stat-card" onclick="(function(){ const cb = document.getElementById('verified-company-filter'); if(cb) cb.checked = true; showSection('company-search'); })()" style="cursor:pointer;">
+					<div class="landing-stat-card" role="button" tabindex="0" onclick="(function(){ const cb = document.getElementById('verified-company-filter'); if(cb) cb.checked = true; showSection('company-search'); })()" style="cursor:pointer;">
 						<span class="landing-stat-icon"><svg viewBox="0 0 24 24" fill="var(--red)"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>
 						<div class="landing-stat-number" id="stat-companies">—</div>
 						<div class="landing-stat-label">Verifizierte Unternehmen</div>
@@ -160,32 +160,32 @@
                         <h2 class="landing-section-title">Warum du hier <em>alles</em> findest, was du brauchst</h2>
                     </div>
                     <div class="landing-features-grid">
-						<div class="landing-feature-card" onclick="showSection('search')" style="cursor:pointer;">
+						<div class="landing-feature-card" role="button" tabindex="0" onclick="showSection('search')" style="cursor:pointer;">
                             <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg></div>
                             <div class="landing-feature-title">Geprüft, nicht einfach gepostet</div>
                             <p class="landing-feature-text">Vor jeder Veröffentlichung prüfen wir anhand der Praktikumsbescheinigung, ob das Praktikum tatsächlich stattgefunden hat. Was du hier liest, hat jemand wirklich erlebt.</p>
                         </div>
-						<div class="landing-feature-card" onclick="showSection('search')" style="cursor:pointer;">
+						<div class="landing-feature-card" role="button" tabindex="0" onclick="showSection('search')" style="cursor:pointer;">
                             <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></div>
                             <div class="landing-feature-title">Acht Kategorien, ein Gesamtbild</div>
                             <p class="landing-feature-text">Betreuung, Gehalt, Arbeitszeiten, Ausstattung und mehr – in acht Kategorien bewertet, inklusive Tarifvergleich.</p>
                         </div>
-						<div class="landing-feature-card" onclick="showSection('jobs')" style="cursor:pointer;">
+						<div class="landing-feature-card" role="button" tabindex="0" onclick="showSection('jobs')" style="cursor:pointer;">
                             <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
                             <div class="landing-feature-title">Stellenangebote von den Betrieben</div>
                             <p class="landing-feature-text">Apotheken, Kliniken und Industrie schreiben selbst aus – mit Gehalt, Arbeitszeiten und Kontaktdetails.</p>
                         </div>
-						<div class="landing-feature-card" onclick="showSection('search')" style="cursor:pointer;">
+						<div class="landing-feature-card" role="button" tabindex="0" onclick="showSection('search')" style="cursor:pointer;">
                             <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
                             <div class="landing-feature-title">Deutschlandweite Suche</div>
                             <p class="landing-feature-text">Finde Praktika anhand von Ort, PLZ, Bundesland oder im Umkreis um dich herum – auch für Praktika im Ausland.</p>
                         </div>
-						<div class="landing-feature-card" onclick="(function(){ const cb=document.getElementById('verified-company-filter'); if(cb) cb.checked=true; showSection('company-search'); })()" style="cursor:pointer;">
+						<div class="landing-feature-card" role="button" tabindex="0" onclick="(function(){ const cb=document.getElementById('verified-company-filter'); if(cb) cb.checked=true; showSection('company-search'); })()" style="cursor:pointer;">
                             <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="var(--red)"><path d="M12 1L14.5 3.5L18 3L19 6.5L22 8.5L21 12L22 15.5L19 17.5L18 21L14.5 20.5L12 23L9.5 20.5L6 21L5 17.5L2 15.5L3 12L2 8.5L5 6.5L6 3L9.5 3.5Z"/><path d="M8 12L10.5 14.5L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
                             <div class="landing-feature-title">Verifizierte Betriebe</div>
                             <p class="landing-feature-text">Unternehmen bestätigen ihre Identität und pflegen Profil, Logo und Kontaktdaten selbst.</p>
                         </div>
-						<div class="landing-feature-card" onclick="showSection('internship-guide')" style="cursor:pointer;">
+						<div class="landing-feature-card" role="button" tabindex="0" onclick="showSection('internship-guide')" style="cursor:pointer;">
                             <div class="landing-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
                             <div class="landing-feature-title">Praktikumsleitfaden</div>
                             <p class="landing-feature-text">Rechte, Pflichten, Vergütung – alles Wichtige zum Pharmaziepraktikum, kompakt und aktuell gehalten.</p>
@@ -298,7 +298,7 @@
 						<option value="rating-asc">Aufsteigend nach Bewertung</option>
 						<option value="salary-desc">Absteigend nach Gehalt</option>
 						<option value="salary-asc">Aufsteigend nach Gehalt</option>
-						<option value="distance-asc" id="distance-sort-option" style="display: none;">Absteigend nach Entfernung</option>
+						<option value="distance-asc" id="distance-sort-option" style="display: none;">Aufsteigend nach Entfernung</option>
 						<option value="saturday-asc">Aufsteigend nach Samstagsarbeit</option>
 						<option value="saturday-desc">Absteigend nach Samstagsarbeit</option>
 					</select>
@@ -321,7 +321,7 @@
 					<form id="review-form">
                         <div class="form-group" style="margin-top: 1rem;">
                             <label>E-Mail-Adresse *</label>
-                            <input type="email" required id="reviewer-email" placeholder="deine.email@beispiel.de">
+                            <input type="email" required id="reviewer-email" placeholder="deine.email@beispiel.de" autocomplete="email">
                             <div class="verification-note">Deine E-Mail-Adresse wird nur zur Verwaltung der Bewertung verwendet und ist nicht öffentlich einsehbar.</div>
                         </div>
 
@@ -397,7 +397,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Monatliches Bruttogehalt (€) *</label>
-                                    <input type="number" required id="salary" placeholder="z.B. 1040" min="0">
+                                    <input type="number" required id="salary" placeholder="z.B. 1040" min="0" inputmode="numeric">
                                 </div>
                                 <div class="form-group">
                                     <label>Samstagsarbeit (x-mal im Monat)</label>
@@ -646,7 +646,7 @@
 									<button type="button" id="remove-file-btn" class="btn btn-secondary" onclick="removeSelectedFile()" style="display: none; margin-left: 1rem; padding: 0.25rem 0.75rem;">✕</button>
 								</div>
 								<small style="color: #666; display: block; margin-top: 0.5rem;">PDF oder Bilddatei zur Verifizierung Ihres Praktikums</small>
-								<p style="font-size: 0.85rem; color: var(--mid); margin-top: 0.75rem; line-height: 1.6;">Die Praktikumsbestätigung wird benötigt, um sicherzustellen, dass das bewertete Praktikum wirklich stattgefunden hat. Dadurch soll das Einreichen von Fake-Bewertungen, die den Eindruck über Unternehmen potentiell verschlechtern oder verbessern könnten, verhindert werden. Deine Praktikumsbestätigung ist nicht öffentlich einsehbar.</p>
+								<p style="font-size: 0.85rem; color: var(--mid); margin-top: 0.75rem; line-height: 1.6;">Die Praktikumsbestätigung wird benötigt, um sicherzustellen, dass das bewertete Praktikum wirklich stattgefunden hat. Dadurch soll das Einreichen von Fake-Bewertungen, die den Eindruck über Unternehmen potentiell verschlechtern oder verbessern könnten, verhindert werden. Deine Praktikumsbestätigung ist nicht öffentlich einsehbar. Sobald du deine Bewertung löschst, wird sie vollständig entfernt.</p>
 							</div>
 						</div>
 
@@ -1219,7 +1219,7 @@
 					<div class="form-group" style="margin-top: 2rem; padding: 1rem; background: transparent; border-radius: 8px;">
 						<label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin-bottom: 0;">
 							<input type="checkbox" id="job-terms-checkbox" required style="flex-shrink: 0; width: 18px; height: 18px; min-width: 18px; cursor: pointer; accent-color: var(--red);">
-							<span>Ich akzeptiere die <span style="text-decoration: underline; color: var(--red); cursor: pointer;" onclick="event.preventDefault(); showJobTermsModal();">Bedingungen für das Einreichen von Stellenangeboten</span>.</span>
+							<span>Ich akzeptiere die <span style="text-decoration: underline; color: var(--red); cursor: pointer;" onclick="event.preventDefault(); showJobTermsModal();">Bedingungen für das Einreichen von Stellenangeboten</span> und bin damit einverstanden, dass alle von mir angegebenen Kontaktdaten öffentlich auf PharmaFaro.de erscheinen.</span>
 						</label>
 					</div>
 
@@ -1868,6 +1868,13 @@
 			document.body.appendChild(toast);
 			setTimeout(() => toast?.remove(), duration);
 		}
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('[role="button"][tabindex="0"]')) {
+                e.preventDefault();
+                e.target.click();
+            }
+        });
 
 		function escapeHtml(str) {
 			if (!str) return '';
